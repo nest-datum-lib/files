@@ -21,15 +21,84 @@ export class SettingSeeder {
 		try {
 			// new transaction
 			await queryRunner.startTransaction();
-			await Bluebird.each([/*{
-				id: 'example',
-				name: 'Example',
-				description: 'Example description',
-				dataTypeId: 'text',
-				defaultValue: '',
-				value: '',
+			await Bluebird.each([{
+				id: 'data-type-setting-service-id',
+				name: 'Service id',
+				description: 'Service id in redis.',
+				dataTypeId: 'data-type-type-text',
+				value: process.env.SERVICE_ID || 'files1',
 				isNotDelete: true,
-			}*/], async (data) => {
+			}, {
+				id: 'data-type-setting-transport-provider',
+				name: 'Transport provider',
+				description: 'The name of the protocol for transporting data between services.',
+				dataTypeId: 'data-type-type-text',
+				value: process.env.TRANSPORT_PROVIDER,
+				isNotDelete: true,
+			}, {
+				id: 'data-type-setting-transport-host',
+				name: 'Service host',
+				description: 'Service IP address.',
+				dataTypeId: 'data-type-type-text',
+				value: process.env.TRANSPORT_HOST,
+				isNotDelete: true,
+			}, {
+				id: 'data-type-setting-transport-port',
+				name: 'Service port',
+				description: 'Service port.',
+				dataTypeId: 'data-type-type-integer',
+				value: process.env.TRANSPORT_PORT,
+				isNotDelete: true,
+			}, {
+				id: 'data-type-setting-cache-namespace',
+				name: 'Cache namespace',
+				description: 'Cache namespace.',
+				dataTypeId: 'data-type-type-text',
+				value: process.env.REDIS_CACHE_NAMESPACE,
+				isNotDelete: true,
+			}, {
+				id: 'data-type-setting-cache-host',
+				name: 'Cache host',
+				description: 'Cache IP address.',
+				dataTypeId: 'data-type-type-text',
+				value: process.env.REDIS_CACHE_HOST,
+				isNotDelete: true,
+			}, {
+				id: 'data-type-setting-cache-port',
+				name: 'Cache port',
+				description: 'Cache port.',
+				dataTypeId: 'data-type-type-integer',
+				value: process.env.REDIS_CACHE_PORT,
+				isNotDelete: true,
+			}, {
+				id: 'data-type-setting-cache-db',
+				name: 'Cache db',
+				description: 'Redis database number.',
+				dataTypeId: 'data-type-type-integer',
+				value: process.env.REDIS_CACHE_DB,
+				isNotDelete: true,
+			}, {
+				id: 'data-type-setting-cache-db',
+				name: 'Cache db',
+				description: 'Redis database number.',
+				dataTypeId: 'data-type-type-text',
+				value: process.env.REDIS_CACHE_PASSWORD,
+				isNotDelete: true,
+			}, {
+				id: 'data-type-setting-http-port',
+				name: 'HTTP port',
+				description: 'The port on which the HTTP api service will be launched.',
+				dataTypeId: 'data-type-type-integer',
+				value: process.env.HTTP_PORT,
+				isNotDelete: true,
+			}, {
+				id: 'data-type-setting-file-root',
+				name: 'File root folder',
+				description: 'Path to the root directory with files.',
+				dataTypeId: 'data-type-type-text',
+				value: process.env.ROOT_PATH,
+				isNotDelete: true,
+			}], async (data) => {
 				try {
 					await this.settingRepository.insert(data);
 				}
