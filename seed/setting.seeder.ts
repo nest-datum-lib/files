@@ -78,7 +78,7 @@ export class SettingSeeder {
 				value: process.env.REDIS_CACHE_DB,
 				isNotDelete: true,
 			}, {
-				id: 'files-setting-cache-db',
+				id: 'files-setting-cache-password',
 				name: 'Cache db',
 				description: 'Redis database number.',
 				dataTypeId: 'data-type-type-text',
