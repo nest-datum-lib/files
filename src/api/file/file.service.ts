@@ -335,7 +335,7 @@ export class FileService extends MysqlService {
 					});
 
 					fs.rename(destinationPath, newPath, async (err) => {
-						if (err) {
+						if (err) {							
 							return reject(new Error(err.message));
 						}
 						else {
