@@ -21,7 +21,7 @@ import { SystemOption } from './system-option.entity';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
 
 @Injectable()
-export class SystemSystemService extends SqlService {
+export class SystemOptionService extends SqlService {
 	constructor(
 		@InjectRepository(SystemOption) private readonly systemOptionRepository: Repository<SystemOption>,
 		@InjectRepository(SystemSystemOption) private readonly systemSystemOptionRepository: Repository<SystemSystemOption>,

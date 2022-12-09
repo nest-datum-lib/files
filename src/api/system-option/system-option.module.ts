@@ -18,7 +18,7 @@ import { SystemOptionController } from './system-option.controller';
 			SystemSystemOption, 
 		]),
 	],
-	Systems: [
+	providers: [
 		BalancerRepository, 
 		BalancerService,
 		CacheService,
