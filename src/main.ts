@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+import { v4 as uuidv4 } from 'uuid';
 import { NestFactory } from '@nestjs/core';
 import {
 	MicroserviceOptions,
