@@ -21,7 +21,6 @@ import { ProviderStatusController } from './provider-status.controller';
 			ProviderStatus, 
 		]),
 		CacheModule,
-		CacheService,
 	],
 	providers: [
 		BalancerRepository, 
