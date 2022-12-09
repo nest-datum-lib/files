@@ -94,21 +94,23 @@ export class SystemOptionService extends SqlService {
 		}
 	}
 
-	async drop(payload): Promise<any> {
+	async drop({ user, ...payload }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
-			const {
-				user,
-				...data
-			} = payload;
+			if (!payload
+				|| typeof payload !== 'object') {
+				payload = {
+					id: '',
+				};
+			}
 
 			await queryRunner.startTransaction();
 			await this.cacheService.clear([ 'system', 'option', 'many' ]);
-			await this.cacheService.clear([ 'system', 'option', 'one', data ]);
+			await this.cacheService.clear([ 'system', 'option', 'one', payload ]);
 
-			await this.systemSystemOptionRepository.delete({ providerOptionId: data['id'] });
-			await this.dropByIsDeleted(this.systemOptionRepository, data['id']);
+			await this.systemSystemOptionRepository.delete({ providerOptionId: payload['id'] });
+			await this.dropByIsDeleted(this.systemOptionRepository, payload['id']);
 
 			await queryRunner.commitTransaction();
 
@@ -118,31 +120,26 @@ export class SystemOptionService extends SqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...data });
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 		finally {
 			await queryRunner.release();
 		}
 	}
 
-	async dropMany(payload): Promise<any> {
+	async dropMany({ user, ...payload }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
-			const {
-				user,
-				...data
-			} = payload;
-			
 			await queryRunner.startTransaction();
 			await this.cacheService.clear([ 'system', 'option', 'many' ]);
-			await this.cacheService.clear([ 'system', 'option', 'one', data ]);
+			await this.cacheService.clear([ 'system', 'option', 'one', payload ]);
 
 			let i = 0;
 
-			while (i < data['ids'].length) {
-				await this.systemSystemOptionRepository.delete({ providerOptionId: data['ids'][i] });
-				await this.dropByIsDeleted(this.systemOptionRepository, data['ids'][i]);
+			while (i < (payload['ids'] || []).length) {
+				await this.systemSystemOptionRepository.delete({ providerOptionId: payload['ids'][i] });
+				await this.dropByIsDeleted(this.systemOptionRepository, payload['ids'][i]);
 				i++;
 			}
 			await queryRunner.commitTransaction();
@@ -153,7 +150,7 @@ export class SystemOptionService extends SqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...data });
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 		finally {
 			await queryRunner.release();
