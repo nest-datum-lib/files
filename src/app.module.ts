@@ -70,8 +70,7 @@ import { SettingModule as HttpSettingModule } from './http/setting.module';
 	],
 	controllers: [ AppController ],
 	providers: [ 
-		AppService,
-		LogsService, 
+		AppService, 
 	],
 })
 export class AppModule {

@@ -98,6 +98,11 @@ export class SystemOptionService extends SqlService {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
+			if (!payload
+				|| typeof payload === !'object') {
+				payload = {};
+			}
+
 			await queryRunner.startTransaction();
 			await this.cacheService.clear([ 'system', 'option', 'many' ]);
 			await this.cacheService.clear([ 'system', 'option', 'one', payload ]);
