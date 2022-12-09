@@ -11,7 +11,7 @@ import { SystemService } from './system.service';
 @Controller()
 export class SystemController {
 	constructor(
-		private readonly registryService: RegistryService,
+		private readonly systemService: SystemService,
 		private readonly balancerService: BalancerService,
 	) {
 	}

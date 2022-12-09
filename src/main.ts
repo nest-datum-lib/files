@@ -33,7 +33,7 @@ async function createApp() {
 	});
 
 	if (registred) {
-		await http.listen(Number(APP_HTTP_PORT), async () => {
+		await http.listen(Number(process.env.APP_HTTP_PORT), async () => {
 			console.log('HTTP service listening on port:', process.env.APP_HTTP_PORT);
 			console.log('Replica listening on port:', process.env.APP_PORT);
 

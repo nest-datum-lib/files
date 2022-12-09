@@ -8,7 +8,7 @@ import {
 	NextFunction, 
 } from 'express';
 import { BalancerService } from 'nest-datum/balancer/src';
-import { TrafficException } from 'nest-datum/exceptions';
+import { TrafficException } from 'nest-datum/exceptions/src';
 
 @Injectable()
 export class TrafficMiddleware implements NestMiddleware {

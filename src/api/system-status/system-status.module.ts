@@ -18,7 +18,7 @@ import { SystemStatusController } from './system-status.controller';
 			SystemStatus, 
 		]),
 	],
-	Systems: [
+	providers: [
 		BalancerRepository, 
 		BalancerService,
 		CacheService,
