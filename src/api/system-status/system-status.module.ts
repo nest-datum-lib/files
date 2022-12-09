@@ -4,7 +4,10 @@ import {
 	BalancerRepository,
 	BalancerService, 
 } from 'nest-datum/balancer/src';
-import { CacheService } from 'nest-datum/cache/src';
+import { 
+	CacheService,
+	CacheModule, 
+} from 'nest-datum/cache/src';
 import { System } from '../system/system.entity';
 import { SystemStatus } from './system-status.entity';
 import { SystemStatusService } from './system-status.service';
@@ -17,6 +20,8 @@ import { SystemStatusController } from './system-status.controller';
 			System,
 			SystemStatus, 
 		]),
+		CacheModule,
+		CacheService,
 	],
 	providers: [
 		BalancerRepository, 
