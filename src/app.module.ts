@@ -9,7 +9,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { typeormConfig } from 'config/typeorm';
 import { redisConfig } from 'config/redis';
-import { BalancerModule } from 'nest-datum/balancer/src'
+import { 
+	BalancerModule,
+	BalancerRepository,
+	BalancerService, 
+} from 'nest-datum/balancer/src';
 import { TokenMiddleware } from './token.middleware';
 import { TrafficMiddleware } from './traffic.middleware';
 import { AppController } from './app.controller';
@@ -70,6 +74,8 @@ import { SettingModule as HttpSettingModule } from './http/setting.module';
 	],
 	controllers: [ AppController ],
 	providers: [ 
+		BalancerRepository,
+		BalancerService, 
 		AppService, 
 	],
 })
