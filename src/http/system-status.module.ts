@@ -9,6 +9,7 @@ import {
 	BalancerRepository,
 	BalancerService, 
 } from 'nest-datum/balancer/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { SystemStatusController } from './system-status.controller';
 import { SystemStatusService } from '../api/system-status/system-status.service';
 import { System } from '../api/system/system.entity';
@@ -26,6 +27,7 @@ import { SystemStatus } from '../api/system-status/system-status.entity';
 		BalancerRepository,
 		BalancerService,
 		SystemStatusService,
+		CacheService,
 	],
 })
 export class SystemStatusModule implements NestModule {

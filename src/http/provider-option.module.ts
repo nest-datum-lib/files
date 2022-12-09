@@ -9,6 +9,7 @@ import {
 	BalancerRepository,
 	BalancerService, 
 } from 'nest-datum/balancer/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { ProviderOptionController } from './provider-option.controller';
 import { ProviderOptionService } from '../api/provider-option/provider-option.service';
 import { ProviderProviderProviderOption } from '../api/provider-provider-provider-option/provider-provider-provider-option.entity';
@@ -27,6 +28,7 @@ import { ProviderOption } from '../api/provider-option/provider-option.entity';
 	providers: [ 
 		BalancerRepository,
 		BalancerService,
+		CacheService,
 		ProviderOptionService,
 	],
 })

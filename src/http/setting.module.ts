@@ -9,6 +9,7 @@ import {
 	BalancerRepository,
 	BalancerService, 
 } from 'nest-datum/balancer/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { SettingController } from './setting.controller';
 import { SettingService } from '../api/setting/setting.service';
 import { Setting } from '../api/setting/setting.entity';
@@ -21,6 +22,7 @@ import { Setting } from '../api/setting/setting.entity';
 	providers: [ 
 		BalancerRepository,
 		BalancerService,
+		CacheService,
 		SettingService,
 	],
 })

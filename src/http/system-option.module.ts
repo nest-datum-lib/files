@@ -9,6 +9,7 @@ import {
 	BalancerRepository,
 	BalancerService, 
 } from 'nest-datum/balancer/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { SystemOptionController } from './system-option.controller';
 import { SystemOptionService } from '../api/system-option/system-option.service';
 import { SystemSystemSystemOption } from '../api/system-system-system-option/system-system-system-option.entity';
@@ -28,6 +29,7 @@ import { SystemOption } from '../api/system-option/system-option.entity';
 		BalancerRepository,
 		BalancerService,
 		SystemOptionService,
+		CacheService,
 	],
 })
 export class SystemOptionModule implements NestModule {

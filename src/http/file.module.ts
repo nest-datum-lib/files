@@ -9,6 +9,7 @@ import {
 	BalancerRepository,
 	BalancerService, 
 } from 'nest-datum/balancer/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { FileController } from './file.controller';
 import { FileService } from '../api/file/file.service';
 import { Folder } from '../api/folder/folder.entity';
@@ -25,6 +26,7 @@ import { File } from '../api/file/file.entity';
 	providers: [ 
 		BalancerRepository,
 		BalancerService,
+		CacheService,
 		FileService,
 	],
 })
