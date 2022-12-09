@@ -11,24 +11,21 @@ import {
 	Repository,
 	Connection, 
 } from 'typeorm';
+import { SqlService } from 'nest-datum/sql/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { 
-	MysqlService,
-	RegistryService,
-	LogsService,
-	CacheService, 
-} from '@nest-datum/services';
-import { ErrorException } from '@nest-datum/exceptions';
+	ErrorException,
+	NotFoundException, 
+} from 'nest-datum/exceptions/src';
 import { SystemOption } from './system-option.entity';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
 
 @Injectable()
-export class SystemOptionService extends MysqlService {
+export class SystemSystemService extends SqlService {
 	constructor(
 		@InjectRepository(SystemOption) private readonly systemOptionRepository: Repository<SystemOption>,
 		@InjectRepository(SystemSystemOption) private readonly systemSystemOptionRepository: Repository<SystemSystemOption>,
 		private readonly connection: Connection,
-		private readonly registryService: RegistryService,
-		private readonly logsService: LogsService,
 		private readonly cacheService: CacheService,
 	) {
 		super();
@@ -56,52 +53,56 @@ export class SystemOptionService extends MysqlService {
 		regex: true,
 	};
 
-	async many(payload): Promise<any> {
+	async many({ user, ...payload }): Promise<any> {
 		try {
-			const cachedData = await this.cacheService.get(`${process.env.APP_ID}.systemOption.many`, payload);
+			const cachedData = await this.cacheService.get([ 'system', 'option', 'many', payload ]);
 
 			if (cachedData) {
 				return cachedData;
 			}
 			const output = await this.systemOptionRepository.findAndCount(await this.findMany(payload));
 
-			await this.cacheService.set(`${process.env.APP_ID}.systemOption.many`, payload, output);
+			await this.cacheService.set([ 'system', 'option', 'many', payload ], output);
 			
 			return output;
 		}
 		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 		return [ [], 0 ];
 	}
 
-	async one(payload): Promise<any> {
+	async one({ user, ...payload }): Promise<any> {
 		try {
-			const cachedData = await this.cacheService.get(`${process.env.APP_ID}.systemOption.one`, payload);
+			const cachedData = await this.cacheService.get([ 'system', 'option', 'one', payload ]);
 
 			if (cachedData) {
 				return cachedData;
 			}
 			const output = await this.systemOptionRepository.findOne(await this.findOne(payload));
-
-			await this.cacheService.set(`${process.env.APP_ID}.systemOption.one`, payload, output);
-
+		
+			if (output) {
+				await this.cacheService.set([ 'system', 'option', 'one', payload ], output);
+			}
+			if (!output) {
+				return new NotFoundException('Entity is undefined', getCurrentLine(), { user, ...payload });
+			}
 			return output;
 		}
 		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 	}
 
-	async drop(payload): Promise<any> {
+	async drop({ user, ...payload }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.systemOption.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.systemOption.one`, payload);
+			await this.cacheService.clear([ 'system', 'option', 'many' ]);
+			await this.cacheService.clear([ 'system', 'option', 'one', payload ]);
 
-			await this.systemSystemOptionRepository.delete({ systemOptionId: payload['id'] });
+			await this.systemSystemOptionRepository.delete({ providerOptionId: payload['id'] });
 			await this.dropByIsDeleted(this.systemOptionRepository, payload['id']);
 
 			await queryRunner.commitTransaction();
@@ -112,25 +113,25 @@ export class SystemOptionService extends MysqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 		finally {
 			await queryRunner.release();
 		}
 	}
 
-	async dropMany(payload): Promise<any> {
+	async dropMany({ user, ...payload }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.systemOption.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.systemOption.one`, payload);
+			await this.cacheService.clear([ 'system', 'option', 'many' ]);
+			await this.cacheService.clear([ 'system', 'option', 'one', payload ]);
 
 			let i = 0;
 
 			while (i < payload['ids'].length) {
-				await this.systemSystemOptionRepository.delete({ systemOptionId: payload['ids'][i] });
+				await this.systemSystemOptionRepository.delete({ providerOptionId: payload['ids'][i] });
 				await this.dropByIsDeleted(this.systemOptionRepository, payload['ids'][i]);
 				i++;
 			}
@@ -142,7 +143,7 @@ export class SystemOptionService extends MysqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 		finally {
 			await queryRunner.release();
@@ -154,7 +155,7 @@ export class SystemOptionService extends MysqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.systemOption.many`);
+			await this.cacheService.clear([ 'system', 'option', 'many' ]);
 
 			const output = await this.systemOptionRepository.save({
 				...payload,
@@ -181,8 +182,8 @@ export class SystemOptionService extends MysqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.systemOption.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.systemOption.one`);
+			await this.cacheService.clear([ 'system', 'option', 'many' ]);
+			await this.cacheService.clear([ 'system', 'option', 'one' ]);
 			
 			await this.updateWithId(this.systemOptionRepository, payload);
 			

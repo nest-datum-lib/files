@@ -10,21 +10,17 @@ import {
 	Query,
 	HttpException,
 } from '@nestjs/common';
-import * as Validators from '@nest-datum/validators';
-import { AccessToken } from '@nest-datum/common';
-import { 
-	RegistryService,
-	LogsService, 
-} from '@nest-datum/services';
+import { AccessToken } from 'nest-datum/common/src';
+import { BalancerService } from 'nest-datum/balancer/src';
+import * as Validators from 'nest-datum/validators/src';
 import { ProviderService } from '../api/provider/provider.service';
 
 @ApiTags(`[ ${process.env.SERVICE_FILES} ] Sysytem provider`)
 @Controller(`provider`)
 export class ProviderController {
 	constructor(
-		private readonly registryService: RegistryService,
-		private readonly logsService: LogsService,
 		private readonly providerService: ProviderService,
+		private readonly balancerService: BalancerService,
 	) {
 	}
 
@@ -42,12 +38,8 @@ export class ProviderController {
 		try {
 			const many = await this.providerService.many({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_PROVIDER_MANY'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				relations: Validators.obj('relations', relations),
 				select: Validators.obj('select', select),
@@ -73,7 +65,7 @@ export class ProviderController {
 			};
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -89,12 +81,8 @@ export class ProviderController {
 		try {
 			const output = await this.providerService.one({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_PROVIDER_ONE'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				relations: Validators.obj('relations', relations),
 				select: Validators.obj('select', select),
@@ -106,7 +94,7 @@ export class ProviderController {
 			return output;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -120,12 +108,8 @@ export class ProviderController {
 		try {
 			await this.providerService.drop({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_PROVIDER_DROP'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id, {
 					isRequired: true,
@@ -135,7 +119,7 @@ export class ProviderController {
 			return true;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -149,12 +133,8 @@ export class ProviderController {
 		try {
 			await this.providerService.dropMany({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_PROVIDER_DROP_MANY'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				ids: Validators.arr('ids', ids, {
 					isRequired: true,
@@ -165,7 +145,7 @@ export class ProviderController {
 			return true;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -180,12 +160,8 @@ export class ProviderController {
 		try {
 			await this.providerService.dropOption({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_PROVIDER_DROP_OPTION'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id, {
 					isRequired: true,
@@ -195,7 +171,7 @@ export class ProviderController {
 			return true;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -214,12 +190,8 @@ export class ProviderController {
 		try {
 			const output = await this.providerService.create({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_PROVIDER_CREATE'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id),
 				userId: Validators.id('userId', userId),
@@ -241,7 +213,7 @@ export class ProviderController {
 			return output;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -257,12 +229,8 @@ export class ProviderController {
 		try {
 			const output = await this.providerService.createOption({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_PROVIDER_CREATE_OPTION'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id),
 				optionId: Validators.id('optionId', optionId, {
@@ -274,7 +242,7 @@ export class ProviderController {
 			return output;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -289,12 +257,8 @@ export class ProviderController {
 		try {
 			const output = await this.providerService.createOptions({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_PROVIDER_CREATE_OPTIONS'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id),
 				data: Validators.arr('data', data, {
@@ -305,7 +269,7 @@ export class ProviderController {
 			return output;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -327,12 +291,8 @@ export class ProviderController {
 		try {
 			await this.providerService.update({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_PROVIDER_UPDATE'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id),
 				newId: Validators.id('newId', newId),
@@ -354,7 +314,7 @@ export class ProviderController {
 			return true;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}

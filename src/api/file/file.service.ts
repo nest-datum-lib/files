@@ -13,24 +13,21 @@ import {
 	Repository,
 	Connection, 
 } from 'typeorm';
+import { SqlService } from 'nest-datum/sql/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { 
-	MysqlService,
-	RegistryService,
-	LogsService,
-	CacheService, 
-} from '@nest-datum/services';
-import { ErrorException } from '@nest-datum/exceptions';
+	ErrorException,
+	NotFoundException, 
+} from 'nest-datum/exceptions/src';
 import { Folder } from '../folder/folder.entity';
 import { File } from './file.entity';
 
 @Injectable()
-export class FileService extends MysqlService {
+export class FileService extends SqlService {
 	constructor(
 		@InjectRepository(Folder) private readonly folderRepository: Repository<Folder>,
 		@InjectRepository(File) private readonly fileRepository: Repository<File>,
 		private readonly connection: Connection,
-		private readonly registryService: RegistryService,
-		private readonly logsService: LogsService,
 		private readonly cacheService: CacheService,
 	) {
 		super();
@@ -59,56 +56,60 @@ export class FileService extends MysqlService {
 		type: true,
 	};
 
-	async many(payload): Promise<any> {
+	async many({ user, ...payload }): Promise<any> {
 		try {
-			const cachedData = await this.cacheService.get(`${process.env.APP_ID}.file.many`, payload);
+			const cachedData = await this.cacheService.get([ 'file', 'many', payload ]);
 
 			if (cachedData) {
 				return cachedData;
 			}
 			const output = await this.fileRepository.findAndCount(await this.findMany(payload));
 
-			await this.cacheService.set(`${process.env.APP_ID}.file.many`, payload, output);
+			await this.cacheService.set([ 'file', 'many', payload ], output);
 			
 			return output;
 		}
 		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 		return [ [], 0 ];
 	}
 
-	async one(payload): Promise<any> {
+	async one({ user, ...payload }): Promise<any> {
 		try {
-			const cachedData = await this.cacheService.get(`${process.env.APP_ID}.file.one`, payload);
+			const cachedData = await this.cacheService.get([ 'file', 'one', payload ]);
 
 			if (cachedData) {
 				return cachedData;
 			}
 			const output = await this.fileRepository.findOne(await this.findOne(payload));
 		
-			await this.cacheService.set(`${process.env.APP_ID}.file.one`, payload, output);
-
+			if (output) {
+				await this.cacheService.set([ 'file', 'one', payload ], output);
+			}
+			if (!output) {
+				return new NotFoundException('Entity is undefined', getCurrentLine(), { user, ...payload });
+			}
 			return output;
 		}
 		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 	}
 
-	async drop(payload): Promise<any> {
+	async drop({ user, ...payload }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.file.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.file.one`, payload);
+			await this.cacheService.clear([ 'file', 'many' ]);
+			await this.cacheService.clear([ 'file', 'one', payload ]);
 
 			const file = await this.dropByIsDeleted(this.fileRepository, payload['id']);
 
 			if (file['isDeleted']) {
 				await (new Promise((resolve, reject) => {
-					fs.unlink(`${process.env.ROOT_PATH}/${file['path']}`, async (err) => {
+					fs.unlink(`${process.env.APP_ROOT_PATH}/${file['path']}`, async (err) => {
 						if (err) {
 							return reject(new Error(err.message));
 						}
@@ -126,20 +127,20 @@ export class FileService extends MysqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 		finally {
 			await queryRunner.release();
 		}
 	}
 
-	async dropMany(payload): Promise<any> {
+	async dropMany({ user, ...payload }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.file.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.file.one`, payload);
+			await this.cacheService.clear([ 'file', 'many' ]);
+			await this.cacheService.clear([ 'file', 'one', payload ]);
 
 			let i = 0;
 
@@ -147,7 +148,7 @@ export class FileService extends MysqlService {
 				const file = await this.dropByIsDeleted(this.fileRepository, payload['ids'][i]);
 			
 				await (new Promise((resolve, reject) => {
-					fs.unlink(`${process.env.ROOT_PATH}/${file['path']}`, async (err) => {
+					fs.unlink(`${process.env.APP_ROOT_PATH}/${file['path']}`, async (err) => {
 						if (err) {
 							return reject(new Error(err.message));
 						}
@@ -166,7 +167,7 @@ export class FileService extends MysqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 		finally {
 			await queryRunner.release();
@@ -178,9 +179,9 @@ export class FileService extends MysqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.folder.one`);
-			await this.cacheService.clear(`${process.env.APP_ID}.folder.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.file.many`);
+			await this.cacheService.clear([ 'folder', 'one' ]);
+			await this.cacheService.clear([ 'folder', 'many' ]);
+			await this.cacheService.clear([ 'file', 'many' ]);
 
 			const parentFolder = await this.folderRepository.findOne({
 				select: {
@@ -219,13 +220,13 @@ export class FileService extends MysqlService {
 					});
 
 					output.push(file);
-					fs.createWriteStream(`${process.env.ROOT_PATH}/${parentFolder['path']}/${fileName}`).write(buffer);
+					fs.createWriteStream(`${process.env.APP_ROOT_PATH}/${parentFolder['path']}/${fileName}`).write(buffer);
 					i++;
 				}
 				await (new Promise(async (resolve, reject) => {
-					fs.exists(`${process.env.ROOT_PATH}/${parentFolder['path']}`, async (existsFlag) => {
+					fs.exists(`${process.env.APP_ROOT_PATH}/${parentFolder['path']}`, async (existsFlag) => {
 						if (existsFlag) {
-							fs.mkdir(`${process.env.ROOT_PATH}/${parentFolder['path']}`, { recursive: true }, async (err) => {
+							fs.mkdir(`${process.env.APP_ROOT_PATH}/${parentFolder['path']}`, { recursive: true }, async (err) => {
 								if (err) {
 									return reject(new Error(err.message));
 								}
@@ -261,10 +262,10 @@ export class FileService extends MysqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.folder.one`);
-			await this.cacheService.clear(`${process.env.APP_ID}.folder.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.file.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.file.one`);
+			await this.cacheService.clear([ 'folder', 'one' ]);
+			await this.cacheService.clear([ 'folder', 'many' ]);
+			await this.cacheService.clear([ 'file', 'many' ]);
+			await this.cacheService.clear([ 'file', 'one' ]);
 			
 			const file = await this.fileRepository.findOne({ 
 				select: {
@@ -289,20 +290,20 @@ export class FileService extends MysqlService {
 					path: `${payload['path']}/${file['name']}`,
 				});
 				await (new Promise((resolve, reject) => {
-					fs.exists(`${process.env.ROOT_PATH}/${newPath}`, async (existsFlag) => {
+					fs.exists(`${process.env.APP_ROOT_PATH}/${newPath}`, async (existsFlag) => {
 						if (existsFlag) {
 							let fileName = payload['name'] || file['name'];
 
-							fs.exists(`${process.env.ROOT_PATH}/${newPath}/${fileName}`, async (existsFlag) => {
+							fs.exists(`${process.env.APP_ROOT_PATH}/${newPath}/${fileName}`, async (existsFlag) => {
 								if (existsFlag) {
 									fileName = `(copy ${uuidv4()}) - ${fileName}`;
 								}
-								fs.copyFile(`${process.env.ROOT_PATH}/${newPath}/${file['name']}`, `${process.env.ROOT_PATH}/${newPath}/${fileName}`, async (err) => {
+								fs.copyFile(`${process.env.APP_ROOT_PATH}/${newPath}/${file['name']}`, `${process.env.APP_ROOT_PATH}/${newPath}/${fileName}`, async (err) => {
 									if (err) {
 										return reject(new Error(err.message));
 									}
 									else {
-										fs.unlink(`${process.env.ROOT_PATH}/${newPath}/${file['name']}`, async (err) => {
+										fs.unlink(`${process.env.APP_ROOT_PATH}/${newPath}/${file['name']}`, async (err) => {
 											if (err) {
 												return reject(new Error(err.message));
 											}
@@ -326,8 +327,8 @@ export class FileService extends MysqlService {
 				&& (payload['path'] === file['path']
 					|| typeof payload['path'] !== 'string')) {
 				await (new Promise(async (resolve, reject) => {
-					const destinationPath = `${process.env.ROOT_PATH}${file['parent']['path']}/${file['name']}`;
-					const newPath = `${process.env.ROOT_PATH}${file['parent']['path']}/${payload['name']}`;
+					const destinationPath = `${process.env.APP_ROOT_PATH}${file['parent']['path']}/${file['name']}`;
+					const newPath = `${process.env.APP_ROOT_PATH}${file['parent']['path']}/${payload['name']}`;
 
 					await this.updateWithId(this.fileRepository, {
 						id: payload['id'],

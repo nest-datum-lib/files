@@ -15,24 +15,21 @@ import {
 	Connection, 
 	Like,
 } from 'typeorm';
+import { SqlService } from 'nest-datum/sql/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { 
-	MysqlService,
-	RegistryService,
-	LogsService,
-	CacheService, 
-} from '@nest-datum/services';
-import { ErrorException } from '@nest-datum/exceptions';
+	ErrorException,
+	NotFoundException, 
+} from 'nest-datum/exceptions/src';
 import { File } from '../file/file.entity';
 import { Folder } from './folder.entity';
 
 @Injectable()
-export class FolderService extends MysqlService {
+export class FolderService extends SqlService {
 	constructor(
 		@InjectRepository(Folder) private readonly folderRepository: Repository<Folder>,
 		@InjectRepository(File) private readonly fileRepository: Repository<File>,
 		private readonly connection: Connection,
-		private readonly registryService: RegistryService,
-		private readonly logsService: LogsService,
 		private readonly cacheService: CacheService,
 	) {
 		super();
@@ -58,50 +55,54 @@ export class FolderService extends MysqlService {
 		description: true,
 	};
 
-	async many(payload): Promise<any> {
+	async many({ user, ...payload }): Promise<any> {
 		try {
-			const cachedData = await this.cacheService.get(`${process.env.APP_ID}.folder.many`, payload);
+			const cachedData = await this.cacheService.get([ 'folder', 'many', payload ]);
 
 			if (cachedData) {
 				return cachedData;
 			}
 			const output = await this.folderRepository.findAndCount(await this.findMany(payload));
 
-			await this.cacheService.set(`${process.env.APP_ID}.folder.many`, payload, output);
+			await this.cacheService.set([ 'folder', 'many', payload ], output);
 			
 			return output;
 		}
 		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 		return [ [], 0 ];
 	}
 
-	async one(payload): Promise<any> {
+	async one({ user, ...payload }): Promise<any> {
 		try {
-			const cachedData = await this.cacheService.get(`${process.env.APP_ID}.folder.one`, payload);
+			const cachedData = await this.cacheService.get([ 'folder', 'one', payload ]);
 
 			if (cachedData) {
 				return cachedData;
 			}
 			const output = await this.folderRepository.findOne(await this.findOne(payload));
 		
-			await this.cacheService.set(`${process.env.APP_ID}.folder.one`, payload, output);
-
+			if (output) {
+				await this.cacheService.set([ 'folder', 'one', payload ], output);
+			}
+			if (!output) {
+				return new NotFoundException('Entity is undefined', getCurrentLine(), { user, ...payload });
+			}
 			return output;
 		}
 		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 	}
 
-	async drop(payload): Promise<any> {
+	async drop({ user, ...payload }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.folder.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.folder.one`, payload);
+			await this.cacheService.clear([ 'folder', 'many' ]);
+			await this.cacheService.clear([ 'folder', 'one', payload ]);
 
 			const folder = await this.dropByIsDeleted(this.folderRepository, payload['id'], async (folder) => {
 				const filderChildItems = await this.folderRepository.find({
@@ -123,7 +124,7 @@ export class FolderService extends MysqlService {
 			
 			if (folder['isDeleted']) {
 				await (new Promise((resolve, reject) => {
-					fs.rmdir(`${process.env.ROOT_PATH}${folder['path']}`, { recursive: true }, async (err) => {
+					fs.rmdir(`${process.env.APP_ROOT_PATH}${folder['path']}`, { recursive: true }, async (err) => {
 						if (err) {
 							return reject(new Error(err.message));
 						}
@@ -141,20 +142,20 @@ export class FolderService extends MysqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 		finally {
 			await queryRunner.release();
 		}
 	}
 
-	async dropMany(payload): Promise<any> {
+	async dropMany({ user, ...payload }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.folder.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.folder.one`, payload);
+			await this.cacheService.clear([ 'folder', 'many' ]);
+			await this.cacheService.clear([ 'folder', 'one', payload ]);
 
 			let i = 0;
 
@@ -177,7 +178,7 @@ export class FolderService extends MysqlService {
 					}
 				});
 				await (new Promise((resolve, reject) => {
-					fs.remove(`${process.env.ROOT_PATH}/${folder['path']}`, async (err) => {
+					fs.remove(`${process.env.APP_ROOT_PATH}/${folder['path']}`, async (err) => {
 						if (err) {
 							return reject(new Error(err.message));
 						}
@@ -196,7 +197,7 @@ export class FolderService extends MysqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 		finally {
 			await queryRunner.release();
@@ -208,7 +209,7 @@ export class FolderService extends MysqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.folder.many`);
+			await this.cacheService.clear([ 'folder', 'many' ]);
 
 			const parentFolder = await this.folderRepository.findOne({
 				select: {
@@ -240,7 +241,7 @@ export class FolderService extends MysqlService {
 			else {
 				throw new Error(`Parent folder is not exists.`);
 			}
-			const destinationPath = '/'+ (`${process.env.ROOT_PATH}/${parentFolder['path']}/${payload['name']}`);
+			const destinationPath = '/'+ (`${process.env.APP_ROOT_PATH}/${parentFolder['path']}/${payload['name']}`);
 
 			await (new Promise(async (resolve, reject) => {
 				fs.exists(destinationPath, async (existsFlag) => {
@@ -284,8 +285,8 @@ export class FolderService extends MysqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.folder.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.folder.one`);
+			await this.cacheService.clear([ 'folder', 'many' ]);
+			await this.cacheService.clear([ 'folder', 'one' ]);
 
 			const currentFolder = await this.folderRepository.findOne({ 
 				select: {
@@ -344,20 +345,20 @@ export class FolderService extends MysqlService {
 				}
 
 				await (new Promise((resolve, reject) => {
-					fs.exists(`${process.env.ROOT_PATH}/${newPath}`, async (existsFlag) => {
+					fs.exists(`${process.env.APP_ROOT_PATH}/${newPath}`, async (existsFlag) => {
 						if (existsFlag) {
 							let folderName = payload['name'] || currentFolder['name'];
 
-							fs.exists(`${process.env.ROOT_PATH}/${newPath}/${folderName}`, async (existsFlag) => {
+							fs.exists(`${process.env.APP_ROOT_PATH}/${newPath}/${folderName}`, async (existsFlag) => {
 								if (existsFlag) {
 									folderName = `(copy ${uuidv4()}) - ${folderName}`;
 								}
-								fs.cp(`${process.env.ROOT_PATH}/${newPath}/${currentFolder['name']}`, `${process.env.ROOT_PATH}/${newPath}/${folderName}`, { recursive: true }, async (err) => {
+								fs.cp(`${process.env.APP_ROOT_PATH}/${newPath}/${currentFolder['name']}`, `${process.env.APP_ROOT_PATH}/${newPath}/${folderName}`, { recursive: true }, async (err) => {
 									if (err) {
 										return reject(new Error(err.message));
 									}
 									else {
-										fs.rmdir(`${process.env.ROOT_PATH}/${newPath}/${currentFolder['name']}`, { recursive: true }, async (err) => {
+										fs.rmdir(`${process.env.APP_ROOT_PATH}/${newPath}/${currentFolder['name']}`, { recursive: true }, async (err) => {
 											if (err) {
 												return reject(new Error(err.message));
 											}
@@ -424,8 +425,8 @@ export class FolderService extends MysqlService {
 				}
 
 				await (new Promise((resolve, reject) => {
-					const sourcePath = `${process.env.ROOT_PATH}${currentFolder['path']}`;
-					const destinationPath = `${process.env.ROOT_PATH}${newPath}`;
+					const sourcePath = `${process.env.APP_ROOT_PATH}${currentFolder['path']}`;
+					const destinationPath = `${process.env.APP_ROOT_PATH}${newPath}`;
 
 					fs.rename(sourcePath, destinationPath, async (err) => {
 						if (err) {

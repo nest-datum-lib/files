@@ -6,10 +6,9 @@ import {
 	RequestMethod,
 } from '@nestjs/common';
 import { 
-	RegistryService,
-	LogsService, 
-	CacheService,
-} from '@nest-datum/services';
+	BalancerRepository,
+	BalancerService, 
+} from 'nest-datum/balancer/src';
 import { SystemOptionController } from './system-option.controller';
 import { SystemOptionService } from '../api/system-option/system-option.service';
 import { SystemSystemSystemOption } from '../api/system-system-system-option/system-system-system-option.entity';
@@ -26,9 +25,8 @@ import { SystemOption } from '../api/system-option/system-option.entity';
 	],
 	controllers: [ SystemOptionController ],
 	providers: [ 
-		RegistryService,
-		LogsService,
-		CacheService,
+		BalancerRepository,
+		BalancerService,
 		SystemOptionService,
 	],
 })

@@ -11,22 +11,19 @@ import {
 	Repository,
 	Connection, 
 } from 'typeorm';
+import { SqlService } from 'nest-datum/sql/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { 
-	MysqlService,
-	RegistryService,
-	LogsService,
-	CacheService, 
-} from '@nest-datum/services';
-import { ErrorException } from '@nest-datum/exceptions';
+	ErrorException,
+	NotFoundException, 
+} from 'nest-datum/exceptions/src';
 import { ProviderStatus } from './provider-status.entity';
 
 @Injectable()
-export class ProviderStatusService extends MysqlService {
+export class ProviderStatusService extends SqlService {
 	constructor(
 		@InjectRepository(ProviderStatus) private readonly providerStatusRepository: Repository<ProviderStatus>,
 		private readonly connection: Connection,
-		private readonly registryService: RegistryService,
-		private readonly logsService: LogsService,
 		private readonly cacheService: CacheService,
 	) {
 		super();
@@ -49,65 +46,69 @@ export class ProviderStatusService extends MysqlService {
 		description: true,
 	};
 
-	async many(payload): Promise<any> {
+	async many({ user, ...payload }): Promise<any> {
 		try {
-			const cachedData = await this.cacheService.get(`${process.env.APP_ID}.providerStatus.many`, payload);
+			const cachedData = await this.cacheService.get([ 'provider', 'status', 'many', payload ]);
 
 			if (cachedData) {
 				return cachedData;
 			}
 			const output = await this.providerStatusRepository.findAndCount(await this.findMany(payload));
 
-			await this.cacheService.set(`${process.env.APP_ID}.providerStatus.many`, payload, output);
+			await this.cacheService.set([ 'provider', 'status', 'many', payload ], output);
 			
 			return output;
 		}
 		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 
 		return [ [], 0 ];
 	}
 
-	async one(payload): Promise<any> {
+	async one({ user, ...payload }): Promise<any> {
 		try {
-			const cachedData = await this.cacheService.get(`${process.env.APP_ID}.providerStatus.one`, payload);
+			const cachedData = await this.cacheService.get([ 'provider', 'status', 'one', payload ]);
 
 			if (cachedData) {
 				return cachedData;
 			}
 			const output = await this.providerStatusRepository.findOne(await this.findOne(payload));
-		
-			await this.cacheService.set(`${process.env.APP_ID}.providerStatus.one`, payload, output);
 
+			if (output) {
+				await this.cacheService.set([ 'provider', 'status', 'one', payload ], output);
+			}
+			if (!output) {
+				return new NotFoundException('Entity is undefined', getCurrentLine(), { user, ...payload });
+			}
 			return output;
 		}
 		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 	}
 
-	async drop(payload): Promise<any> {
+	async drop({ user, ...payload }): Promise<any> {
 		try {
-			await this.cacheService.clear(`${process.env.APP_ID}.providerStatus.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.providerStatus.one`, payload);
+			await this.cacheService.clear([ 'provider', 'status', 'many' ]);
+			await this.cacheService.clear([ 'provider', 'status', 'one', payload ]);
 
 			await this.dropByIsDeleted(this.providerStatusRepository, payload['id']);
-
+			
 			return true;
 		}
 		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 	}
 
-	async dropMany(payload): Promise<any> {
+	async dropMany({ user, ...payload }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.providerStatus.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.providerStatus.one`, payload);
+			await this.cacheService.clear([ 'provider', 'status', 'many' ]);
+			await this.cacheService.clear([ 'provider', 'status', 'one', payload ]);
 
 			let i = 0;
 
@@ -123,7 +124,7 @@ export class ProviderStatusService extends MysqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), payload);
+			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
 		}
 		finally {
 			await queryRunner.release();
@@ -135,7 +136,7 @@ export class ProviderStatusService extends MysqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.providerStatus.many`);
+			await this.cacheService.clear([ 'provider', 'status', 'many' ]);
 
 			const output = await this.providerStatusRepository.save({
 				...payload,
@@ -162,8 +163,8 @@ export class ProviderStatusService extends MysqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear(`${process.env.APP_ID}.providerStatus.many`);
-			await this.cacheService.clear(`${process.env.APP_ID}.providerStatus.one`);
+			await this.cacheService.clear([ 'provider', 'status', 'many' ]);
+			await this.cacheService.clear([ 'provider', 'status', 'one' ]);
 			
 			await this.updateWithId(this.providerStatusRepository, payload);
 			

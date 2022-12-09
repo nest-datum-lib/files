@@ -5,8 +5,10 @@ import { Provider } from '../provider/provider.entity';
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([ ProviderProviderOption ]),
-		TypeOrmModule.forFeature([ Provider ]),
+		TypeOrmModule.forFeature([ 
+			ProviderProviderOption,
+			Provider, 
+		]),
 	],
 })
 export class ProviderProviderProviderOptionModule {

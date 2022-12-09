@@ -10,21 +10,17 @@ import {
 	Query,
 	HttpException,
 } from '@nestjs/common';
-import * as Validators from '@nest-datum/validators';
-import { AccessToken } from '@nest-datum/common';
-import { 
-	RegistryService,
-	LogsService, 
-} from '@nest-datum/services';
+import { AccessToken } from 'nest-datum/common/src';
+import { BalancerService } from 'nest-datum/balancer/src';
+import * as Validators from 'nest-datum/validators/src';
 import { SystemService } from '../api/system/system.service';
 
 @ApiTags(`[ ${process.env.SERVICE_FILES} ] File system`)
 @Controller(`system`)
 export class SystemController {
 	constructor(
-		private readonly registryService: RegistryService,
-		private readonly logsService: LogsService,
 		private readonly systemService: SystemService,
+		private readonly balancerService: BalancerService,
 	) {
 	}
 
@@ -42,12 +38,8 @@ export class SystemController {
 		try {
 			const many = await this.systemService.many({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SYSTEM_MANY'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				relations: Validators.obj('relations', relations),
 				select: Validators.obj('select', select),
@@ -73,7 +65,7 @@ export class SystemController {
 			};
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -89,12 +81,8 @@ export class SystemController {
 		try {
 			const output = await this.systemService.one({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SYSTEM_ONE'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				relations: Validators.obj('relations', relations),
 				select: Validators.obj('select', select),
@@ -106,7 +94,7 @@ export class SystemController {
 			return output;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -120,12 +108,8 @@ export class SystemController {
 		try {
 			await this.systemService.drop({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SYSTEM_DROP'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id, {
 					isRequired: true,
@@ -135,7 +119,7 @@ export class SystemController {
 			return true;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -149,12 +133,8 @@ export class SystemController {
 		try {
 			await this.systemService.dropMany({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SYSTEM_DROP_MANY'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				ids: Validators.arr('ids', ids, {
 					isRequired: true,
@@ -165,7 +145,7 @@ export class SystemController {
 			return true;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -180,12 +160,8 @@ export class SystemController {
 		try {
 			await this.systemService.dropOption({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SYSTEM_DROP_OPTION'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id, {
 					isRequired: true,
@@ -195,7 +171,7 @@ export class SystemController {
 			return true;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -215,12 +191,8 @@ export class SystemController {
 		try {
 			const output = await this.systemService.create({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SYSTEM_CREATE'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id),
 				userId: Validators.id('userId', userId),
@@ -245,7 +217,7 @@ export class SystemController {
 			return output;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -261,12 +233,8 @@ export class SystemController {
 		try {
 			const output = await this.systemService.createOption({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SYSTEM_CREATE_OPTION'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id),
 				optionId: Validators.id('optionId', optionId, {
@@ -278,7 +246,7 @@ export class SystemController {
 			return output;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -293,12 +261,8 @@ export class SystemController {
 		try {
 			const output = await this.systemService.createOptions({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SYSTEM_CREATE_OPTIONS'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id),
 				data: Validators.arr('data', data, {
@@ -309,7 +273,7 @@ export class SystemController {
 			return output;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -332,12 +296,8 @@ export class SystemController {
 		try {
 			await this.systemService.update({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SYSTEM_UPDATE'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id),
 				newId: Validators.id('newId', newId),
@@ -362,7 +322,7 @@ export class SystemController {
 			return true;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}

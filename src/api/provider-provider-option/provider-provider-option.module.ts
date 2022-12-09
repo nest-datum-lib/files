@@ -6,9 +6,11 @@ import { Provider } from '../provider/provider.entity';
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([ ProviderProviderProviderOption ]),
-		TypeOrmModule.forFeature([ ProviderOption ]),
-		TypeOrmModule.forFeature([ Provider ]),
+		TypeOrmModule.forFeature([ 
+			ProviderProviderProviderOption,
+			ProviderOption,
+			Provider, 
+		]),
 	],
 })
 export class ProviderProviderOptionModule {

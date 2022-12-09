@@ -10,21 +10,17 @@ import {
 	Query,
 	HttpException,
 } from '@nestjs/common';
-import * as Validators from '@nest-datum/validators';
-import { AccessToken } from '@nest-datum/common';
-import { 
-	RegistryService,
-	LogsService, 
-} from '@nest-datum/services';
+import { AccessToken } from 'nest-datum/common/src';
+import { BalancerService } from 'nest-datum/balancer/src';
+import * as Validators from 'nest-datum/validators/src';
 import { SettingService } from '../api/setting/setting.service';
 
 @ApiTags(`[ ${process.env.SERVICE_DATA_TYPE} ] Settings`)
 @Controller(`setting`)
 export class SettingController {
 	constructor(
-		private readonly registryService: RegistryService,
-		private readonly logsService: LogsService,
 		private readonly settingService: SettingService,
+		private readonly balancerService: BalancerService,
 	) {
 	}
 
@@ -42,12 +38,8 @@ export class SettingController {
 		try {
 			const many = await this.settingService.many({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SETTING_MANY'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				relations: Validators.obj('relations', relations),
 				select: Validators.obj('select', select),
@@ -73,7 +65,7 @@ export class SettingController {
 			};
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -89,12 +81,8 @@ export class SettingController {
 		try {
 			const output = await this.settingService.one({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SETTING_ONE'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				relations: Validators.obj('relations', relations),
 				select: Validators.obj('select', select),
@@ -106,7 +94,7 @@ export class SettingController {
 			return output;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -120,12 +108,8 @@ export class SettingController {
 		try {
 			await this.settingService.drop({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SETTING_DROP'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id, {
 					isRequired: true,
@@ -135,7 +119,7 @@ export class SettingController {
 			return true;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -149,12 +133,8 @@ export class SettingController {
 		try {
 			await this.settingService.dropMany({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SETTING_DROP_MANY'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				ids: Validators.arr('ids', ids, {
 					isRequired: true,
@@ -165,7 +145,7 @@ export class SettingController {
 			return true;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -186,12 +166,8 @@ export class SettingController {
 		try {
 			const output = await this.settingService.create({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SETTING_CREATE'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id),
 				userId: Validators.id('userId', userId),
@@ -217,7 +193,7 @@ export class SettingController {
 			return output;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
@@ -241,12 +217,8 @@ export class SettingController {
 		try {
 			await this.settingService.update({
 				user: Validators.token('accessToken', accessToken, {
-					secret: process.env.JWT_SECRET_ACCESS_KEY,
-					timeout: process.env.JWT_ACCESS_TIMEOUT,
+					accesses: [ process['ACCESS_FILES_SETTING_UPDATE'] ],
 					isRequired: true,
-					role: {
-						name: [ 'Admin' ],
-					},
 				}),
 				id: Validators.id('id', id),
 				newId: Validators.id('newId', newId),
@@ -271,7 +243,7 @@ export class SettingController {
 			return true;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.log(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}

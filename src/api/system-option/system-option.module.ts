@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { 
-	RegistryService,
-	LogsService,
-	CacheService,
-} from '@nest-datum/services';
-import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
+	BalancerRepository,
+	BalancerService, 
+} from 'nest-datum/balancer/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
 import { SystemOption } from './system-option.entity';
 import { SystemOptionService } from './system-option.service';
@@ -16,13 +15,12 @@ import { SystemOptionController } from './system-option.controller';
 	imports: [
 		TypeOrmModule.forFeature([ 
 			SystemOption,
-			SystemSystemOption,
-			SystemSystemSystemOption, 
+			SystemSystemOption, 
 		]),
 	],
-	providers: [
-		RegistryService, 
-		LogsService,
+	Systems: [
+		BalancerRepository, 
+		BalancerService,
 		CacheService,
 		SystemOptionService, 
 	],

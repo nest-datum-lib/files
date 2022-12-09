@@ -6,10 +6,9 @@ import {
 	RequestMethod,
 } from '@nestjs/common';
 import { 
-	RegistryService,
-	LogsService, 
-	CacheService,
-} from '@nest-datum/services';
+	BalancerRepository,
+	BalancerService, 
+} from 'nest-datum/balancer/src';
 import { FileController } from './file.controller';
 import { FileService } from '../api/file/file.service';
 import { Folder } from '../api/folder/folder.entity';
@@ -24,9 +23,8 @@ import { File } from '../api/file/file.entity';
 	],
 	controllers: [ FileController ],
 	providers: [ 
-		RegistryService,
-		LogsService,
-		CacheService,
+		BalancerRepository,
+		BalancerService,
 		FileService,
 	],
 })

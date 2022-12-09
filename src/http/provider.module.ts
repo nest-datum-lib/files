@@ -6,10 +6,9 @@ import {
 	RequestMethod,
 } from '@nestjs/common';
 import { 
-	RegistryService,
-	LogsService, 
-	CacheService,
-} from '@nest-datum/services';
+	BalancerRepository,
+	BalancerService, 
+} from 'nest-datum/balancer/src';
 import { ProviderController } from './provider.controller';
 import { ProviderService } from '../api/provider/provider.service';
 import { System } from '../api/system/system.entity';
@@ -30,9 +29,8 @@ import { Provider } from '../api/provider/provider.entity';
 	],
 	controllers: [ ProviderController ],
 	providers: [ 
-		RegistryService,
-		LogsService,
-		CacheService,
+		BalancerRepository,
+		BalancerService,
 		ProviderService,
 	],
 })

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CacheService } from '@nest-datum/services';
 import { typeormConfig } from 'config/typeorm';
 import { redisConfig } from 'config/redis';
+import { CacheService } from 'nest-datum/cache/src';
 import { SeedService } from './seed.service';
 import { ProviderStatus } from 'src/api/provider-status/provider-status.entity';
 import { ProviderOption } from 'src/api/provider-option/provider-option.entity';

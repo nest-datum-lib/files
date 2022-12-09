@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { 
-	RegistryService,
-	LogsService,
-	CacheService,
-} from '@nest-datum/services';
-import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
+	BalancerRepository,
+	BalancerService, 
+} from 'nest-datum/balancer/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { ProviderProviderOption } from '../provider-provider-option/provider-provider-option.entity';
 import { ProviderOption } from './provider-option.entity';
 import { ProviderOptionService } from './provider-option.service';
@@ -16,13 +15,12 @@ import { ProviderOptionController } from './provider-option.controller';
 	imports: [
 		TypeOrmModule.forFeature([ 
 			ProviderOption,
-			ProviderProviderOption,
-			ProviderProviderProviderOption, 
+			ProviderProviderOption, 
 		]),
 	],
 	providers: [
-		RegistryService, 
-		LogsService,
+		BalancerRepository, 
+		BalancerService,
 		CacheService,
 		ProviderOptionService, 
 	],

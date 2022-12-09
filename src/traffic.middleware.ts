@@ -7,13 +7,13 @@ import {
 	Response, 
 	NextFunction, 
 } from 'express';
-import { LogsService } from '@nest-datum/services';
-import { TrafficException } from '@nest-datum/exceptions';
+import { BalancerService } from 'nest-datum/balancer/src';
+import { TrafficException } from 'nest-datum/exceptions';
 
 @Injectable()
 export class TrafficMiddleware implements NestMiddleware {
 	constructor(
-		private readonly logsService: LogsService,
+		private readonly balancerService: BalancerService,
 	) {
 	}
 
@@ -39,7 +39,7 @@ export class TrafficMiddleware implements NestMiddleware {
 				? referrer['host']
 				: referrer;
 
-			this.logsService.emit(new TrafficException(`TrafficMiddleware - ${referrerStr}`, {}, {
+			this.balancerService.log(new TrafficException(`TrafficMiddleware - ${referrerStr}`, {}, {
 				host,
 				referrer: referrerStr,
 				ip,

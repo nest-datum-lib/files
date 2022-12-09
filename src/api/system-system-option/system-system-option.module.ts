@@ -6,9 +6,11 @@ import { System } from '../system/system.entity';
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([ SystemSystemSystemOption ]),
-		TypeOrmModule.forFeature([ SystemOption ]),
-		TypeOrmModule.forFeature([ System ]),
+		TypeOrmModule.forFeature([ 
+			SystemSystemSystemOption,
+			SystemOption,
+			System, 
+		]),
 	],
 })
 export class SystemSystemOptionModule {

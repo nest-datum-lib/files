@@ -4,7 +4,7 @@ import {
 	Injectable,
 	Logger,
 } from '@nestjs/common';
-import { CacheService } from '@nest-datum/services';
+import { CacheService } from 'nest-datum/cache/src';
 import { ProviderStatusSeeder } from './provider-status.seeder';
 import { ProviderSeeder } from './provider.seeder';
 import { SystemStatusSeeder } from './system-status.seeder';
@@ -39,18 +39,18 @@ export class SeedService {
 
 	async send() {
 		try {
-			await this.cacheService.clear('providerStatus.many');
-			await this.cacheService.clear('providerStatus.one');
-			await this.cacheService.clear('systemStatus.many');
-			await this.cacheService.clear('systemStatus.one');
-			await this.cacheService.clear('provider.many');
-			await this.cacheService.clear('provider.one');
-			await this.cacheService.clear('system.many');
-			await this.cacheService.clear('system.one');
-			await this.cacheService.clear('folder.many');
-			await this.cacheService.clear('folder.one');
-			await this.cacheService.clear('setting.many');
-			await this.cacheService.clear('setting.one');
+			await this.cacheService.clear([ 'provider', 'status', 'many' ]);
+			await this.cacheService.clear([ 'provider', 'status', 'one' ]);
+			await this.cacheService.clear([ 'system', 'status', 'many' ]);
+			await this.cacheService.clear([ 'system', 'status', 'one' ]);
+			await this.cacheService.clear([ 'provider', 'many' ]);
+			await this.cacheService.clear([ 'provider', 'one' ]);
+			await this.cacheService.clear([ 'system', 'many' ]);
+			await this.cacheService.clear([ 'system', 'one' ]);
+			await this.cacheService.clear([ 'folder', 'many' ]);
+			await this.cacheService.clear([ 'folder', 'one' ]);
+			await this.cacheService.clear([ 'setting', 'many' ]);
+			await this.cacheService.clear([ 'setting', 'one' ]);
 
 			await Bluebird.each(this.seeders, async (seeder) => {
 				this.logger.log(`Seeding ${seeder.constructor.name}`);

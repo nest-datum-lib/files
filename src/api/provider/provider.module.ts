@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { 
-	RegistryService,
-	LogsService,
-	CacheService, 
-} from '@nest-datum/services';
+	BalancerRepository,
+	BalancerService, 
+} from 'nest-datum/balancer/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { System } from '../system/system.entity';
 import { ProviderStatus } from '../provider-status/provider-status.entity';
 import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
@@ -25,8 +25,8 @@ import { ProviderController } from './provider.controller';
 		]),
 	],
 	providers: [
-		RegistryService, 
-		LogsService,
+		BalancerRepository, 
+		BalancerService,
 		CacheService,
 		ProviderService, 
 	],

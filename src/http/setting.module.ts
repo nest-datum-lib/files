@@ -6,10 +6,9 @@ import {
 	RequestMethod,
 } from '@nestjs/common';
 import { 
-	RegistryService,
-	LogsService, 
-	CacheService,
-} from '@nest-datum/services';
+	BalancerRepository,
+	BalancerService, 
+} from 'nest-datum/balancer/src';
 import { SettingController } from './setting.controller';
 import { SettingService } from '../api/setting/setting.service';
 import { Setting } from '../api/setting/setting.entity';
@@ -20,9 +19,8 @@ import { Setting } from '../api/setting/setting.entity';
 	],
 	controllers: [ SettingController ],
 	providers: [ 
-		RegistryService,
-		LogsService,
-		CacheService,
+		BalancerRepository,
+		BalancerService,
 		SettingService,
 	],
 })

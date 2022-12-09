@@ -10,8 +10,8 @@ import {
 	Response, 
 	NextFunction, 
 } from 'express';
-import { WarningException } from '@nest-datum/exceptions';
-import { checkToken } from '@nest-datum/jwt';
+import { WarningException } from 'nest-datum/exceptions/src';
+import { checkToken } from 'nest-datum/jwt/src';
 
 @Injectable()
 export class TokenMiddleware implements NestMiddleware {
