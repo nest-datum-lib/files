@@ -5,6 +5,7 @@ import {
 	MicroserviceOptions,
 	Transport,
 } from '@nestjs/microservices';
+import { TransportStrategies } from 'nest-datum/common/src';
 import { 
 	BalancerModule,
 	BalancerService, 
@@ -23,16 +24,6 @@ async function createApp() {
 	const balancer = await NestFactory.create(BalancerModule);
 	const balancerService = balancer.get(BalancerService);
 
-	if (process.env.SWAGGER_ROUTE) {
-		const config = new DocumentBuilder()
-			.setTitle('HTTP api')
-			.setDescription('HTTP API of all ecosystem microservices.')
-			.setVersion('1.0')
-			.build();
-		const document = SwaggerModule.createDocument(http, config);
-			
-		SwaggerModule.setup(process.env.SWAGGER_ROUTE, http, document);
-	}
 	http.enableCors();
 
 	const registred = await balancerService.registry({
