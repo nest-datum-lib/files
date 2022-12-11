@@ -133,30 +133,6 @@ export class ProviderController {
 		}
 	}
 
-	@EventPattern('provider.dropOption')
-	async dropOption(payload) {
-		try {
-			await this.providerService.dropOption({
-				user: Validators.token('accessToken', payload['accessToken'], {
-					accesses: [ process['ACCESS_FILES_PROVIDER_DROP_OPTION'] ],
-					isRequired: true,
-				}),
-				id: Validators.id('id', payload['id'], {
-					isRequired: true,
-				}),
-			});
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return true;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return err;
-		}
-	}
-
 	@EventPattern('provider.create')
 	async create(payload) {
 		try {
@@ -180,33 +156,6 @@ export class ProviderController {
 					max: 255,
 				}),
 				isNotDelete: Validators.bool('isNotDelete', payload['isNotDelete']),
-			});
-
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return output;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return err;
-		}
-	}
-
-	@EventPattern('provider.createOption')
-	async createOption(payload) {
-		try {
-			const output = await this.providerService.createOption({
-				user: Validators.token('accessToken', payload['accessToken'], {
-					accesses: [ process['ACCESS_FILES_PROVIDER_CREATE_OPTION'] ],
-					isRequired: true,
-				}),
-				id: Validators.id('id', payload['id']),
-				providerId: Validators.id('providerId', payload['providerId'], {
-					isRequired: true,
-				}),
-				data: Validators.obj('data', payload['data']) || {},
 			});
 
 			this.balancerService.decrementServiceResponseLoadingIndicator();

@@ -151,33 +151,6 @@ export class ProviderService extends SqlService {
 		}
 	}
 
-	async dropOption({ user, id }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'provider', 'one' ]);
-			await this.cacheService.clear([ 'provider', 'many' ]);
-			await this.cacheService.clear([ 'provider', 'option', 'many' ]);
-
-			await this.providerProviderProviderOptionRepository.delete({ providerProviderOptionId: id });
-			await this.providerProviderOptionRepository.delete({ id });
-
-			await queryRunner.commitTransaction();
-
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, id });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
 	async create({ user, ...payload }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
@@ -199,50 +172,6 @@ export class ProviderService extends SqlService {
 			await queryRunner.release();
 
 			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
-	async createOption({ 
-		user, 
-		id,
-		providerId, 
-		data, 
-	}): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner();
-
-		try {
-			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'provider', 'one' ]);
-			await this.cacheService.clear([ 'provider', 'many' ]);
-			await this.cacheService.clear([ 'provider', 'option', 'many' ]);
-
-			const providerProviderOption = await this.providerProviderOptionRepository.save({
-				providerId,
-				providerOptionId: id,
-				...data,
-			});
-			
-			const output = await this.one({
-				user,
-				id: providerId,
-			});
-
-			output['providerProviderOptions'] = [ providerProviderOption ];
-
-			await queryRunner.commitTransaction();
-
-			return output;
-		}
-		catch (err) {
-			console.log('err', err);
-
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, id, providerId, data });
 		}
 		finally {
 			await queryRunner.release();
