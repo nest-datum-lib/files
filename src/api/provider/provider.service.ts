@@ -243,6 +243,8 @@ export class ProviderService extends SqlService {
 			return output;
 		}
 		catch (err) {
+			console.log('err', err);
+
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
