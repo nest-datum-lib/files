@@ -38,8 +38,6 @@ export class ProviderController {
 		@Query('sort') sort: string,
 	): Promise<any> {
 		try {
-			console.log('!!!!!!!!!!!!!');
-
 			const many = await this.providerProviderOptionService.many({
 				user: Validators.token('accessToken', accessToken, {
 					accesses: [ process['ACCESS_FILES_PROVIDER_OPTION_RELATION_MANY'] ],

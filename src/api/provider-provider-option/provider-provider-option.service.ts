@@ -31,7 +31,6 @@ export class ProviderProviderOptionService extends SqlService {
 
 	protected selectDefaultMany = {
 		id: true,
-		userId: true,
 		providerId: true,
 		providerOptionId: true,
 		createdAt: true,
