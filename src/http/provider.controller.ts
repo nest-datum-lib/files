@@ -148,6 +148,8 @@ export class ProviderController {
 					isRequired: true,
 				}),
 			});
+
+			return output;
 		}
 		catch (err) {
 			this.balancerService.log(err);
