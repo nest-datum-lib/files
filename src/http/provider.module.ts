@@ -77,6 +77,14 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
+				path: `provider/:id/options`,
+				method: RequestMethod.POST,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
 				path: `provider`,
 				method: RequestMethod.GET,
 			});

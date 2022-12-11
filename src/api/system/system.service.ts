@@ -152,33 +152,6 @@ export class SystemService extends SqlService {
 		}
 	}
 
-	async dropOption({ user, id }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'system', 'one' ]);
-			await this.cacheService.clear([ 'system', 'many' ]);
-			await this.cacheService.clear([ 'system', 'option', 'many' ]);
-
-			await this.systemSystemSystemOptionRepository.delete({ systemSystemOptionId: id });
-			await this.systemSystemOptionRepository.delete({ id });
-
-			await queryRunner.commitTransaction();
-
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, id });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
 	async create({ user, ...payload }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
@@ -206,42 +179,52 @@ export class SystemService extends SqlService {
 		}
 	}
 
-	async createOption({ 
-		user, 
-		id,
-		systemId, 
-		data, 
-	}): Promise<any> {
+	async createOptions({ user, id, data }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner();
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'system', 'one' ]);
 			await this.cacheService.clear([ 'system', 'many' ]);
-			await this.cacheService.clear([ 'system', 'option', 'many' ]);
 
-			const systemSystemOption = await this.systemSystemOptionRepository.save({
-				systemId,
-				systemOptionId: id,
-				...data,
-			});
-			
-			const output = await this.one({
-				user,
-				id: systemId,
+			await this.systemSystemSystemOptionRepository.delete({
+				systemId: id,
 			});
 
-			output['systemSystemOptions'] = [ systemSystemOption ];
+			let i = 0,
+				ii = 0;
 
+			while (i < data.length) {
+				ii = 0;
+
+				const option = data[i];
+
+				while (ii < option.length) {
+					const {
+						entityOptionId,
+						entityId,
+						id: itemId,
+						...optionData
+					} = option[ii];
+
+					const output = await this.systemSystemSystemOptionRepository.save({
+						...optionData,
+						systemId: id,
+						systemSystemOptionId: entityOptionId,
+					});
+
+					ii++;
+				}
+				i++;
+			}
 			await queryRunner.commitTransaction();
-
-			return output;
+			
+			return true;
 		}
 		catch (err) {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), { user, id, systemId, data });
+			throw new ErrorException(err.message, getCurrentLine(), { user, id, data });
 		}
 		finally {
 			await queryRunner.release();

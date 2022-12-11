@@ -81,6 +81,14 @@ export class SystemModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
+				path: `system/:id/options`,
+				method: RequestMethod.POST,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
 				path: `/system`,
 				method: RequestMethod.GET,
 			});

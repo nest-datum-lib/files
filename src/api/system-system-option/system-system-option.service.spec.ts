@@ -6,7 +6,7 @@ describe('SystemSystemOptionService', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
-			Systems: [SystemSystemOptionService],
+			providers: [SystemSystemOptionService],
 		}).compile();
 
 		service = module.get<SystemSystemOptionService>(SystemSystemOptionService);

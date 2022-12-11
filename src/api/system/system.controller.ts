@@ -133,30 +133,6 @@ export class SystemController {
 		}
 	}
 
-	@EventPattern('system.dropOption')
-	async dropOption(payload) {
-		try {
-			await this.systemService.dropOption({
-				user: Validators.token('accessToken', payload['accessToken'], {
-					accesses: [ process['ACCESS_FILES_SYSTEM_DROP_OPTION'] ],
-					isRequired: true,
-				}),
-				id: Validators.id('id', payload['id'], {
-					isRequired: true,
-				}),
-			});
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return true;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return err;
-		}
-	}
-
 	@EventPattern('system.create')
 	async create(payload) {
 		try {
@@ -197,19 +173,18 @@ export class SystemController {
 		}
 	}
 
-	@EventPattern('system.createOption')
-	async createOption(payload) {
+	@EventPattern('system.createOptions')
+	async createOptions(payload) {
 		try {
-			const output = await this.systemService.createOption({
+			const output = await this.systemService.createOptions({
 				user: Validators.token('accessToken', payload['accessToken'], {
-					accesses: [ process['ACCESS_FILES_SYSTEM_CREATE_OPTION'] ],
+					accesses: [ process['ACCESS_FILES_SYSTEM_CREATE_OPTIONS'] ],
 					isRequired: true,
 				}),
 				id: Validators.id('id', payload['id']),
-				systemId: Validators.id('systemId', payload['systemId'], {
+				data: Validators.arr('data', payload['data'], {
 					isRequired: true,
 				}),
-				data: Validators.obj('data', payload['data']) || {},
 			});
 
 			this.balancerService.decrementServiceResponseLoadingIndicator();

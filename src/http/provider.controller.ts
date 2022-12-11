@@ -327,6 +327,33 @@ export class ProviderController {
 		}
 	}
 
+	@Post(':id/options')
+	async createOptions(
+		@AccessToken() accessToken: string,
+		@Param('id') id: string,
+		@Body() data,
+	) {
+		try {
+			const output = await this.providerService.createOptions({
+				user: Validators.token('accessToken', accessToken, {
+					accesses: [ process['ACCESS_FILES_PROVIDER_CREATE_OPTIONS'] ],
+					isRequired: true,
+				}),
+				id: Validators.id('id', id),
+				data: Validators.arr('data', data, {
+					isRequired: true,
+				}),
+			});
+
+			return output;
+		}
+		catch (err) {
+			this.logsService.emit(err);
+			
+			throw new HttpException(err.message, err.httpCode || 500);
+		}
+	}
+
 	@Patch(':id')
 	async update(
 		@AccessToken() accessToken: string,
