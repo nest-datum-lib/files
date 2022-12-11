@@ -102,8 +102,9 @@ export class FileService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'file', 'many' ]);
-			await this.cacheService.clear([ 'file', 'one', payload ]);
+			
+			this.cacheService.clear([ 'file', 'many' ]);
+			this.cacheService.clear([ 'file', 'one', payload ]);
 
 			const file = await this.dropByIsDeleted(this.fileRepository, payload['id']);
 
@@ -139,8 +140,9 @@ export class FileService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'file', 'many' ]);
-			await this.cacheService.clear([ 'file', 'one', payload ]);
+			
+			this.cacheService.clear([ 'file', 'many' ]);
+			this.cacheService.clear([ 'file', 'one', payload ]);
 
 			let i = 0;
 
@@ -179,9 +181,10 @@ export class FileService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'folder', 'one' ]);
-			await this.cacheService.clear([ 'folder', 'many' ]);
-			await this.cacheService.clear([ 'file', 'many' ]);
+			
+			this.cacheService.clear([ 'folder', 'one' ]);
+			this.cacheService.clear([ 'folder', 'many' ]);
+			this.cacheService.clear([ 'file', 'many' ]);
 
 			const parentFolder = await this.folderRepository.findOne({
 				select: {
@@ -262,10 +265,11 @@ export class FileService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'folder', 'one' ]);
-			await this.cacheService.clear([ 'folder', 'many' ]);
-			await this.cacheService.clear([ 'file', 'many' ]);
-			await this.cacheService.clear([ 'file', 'one' ]);
+			
+			this.cacheService.clear([ 'folder', 'one' ]);
+			this.cacheService.clear([ 'folder', 'many' ]);
+			this.cacheService.clear([ 'file', 'many' ]);
+			this.cacheService.clear([ 'file', 'one' ]);
 			
 			const file = await this.fileRepository.findOne({ 
 				select: {
