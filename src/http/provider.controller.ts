@@ -14,12 +14,14 @@ import { AccessToken } from 'nest-datum/common/src';
 import { BalancerService } from 'nest-datum/balancer/src';
 import * as Validators from 'nest-datum/validators/src';
 import { ProviderService } from '../api/provider/provider.service';
+import { ProviderProviderOptionService } from '../api/provider-provider-option/provider-provider-option.service';
 
 @ApiTags(`[ ${process.env.SERVICE_FILES} ] Sysytem provider`)
 @Controller(`provider`)
 export class ProviderController {
 	constructor(
 		private readonly providerService: ProviderService,
+		private readonly providerProviderOptionService: ProviderProviderOptionService,
 		private readonly balancerService: BalancerService,
 	) {
 	}
