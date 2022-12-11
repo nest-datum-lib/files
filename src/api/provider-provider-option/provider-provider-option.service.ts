@@ -87,6 +87,7 @@ export class ProviderProviderOptionService extends SqlService {
 		try {
 			this.cacheService.clear([ 'provider', 'option', 'relation', 'many' ]);
 			this.cacheService.clear([ 'provider', 'option', 'relation', 'one', id ]);
+			this.cacheService.clear([ 'provider', 'option', 'one' ]);
 			this.cacheService.clear([ 'provider', 'one' ]);
 
 			await this.providerProviderOptionRepository.delete({ id });
@@ -138,6 +139,7 @@ export class ProviderProviderOptionService extends SqlService {
 
 			this.cacheService.clear([ 'provider', 'option', 'relation', 'many' ]);
 			this.cacheService.clear([ 'provider', 'option', 'many' ]);
+			this.cacheService.clear([ 'provider', 'option', 'one' ]);
 			this.cacheService.clear([ 'provider', 'many' ]);
 			this.cacheService.clear([ 'provider', 'one' ]);
 
