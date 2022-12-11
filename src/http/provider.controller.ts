@@ -300,7 +300,7 @@ export class ProviderController {
 	async optionCreate(
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
-		@Body('providerOptionId') providerOptionId: string,
+		@Body('providerId') providerId: string,
 	) {
 		try {
 			const output = await this.providerProviderOptionService.create({
@@ -309,10 +309,10 @@ export class ProviderController {
 					isRequired: true,
 				}),
 				id: Validators.id('id', id),
-				providerId: Validators.id('providerId', id, {
+				providerId: Validators.id('providerId', providerId, {
 					isRequired: true,
 				}),
-				providerOptionId: Validators.id('providerOptionId', providerOptionId, {
+				providerOptionId: Validators.id('providerOptionId', id, {
 					isRequired: true,
 				}),
 			});
