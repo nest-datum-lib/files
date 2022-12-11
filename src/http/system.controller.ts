@@ -352,7 +352,7 @@ export class SystemController {
 			return output;
 		}
 		catch (err) {
-			this.logsService.emit(err);
+			this.balancerService.emit(err);
 			
 			throw new HttpException(err.message, err.httpCode || 500);
 		}
