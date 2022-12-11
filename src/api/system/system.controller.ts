@@ -224,32 +224,6 @@ export class SystemController {
 		}
 	}
 
-	@EventPattern('system.createOptions')
-	async createOptions(payload) {
-		try {
-			const output = await this.systemService.createOptions({
-				user: Validators.token('accessToken', payload['accessToken'], {
-					accesses: [ process['ACCESS_FILES_SYSTEM_CREATE_OPTIONS'] ],
-					isRequired: true,
-				}),
-				id: Validators.id('id', payload['id']),
-				data: Validators.arr('data', payload['data'], {
-					isRequired: true,
-				}),
-			});
-
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return output;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return err;
-		}
-	}
-
 	@EventPattern('system.update')
 	async update(payload) {
 		try {

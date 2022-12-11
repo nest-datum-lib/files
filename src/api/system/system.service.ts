@@ -248,58 +248,6 @@ export class SystemService extends SqlService {
 		}
 	}
 
-	async createOptions({ user, id, data }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner();
-
-		try {
-			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'system', 'many' ]);
-
-			await this.systemSystemSystemOptionRepository.delete({
-				systemId: id,
-			});
-
-			let i = 0,
-				ii = 0;
-
-			while (i < data.length) {
-				ii = 0;
-
-				const option = data[i];
-
-				while (ii < option.length) {
-					const {
-						entityOptionId,
-						entityId,
-						id: itemId,
-						...optionData
-					} = option[ii];
-
-					const output = await this.systemSystemSystemOptionRepository.save({
-						...optionData,
-						systemId: id,
-						systemSystemOptionId: entityOptionId,
-					});
-
-					ii++;
-				}
-				i++;
-			}
-			await queryRunner.commitTransaction();
-			
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, id, data });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
 	async update({ user, ...payload }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 

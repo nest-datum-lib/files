@@ -151,7 +151,7 @@ export class SystemController {
 		}
 	}
 
-	@Delete(':id/options/:optionId')
+	@Delete(':id/option/:optionId')
 	async dropOption(
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
@@ -223,7 +223,7 @@ export class SystemController {
 		}
 	}
 
-	@Post(':id/options/:optionId')
+	@Post(':id/option')
 	async createOption(
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
@@ -241,33 +241,6 @@ export class SystemController {
 					isRequired: true,
 				}),
 				data: Validators.arr('data', data) || {},
-			});
-
-			return output;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			
-			throw new HttpException(err.message, err.httpCode || 500);
-		}
-	}
-
-	@Post(':id/options')
-	async createOptions(
-		@AccessToken() accessToken: string,
-		@Param('id') id: string,
-		@Body() data,
-	) {
-		try {
-			const output = await this.systemService.createOptions({
-				user: Validators.token('accessToken', accessToken, {
-					accesses: [ process['ACCESS_FILES_SYSTEM_CREATE_OPTIONS'] ],
-					isRequired: true,
-				}),
-				id: Validators.id('id', id),
-				data: Validators.arr('data', data, {
-					isRequired: true,
-				}),
 			});
 
 			return output;
