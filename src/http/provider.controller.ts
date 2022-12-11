@@ -299,8 +299,9 @@ export class ProviderController {
 	@Post(':id/option')
 	async optionCreate(
 		@AccessToken() accessToken: string,
-		@Param('id') id: string,
+		@Param('id') providerOptionId: string,
 		@Body('providerId') providerId: string,
+		@Body('id') id: string,
 	) {
 		try {
 			const output = await this.providerProviderOptionService.create({
@@ -308,10 +309,11 @@ export class ProviderController {
 					accesses: [ process['ACCESS_FILES_PROVIDER_OPTION_RELATION_CREATE'] ],
 					isRequired: true,
 				}),
+				id: Validators.id('id', id),
 				providerId: Validators.id('providerId', providerId, {
 					isRequired: true,
 				}),
-				providerOptionId: Validators.id('providerOptionId', id, {
+				providerOptionId: Validators.id('providerOptionId', providerOptionId, {
 					isRequired: true,
 				}),
 			});
