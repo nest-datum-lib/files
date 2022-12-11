@@ -105,6 +105,8 @@ export class CacheService {
 
 						while (i < resultKeys.length) {
 							try {
+								console.log('resultKeys[i]', resultKeys[i]);
+
 								await this.redisCache.del(resultKeys[i]);
 							}
 							catch (err) {
