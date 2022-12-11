@@ -103,7 +103,7 @@ export class ProviderController {
 	}
 
 	@Get('option')
-	async many(
+	async optionMany(
 		@AccessToken() accessToken: string,
 		@Query('select') select: string,
 		@Query('relations') relations: string,
@@ -150,7 +150,7 @@ export class ProviderController {
 	}
 
 	@Get('option/:id')
-	async one(
+	async optionOne(
 		@AccessToken() accessToken: string,
 		@Query('select') select: string,
 		@Query('relations') relations: string,
@@ -230,7 +230,7 @@ export class ProviderController {
 	}
 
 	@Delete('option/:id')
-	async drop(
+	async optionDrop(
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
 	) {
@@ -297,7 +297,7 @@ export class ProviderController {
 	}
 
 	@Post(':id/option')
-	async createOption(
+	async optionCreate(
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
 		@Body('providerOptionId') providerOptionId: string,

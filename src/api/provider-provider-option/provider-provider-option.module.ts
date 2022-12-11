@@ -6,6 +6,7 @@ import {
 } from 'nest-datum/balancer/src';
 import { CacheService } from 'nest-datum/cache/src';
 import { ProviderProviderOptionController } from './provider-provider-option.controller';
+import { ProviderProviderOptionService } from './provider-provider-option.service';
 import { ProviderProviderOption } from './provider-provider-option.entity';
 import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
 import { ProviderOption } from '../provider-option/provider-option.entity';
