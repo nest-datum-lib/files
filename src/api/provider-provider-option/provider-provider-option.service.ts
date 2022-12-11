@@ -139,6 +139,7 @@ export class ProviderProviderOptionService extends SqlService {
 			this.cacheService.clear([ 'provider', 'option', 'relation', 'many' ]);
 			this.cacheService.clear([ 'provider', 'option', 'many' ]);
 			this.cacheService.clear([ 'provider', 'many' ]);
+			this.cacheService.clear([ 'provider', 'one' ]);
 
 			const userId = (user
 				&& typeof user === 'object')
