@@ -14,12 +14,14 @@ import { AccessToken } from 'nest-datum/common/src';
 import { BalancerService } from 'nest-datum/balancer/src';
 import * as Validators from 'nest-datum/validators/src';
 import { SystemService } from '../api/system/system.service';
+import { SystemSystemOptionService } from '../api/system-system-option/system-system-option.service';
 
 @ApiTags(`[ ${process.env.SERVICE_FILES} ] File system`)
 @Controller(`system`)
 export class SystemController {
 	constructor(
 		private readonly systemService: SystemService,
+		private readonly systemSystemOptionService: SystemSystemOptionService,
 		private readonly balancerService: BalancerService,
 	) {
 	}
