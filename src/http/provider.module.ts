@@ -67,6 +67,14 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
+				path: `${process.env.SERVICE_FILES}/provider/:id/options/:optionId`,
+				method: RequestMethod.DELETE,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
 				path: `${process.env.SERVICE_FILES}/provider`,
 				method: RequestMethod.POST,
 			});
@@ -75,7 +83,31 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
+				path: `${process.env.SERVICE_FILES}/provider/:id/options`,
+				method: RequestMethod.POST,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
+				path: `${process.env.SERVICE_FILES}/provider/:id/options/:optionId`,
+				method: RequestMethod.POST,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
 				path: `${process.env.SERVICE_FILES}/provider/:id`,
+				method: RequestMethod.PATCH,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
+				path: `${process.env.SERVICE_FILES}/provider/:id/options/:optionId`,
 				method: RequestMethod.PATCH,
 			});
 	}

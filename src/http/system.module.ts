@@ -71,6 +71,14 @@ export class SystemModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
+				path: `${process.env.SERVICE_FILES}/system/:id/options/:optionId`,
+				method: RequestMethod.DELETE,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
 				path: `${process.env.SERVICE_FILES}/system`,
 				method: RequestMethod.POST,
 			});
@@ -79,7 +87,31 @@ export class SystemModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
+				path: `${process.env.SERVICE_FILES}/system/:id/options`,
+				method: RequestMethod.POST,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
+				path: `${process.env.SERVICE_FILES}/system/:id/options/:optionId`,
+				method: RequestMethod.POST,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
 				path: `${process.env.SERVICE_FILES}/system/:id`,
+				method: RequestMethod.PATCH,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
+				path: `${process.env.SERVICE_FILES}/system/:id/options/:optionId`,
 				method: RequestMethod.PATCH,
 			});
 	}
