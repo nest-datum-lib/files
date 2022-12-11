@@ -308,7 +308,6 @@ export class ProviderController {
 					accesses: [ process['ACCESS_FILES_PROVIDER_OPTION_RELATION_CREATE'] ],
 					isRequired: true,
 				}),
-				id: Validators.id('id', id),
 				providerId: Validators.id('providerId', providerId, {
 					isRequired: true,
 				}),
