@@ -55,14 +55,14 @@ export class ProviderOptionService extends SqlService {
 
 	async many({ user, ...payload }): Promise<any> {
 		try {
-			const cachedData = await this.cacheService.get([ 'letter', 'option', 'many', payload ]);
+			const cachedData = await this.cacheService.get([ 'provider', 'option', 'many', payload ]);
 
 			if (cachedData) {
 				return cachedData;
 			}
 			const output = await this.providerOptionRepository.findAndCount(await this.findMany(payload));
 
-			await this.cacheService.set([ 'letter', 'option', 'many', payload ], output);
+			await this.cacheService.set([ 'provider', 'option', 'many', payload ], output);
 			
 			return output;
 		}
@@ -74,7 +74,7 @@ export class ProviderOptionService extends SqlService {
 
 	async one({ user, ...payload }): Promise<any> {
 		try {
-			const cachedData = await this.cacheService.get([ 'letter', 'option', 'one', payload ]);
+			const cachedData = await this.cacheService.get([ 'provider', 'option', 'one', payload ]);
 
 			if (cachedData) {
 				return cachedData;
@@ -82,7 +82,7 @@ export class ProviderOptionService extends SqlService {
 			const output = await this.providerOptionRepository.findOne(await this.findOne(payload));
 		
 			if (output) {
-				await this.cacheService.set([ 'letter', 'option', 'one', payload ], output);
+				await this.cacheService.set([ 'provider', 'option', 'one', payload ], output);
 			}
 			if (!output) {
 				return new NotFoundException('Entity is undefined', getCurrentLine(), { user, ...payload });
@@ -99,8 +99,8 @@ export class ProviderOptionService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'letter', 'option', 'many' ]);
-			await this.cacheService.clear([ 'letter', 'option', 'one', payload ]);
+			await this.cacheService.clear([ 'provider', 'option', 'many' ]);
+			await this.cacheService.clear([ 'provider', 'option', 'one', payload ]);
 
 			await this.providerProviderOptionRepository.delete({ providerOptionId: payload['id'] });
 			await this.dropByIsDeleted(this.providerOptionRepository, payload['id']);
@@ -125,8 +125,8 @@ export class ProviderOptionService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'letter', 'option', 'many' ]);
-			await this.cacheService.clear([ 'letter', 'option', 'one', payload ]);
+			await this.cacheService.clear([ 'provider', 'option', 'many' ]);
+			await this.cacheService.clear([ 'provider', 'option', 'one', payload ]);
 
 			let i = 0;
 
@@ -155,7 +155,7 @@ export class ProviderOptionService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'letter', 'option', 'many' ]);
+			await this.cacheService.clear([ 'provider', 'option', 'many' ]);
 
 			const output = await this.providerOptionRepository.save({
 				...payload,
@@ -182,8 +182,8 @@ export class ProviderOptionService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'letter', 'option', 'many' ]);
-			await this.cacheService.clear([ 'letter', 'option', 'one' ]);
+			await this.cacheService.clear([ 'provider', 'option', 'many' ]);
+			await this.cacheService.clear([ 'provider', 'option', 'one' ]);
 			
 			await this.updateWithId(this.providerOptionRepository, payload);
 			
