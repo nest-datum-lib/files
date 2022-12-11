@@ -227,19 +227,19 @@ export class SystemController {
 	async createOption(
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
-		@Body('optionId') optionId: string,
+		@Body('systemId') systemId: string,
 		@Body() data,
 	) {
 		try {
-			delete data['optionId'];
-			
+			delete data['systemId'];
+
 			const output = await this.systemService.createOption({
 				user: Validators.token('accessToken', accessToken, {
 					accesses: [ process['ACCESS_FILES_SYSTEM_CREATE_OPTION'] ],
 					isRequired: true,
 				}),
 				id: Validators.id('id', id),
-				optionId: Validators.id('optionId', optionId, {
+				systemId: Validators.id('systemId', systemId, {
 					isRequired: true,
 				}),
 				data: Validators.obj('data', data) || {},

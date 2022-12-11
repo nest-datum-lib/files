@@ -203,7 +203,7 @@ export class ProviderController {
 					isRequired: true,
 				}),
 				id: Validators.id('id', payload['id']),
-				optionId: Validators.id('optionId', payload['optionId'], {
+				providerId: Validators.id('providerId', payload['providerId'], {
 					isRequired: true,
 				}),
 				data: Validators.obj('data', payload['data']) || {},

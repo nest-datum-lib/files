@@ -208,7 +208,7 @@ export class ProviderService extends SqlService {
 	async createOption({ 
 		user, 
 		id,
-		optionId, 
+		providerId, 
 		data, 
 	}): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner();
@@ -220,20 +220,20 @@ export class ProviderService extends SqlService {
 			await this.cacheService.clear([ 'provider', 'option', 'many' ]);
 
 			console.log('==========', {
-				providerId: id,
-				providerOptionId: optionId,
+				providerId: providerId,
+				providerOptionId: id,
 				...data,
 			});
 
 			const providerProviderOption = await this.providerProviderOptionRepository.save({
-				providerId: id,
-				providerOptionId: optionId,
+				providerId,
+				providerOptionId: id,
 				...data,
 			});
 			
 			const output = await this.one({
 				user,
-				id,
+				id: providerId,
 			});
 
 			output['providerProviderOptions'] = [ providerProviderOption ];

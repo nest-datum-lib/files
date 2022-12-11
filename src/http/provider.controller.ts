@@ -223,11 +223,11 @@ export class ProviderController {
 	async createOption(
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
-		@Body('optionId') optionId: string,
+		@Body('providerId') providerId: string,
 		@Body() data,
 	) {
 		try {
-			delete data['optionId'];
+			delete data['providerId'];
 
 			const output = await this.providerService.createOption({
 				user: Validators.token('accessToken', accessToken, {
@@ -235,7 +235,7 @@ export class ProviderController {
 					isRequired: true,
 				}),
 				id: Validators.id('id', id),
-				optionId: Validators.id('optionId', optionId, {
+				providerId: Validators.id('providerId', providerId, {
 					isRequired: true,
 				}),
 				data: Validators.obj('data', data) || {},

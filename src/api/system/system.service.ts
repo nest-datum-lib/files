@@ -209,7 +209,7 @@ export class SystemService extends SqlService {
 	async createOption({ 
 		user, 
 		id,
-		optionId, 
+		systemId, 
 		data, 
 	}): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner();
@@ -221,14 +221,14 @@ export class SystemService extends SqlService {
 			await this.cacheService.clear([ 'system', 'option', 'many' ]);
 
 			const systemSystemOption = await this.systemSystemOptionRepository.save({
-				systemId: id,
-				systemOptionId: optionId,
+				systemId,
+				systemOptionId: id,
 				...data,
 			});
 			
 			const output = await this.one({
 				user,
-				id,
+				id: systemId,
 			});
 
 			output['systemSystemOptions'] = [ systemSystemOption ];

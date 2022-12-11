@@ -206,7 +206,7 @@ export class SystemController {
 					isRequired: true,
 				}),
 				id: Validators.id('id', payload['id']),
-				optionId: Validators.id('optionId', payload['optionId'], {
+				systemId: Validators.id('systemId', payload['systemId'], {
 					isRequired: true,
 				}),
 				data: Validators.obj('data', payload['data']) || {},
