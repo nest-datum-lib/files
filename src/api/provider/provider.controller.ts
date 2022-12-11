@@ -206,7 +206,7 @@ export class ProviderController {
 				optionId: Validators.id('optionId', payload['optionId'], {
 					isRequired: true,
 				}),
-				data: Validators.arr('data', payload['data']) || {},
+				data: Validators.obj('data', payload['data']) || {},
 			});
 
 			this.balancerService.decrementServiceResponseLoadingIndicator();

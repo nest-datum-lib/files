@@ -223,7 +223,7 @@ export class ProviderController {
 	async createOption(
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
-		@Param('optionId') optionId: string,
+		@Body('optionId') optionId: string,
 		@Body() data,
 	) {
 		try {
@@ -236,7 +236,7 @@ export class ProviderController {
 				optionId: Validators.id('optionId', optionId, {
 					isRequired: true,
 				}),
-				data: Validators.arr('data', data) || {},
+				data: Validators.obj('data', data) || {},
 			});
 
 			return output;

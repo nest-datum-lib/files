@@ -227,7 +227,7 @@ export class SystemController {
 	async createOption(
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
-		@Param('optionId') optionId: string,
+		@Body('optionId') optionId: string,
 		@Body() data,
 	) {
 		try {
@@ -240,7 +240,7 @@ export class SystemController {
 				optionId: Validators.id('optionId', optionId, {
 					isRequired: true,
 				}),
-				data: Validators.arr('data', data) || {},
+				data: Validators.obj('data', data) || {},
 			});
 
 			return output;
