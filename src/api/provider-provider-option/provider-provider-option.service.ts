@@ -85,8 +85,6 @@ export class ProviderProviderOptionService extends SqlService {
 
 	async drop({ user, id }): Promise<any> {
 		try {
-			console.log('drop', id);
-
 			this.cacheService.clear([ 'provider', 'option', 'relation', 'many' ]);
 			this.cacheService.clear([ 'provider', 'option', 'relation', 'one', id ]);
 

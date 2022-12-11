@@ -108,9 +108,7 @@ export class ProviderController {
 		@Param('id') id: string,
 	) {
 		try {
-			console.log('optionDrop', id);
-
-			await this.providerProviderOptionService.dropMany({
+			await this.providerProviderOptionService.drop({
 				user: Validators.token('accessToken', accessToken, {
 					accesses: [ process['ACCESS_FILES_PROVIDER_DROP_OPTION_RELATION_MANY'] ],
 					isRequired: true,
