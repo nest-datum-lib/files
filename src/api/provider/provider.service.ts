@@ -248,7 +248,7 @@ export class ProviderService extends SqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), { user, id, optionId, data });
+			throw new ErrorException(err.message, getCurrentLine(), { user, id, providerId, data });
 		}
 		finally {
 			await queryRunner.release();

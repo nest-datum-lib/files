@@ -241,7 +241,7 @@ export class SystemService extends SqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), { user, id, optionId, data });
+			throw new ErrorException(err.message, getCurrentLine(), { user, id, systemId, data });
 		}
 		finally {
 			await queryRunner.release();
