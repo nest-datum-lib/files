@@ -44,14 +44,14 @@ export class ProviderProviderOptionService extends SqlService {
 
 	async many({ user, ...payload }): Promise<any> {
 		try {
-			const cachedData = await this.cacheService.get([ 'form', 'field', 'many', payload ]);
+			const cachedData = await this.cacheService.get([ 'provider', 'option', 'relation', 'many', payload ]);
 
 			if (cachedData) {
 				return cachedData;
 			}
 			const output = await this.providerProviderOptionRepository.findAndCount(await this.findMany(payload));
 
-			this.cacheService.set([ 'form', 'field', 'many', payload ], output);
+			this.cacheService.set([ 'provider', 'option', 'relation', 'many', payload ], output);
 			
 			return output;
 		}
@@ -64,7 +64,7 @@ export class ProviderProviderOptionService extends SqlService {
 
 	async one({ user, ...payload }): Promise<any> {
 		try {
-			const cachedData = await this.cacheService.get([ 'form', 'field', 'one' , payload ]);
+			const cachedData = await this.cacheService.get([ 'provider', 'option', 'relation', 'one' , payload ]);
 
 			if (cachedData) {
 				return cachedData;
@@ -72,7 +72,7 @@ export class ProviderProviderOptionService extends SqlService {
 			const output = await this.providerProviderOptionRepository.findOne(await this.findOne(payload));
 		
 			if (output) {
-				this.cacheService.set([ 'form', 'field', 'one', payload ], output);
+				this.cacheService.set([ 'provider', 'option', 'relation', 'one', payload ], output);
 			}
 			else {
 				return new NotFoundException('Entity is undefined', getCurrentLine(), { user, ...payload });
@@ -86,8 +86,8 @@ export class ProviderProviderOptionService extends SqlService {
 
 	async drop({ user, ...payload }): Promise<any> {
 		try {
-			this.cacheService.clear([ 'form', 'field', 'many' ]);
-			this.cacheService.clear([ 'form', 'field', 'one', payload ]);
+			this.cacheService.clear([ 'provider', 'option', 'relation', 'many' ]);
+			this.cacheService.clear([ 'provider', 'option', 'relation', 'one', payload ]);
 
 			await this.providerProviderOptionRepository.delete({ id: payload['id'] });
 
@@ -104,10 +104,10 @@ export class ProviderProviderOptionService extends SqlService {
 		try {
 			await queryRunner.startTransaction();
 			
-			this.cacheService.clear([ 'form', 'field', 'many' ]);
-			this.cacheService.clear([ 'form', 'field', 'one', payload ]);
-			this.cacheService.clear([ 'form', 'many' ]);
-			this.cacheService.clear([ 'field', 'many' ]);
+			this.cacheService.clear([ 'provider', 'option', 'relation', 'many' ]);
+			this.cacheService.clear([ 'provider', 'option', 'relation', 'one', payload ]);
+			this.cacheService.clear([ 'provider', 'option', 'many' ]);
+			this.cacheService.clear([ 'provider', 'many' ]);
 
 			let i = 0;
 
@@ -136,26 +136,26 @@ export class ProviderProviderOptionService extends SqlService {
 		try {
 			await queryRunner.startTransaction();
 
-			this.cacheService.clear([ 'form', 'field', 'many' ]);
-			this.cacheService.clear([ 'form', 'many' ]);
-			this.cacheService.clear([ 'field', 'many' ]);
+			this.cacheService.clear([ 'provider', 'option', 'relation', 'many' ]);
+			this.cacheService.clear([ 'provider', 'option', 'many' ]);
+			this.cacheService.clear([ 'provider', 'many' ]);
 
 			const userId = (user
 				&& typeof user === 'object')
 				? (user['id'] || '')
 				: '';
-			const formField = await this.providerProviderOptionRepository.save({
+			const providerOptionRelation = await this.providerProviderOptionRepository.save({
 				id: id || uuidv4(),
 				userId,
 				providerId,
 				providerOptionId,
 			});
 			
-			formField['userId'] = userId;
+			providerOptionRelation['userId'] = userId;
 
 			await queryRunner.commitTransaction();
 
-			return formField;
+			return providerOptionRelation;
 		}
 		catch (err) {
 			console.log('errr', err);
