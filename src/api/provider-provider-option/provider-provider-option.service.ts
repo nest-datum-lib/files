@@ -17,7 +17,7 @@ import {
 	ErrorException,
 	NotFoundException, 
 } from 'nest-datum/exceptions/src';
-import { ProviderProviderOption } from './provider-provicer-option.entity';
+import { ProviderProviderOption } from './provider-provider-option.entity';
 
 @Injectable()
 export class ProviderProviderOptionService extends SqlService {
