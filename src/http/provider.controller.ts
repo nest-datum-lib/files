@@ -227,6 +227,8 @@ export class ProviderController {
 		@Body() data,
 	) {
 		try {
+			delete data['optionId'];
+
 			const output = await this.providerService.createOption({
 				user: Validators.token('accessToken', accessToken, {
 					accesses: [ process['ACCESS_FILES_PROVIDER_CREATE_OPTION'] ],

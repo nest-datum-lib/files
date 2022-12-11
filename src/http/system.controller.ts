@@ -231,6 +231,8 @@ export class SystemController {
 		@Body() data,
 	) {
 		try {
+			delete data['optionId'];
+			
 			const output = await this.systemService.createOption({
 				user: Validators.token('accessToken', accessToken, {
 					accesses: [ process['ACCESS_FILES_SYSTEM_CREATE_OPTION'] ],
