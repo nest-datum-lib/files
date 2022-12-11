@@ -219,6 +219,12 @@ export class ProviderService extends SqlService {
 			await this.cacheService.clear([ 'provider', 'many' ]);
 			await this.cacheService.clear([ 'provider', 'option', 'many' ]);
 
+			console.log('==========', {
+				providerId: id,
+				providerOptionId: optionId,
+				...data,
+			});
+
 			const providerProviderOption = await this.providerProviderOptionRepository.save({
 				providerId: id,
 				providerOptionId: optionId,
