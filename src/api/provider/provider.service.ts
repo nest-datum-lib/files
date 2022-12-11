@@ -98,8 +98,9 @@ export class ProviderService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'provider', 'many' ]);
-			await this.cacheService.clear([ 'provider', 'one', payload ]);
+			
+			this.cacheService.clear([ 'provider', 'many' ]);
+			this.cacheService.clear([ 'provider', 'one', payload ]);
 
 			await this.providerProviderProviderOptionRepository.delete({ providerId: payload['id'] });
 			await this.providerProviderOptionRepository.delete({ providerId: payload['id'] });
@@ -125,8 +126,9 @@ export class ProviderService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'provider', 'many' ]);
-			await this.cacheService.clear([ 'provider', 'one', payload ]);
+			
+			this.cacheService.clear([ 'provider', 'many' ]);
+			this.cacheService.clear([ 'provider', 'one', payload ]);
 
 			let i = 0;
 
@@ -156,7 +158,8 @@ export class ProviderService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'provider', 'many' ]);
+			
+			this.cacheService.clear([ 'provider', 'many' ]);
 
 			const output = await this.providerRepository.save({
 				...payload,
@@ -183,7 +186,10 @@ export class ProviderService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'provider', 'many' ]);
+
+			this.cacheService.clear([ 'provider', 'option', 'many' ]);
+			this.cacheService.clear([ 'provider', 'many' ]);
+			this.cacheService.clear([ 'provider', 'one' ]);
 
 			await this.providerProviderProviderOptionRepository.delete({
 				providerId: id,
@@ -235,8 +241,9 @@ export class ProviderService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'provider', 'many' ]);
-			await this.cacheService.clear([ 'provider', 'one' ]);
+			
+			this.cacheService.clear([ 'provider', 'many' ]);
+			this.cacheService.clear([ 'provider', 'one' ]);
 			
 			await this.updateWithId(this.providerRepository, payload);
 			

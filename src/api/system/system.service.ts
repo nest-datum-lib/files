@@ -99,8 +99,9 @@ export class SystemService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'system', 'many' ]);
-			await this.cacheService.clear([ 'system', 'one', payload ]);
+			
+			this.cacheService.clear([ 'system', 'many' ]);
+			this.cacheService.clear([ 'system', 'one', payload ]);
 
 			await this.systemSystemSystemOptionRepository.delete({ systemId: payload['id'] });
 			await this.systemSystemOptionRepository.delete({ systemId: payload['id'] });
@@ -126,8 +127,9 @@ export class SystemService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'system', 'many' ]);
-			await this.cacheService.clear([ 'system', 'one', payload ]);
+			
+			this.cacheService.clear([ 'system', 'many' ]);
+			this.cacheService.clear([ 'system', 'one', payload ]);
 
 			let i = 0;
 
@@ -157,7 +159,8 @@ export class SystemService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'system', 'many' ]);
+			
+			this.cacheService.clear([ 'system', 'many' ]);
 
 			const output = await this.systemRepository.save({
 				...payload,
@@ -184,7 +187,10 @@ export class SystemService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'system', 'many' ]);
+			
+			this.cacheService.clear([ 'system', 'option', 'many' ]);
+			this.cacheService.clear([ 'system', 'many' ]);
+			this.cacheService.clear([ 'system', 'one' ]);
 
 			await this.systemSystemSystemOptionRepository.delete({
 				systemId: id,
@@ -236,8 +242,8 @@ export class SystemService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			await this.cacheService.clear([ 'system', 'many' ]);
-			await this.cacheService.clear([ 'system', 'one' ]);
+			this.cacheService.clear([ 'system', 'many' ]);
+			this.cacheService.clear([ 'system', 'one' ]);
 			
 			await this.updateWithId(this.systemRepository, payload);
 			
