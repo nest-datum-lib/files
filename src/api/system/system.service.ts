@@ -152,7 +152,7 @@ export class SystemService extends SqlService {
 		}
 	}
 
-	async dropOption({ user, ...payload }): Promise<any> {
+	async dropOption({ user, id }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
@@ -161,8 +161,8 @@ export class SystemService extends SqlService {
 			await this.cacheService.clear([ 'system', 'many' ]);
 			await this.cacheService.clear([ 'system', 'option', 'many' ]);
 
-			await this.systemSystemSystemOptionRepository.delete({ systemSystemOptionId: payload['id'] });
-			await this.systemSystemOptionRepository.delete({ id: payload['id'] });
+			await this.systemSystemSystemOptionRepository.delete({ systemSystemOptionId: id });
+			await this.systemSystemOptionRepository.delete({ id });
 
 			await queryRunner.commitTransaction();
 
@@ -172,7 +172,7 @@ export class SystemService extends SqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
+			throw new ErrorException(err.message, getCurrentLine(), { user, id });
 		}
 		finally {
 			await queryRunner.release();

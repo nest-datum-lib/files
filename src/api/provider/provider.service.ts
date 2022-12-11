@@ -151,7 +151,7 @@ export class ProviderService extends SqlService {
 		}
 	}
 
-	async dropOption({ user, ...payload }): Promise<any> {
+	async dropOption({ user, id }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
@@ -160,8 +160,8 @@ export class ProviderService extends SqlService {
 			await this.cacheService.clear([ 'provider', 'many' ]);
 			await this.cacheService.clear([ 'provider', 'option', 'many' ]);
 
-			await this.providerProviderProviderOptionRepository.delete({ providerProviderOptionId: payload['id'] });
-			await this.providerProviderOptionRepository.delete({ id: payload['id'] });
+			await this.providerProviderProviderOptionRepository.delete({ providerProviderOptionId: id });
+			await this.providerProviderOptionRepository.delete({ id });
 
 			await queryRunner.commitTransaction();
 
@@ -171,7 +171,7 @@ export class ProviderService extends SqlService {
 			await queryRunner.rollbackTransaction();
 			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
+			throw new ErrorException(err.message, getCurrentLine(), { user, id });
 		}
 		finally {
 			await queryRunner.release();
@@ -218,12 +218,6 @@ export class ProviderService extends SqlService {
 			await this.cacheService.clear([ 'provider', 'one' ]);
 			await this.cacheService.clear([ 'provider', 'many' ]);
 			await this.cacheService.clear([ 'provider', 'option', 'many' ]);
-
-			console.log('==========', {
-				providerId: providerId,
-				providerOptionId: id,
-				...data,
-			});
 
 			const providerProviderOption = await this.providerProviderOptionRepository.save({
 				providerId,

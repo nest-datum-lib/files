@@ -67,7 +67,7 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/provider/:id/option/:optionId`,
+				path: `${process.env.SERVICE_FILES}/provider/option/:id`,
 				method: RequestMethod.DELETE,
 			});
 		consumer

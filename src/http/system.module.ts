@@ -71,7 +71,7 @@ export class SystemModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/system/:id/option/:optionId`,
+				path: `${process.env.SERVICE_FILES}/system/option/:id`,
 				method: RequestMethod.DELETE,
 			});
 		consumer

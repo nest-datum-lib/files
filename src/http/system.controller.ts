@@ -151,11 +151,10 @@ export class SystemController {
 		}
 	}
 
-	@Delete(':id/option/:optionId')
+	@Delete('option/:id')
 	async dropOption(
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
-		@Param('optionId') optionId: string,
 	) {
 		try {
 			await this.systemService.dropOption({
