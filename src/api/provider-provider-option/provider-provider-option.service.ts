@@ -83,17 +83,19 @@ export class ProviderProviderOptionService extends SqlService {
 		}
 	}
 
-	async drop({ user, ...payload }): Promise<any> {
+	async drop({ user, id }): Promise<any> {
 		try {
-			this.cacheService.clear([ 'provider', 'option', 'relation', 'many' ]);
-			this.cacheService.clear([ 'provider', 'option', 'relation', 'one', payload ]);
+			console.log('drop', id);
 
-			await this.providerProviderOptionRepository.delete({ id: payload['id'] });
+			this.cacheService.clear([ 'provider', 'option', 'relation', 'many' ]);
+			this.cacheService.clear([ 'provider', 'option', 'relation', 'one', id ]);
+
+			await this.providerProviderOptionRepository.delete({ id });
 
 			return true;
 		}
 		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
+			throw new ErrorException(err.message, getCurrentLine(), { user, id });
 		}
 	}
 
