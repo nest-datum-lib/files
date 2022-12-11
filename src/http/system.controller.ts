@@ -24,6 +24,138 @@ export class SystemController {
 	) {
 	}
 
+	@Get('option')
+	async optionMany(
+		@AccessToken() accessToken: string,
+		@Query('select') select: string,
+		@Query('relations') relations: string,
+		@Query('page') page: number,
+		@Query('limit') limit: number,
+		@Query('query') query: string,
+		@Query('filter') filter: string,
+		@Query('sort') sort: string,
+	): Promise<any> {
+		try {
+			const many = await this.systemSystemOptionService.many({
+				user: Validators.token('accessToken', accessToken, {
+					accesses: [ process['ACCESS_FILES_SYSTEM_OPTION_RELATION_MANY'] ],
+					isRequired: true,
+				}),
+				relations: Validators.obj('relations', relations),
+				select: Validators.obj('select', select),
+				sort: Validators.obj('sort', sort),
+				filter: Validators.obj('filter', filter),
+				query: Validators.str('query', query, {
+					min: 1,
+					max: 255,
+				}),
+				page: Validators.int('page', page, {
+					min: 1,
+					default: 1,
+				}),
+				limit: Validators.int('limit', limit, {
+					min: 1,
+					default: 20,
+				}),
+			});
+
+			return {
+				total: many[1],
+				rows: many[0],
+			};
+		}
+		catch (err) {
+			this.balancerService.log(err);
+
+			throw new HttpException(err.message, err.httpCode || 500);
+		}
+	}
+
+	@Get('option/:id')
+	async optionOne(
+		@AccessToken() accessToken: string,
+		@Query('select') select: string,
+		@Query('relations') relations: string,
+		@Param('id') id: string,
+	): Promise<any> {
+		try {
+			const output = await this.systemSystemOptionService.one({
+				user: Validators.token('accessToken', accessToken, {
+					accesses: [ process['ACCESS_FILES_SYSTEM_OPTION_RELATION_ONE'] ],
+					isRequired: true,
+				}),
+				relations: Validators.obj('relations', relations),
+				select: Validators.obj('select', select),
+				id: Validators.id('id', id, {
+					isRequired: true,
+				}),
+			});
+
+			return output;
+		}
+		catch (err) {
+			this.balancerService.log(err);
+
+			throw new HttpException(err.message, err.httpCode || 500);
+		}
+	}
+
+	@Delete('option/:id')
+	async optionDrop(
+		@AccessToken() accessToken: string,
+		@Param('id') id: string,
+	) {
+		try {
+			await this.systemSystemOptionService.drop({
+				user: Validators.token('accessToken', accessToken, {
+					accesses: [ process['ACCESS_FILES_SYSTEM_DROP_OPTION_RELATION_MANY'] ],
+					isRequired: true,
+				}),
+				id: Validators.id('id', id, {
+					isRequired: true,
+				}),
+			});
+
+			return true;
+		}
+		catch (err) {
+			this.balancerService.log(err);
+
+			throw new HttpException(err.message, err.httpCode || 500);
+		}
+	}
+
+	@Post(':id/option')
+	async optionCreate(
+		@AccessToken() accessToken: string,
+		@Param('id') systemOptionId: string,
+		@Body('systemId') systemId: string,
+		@Body('id') id: string,
+	) {
+		try {
+			const output = await this.systemSystemOptionService.create({
+				user: Validators.token('accessToken', accessToken, {
+					accesses: [ process['ACCESS_FILES_SYSTEM_OPTION_RELATION_CREATE'] ],
+					isRequired: true,
+				}),
+				id: Validators.id('id', id),
+				systemId: Validators.id('systemId', systemId, {
+					isRequired: true,
+				}),
+				systemOptionId: Validators.id('systemOptionId', systemOptionId, {
+					isRequired: true,
+				}),
+			});
+
+			return output;
+		}
+		catch (err) {
+			this.balancerService.log(err);
+
+			throw new HttpException(err.message, err.httpCode || 500);
+		}
+	}
+
 	@Get()
 	async many(
 		@AccessToken() accessToken: string,
@@ -151,31 +283,6 @@ export class SystemController {
 		}
 	}
 
-	@Delete('option/:id')
-	async dropOption(
-		@AccessToken() accessToken: string,
-		@Param('id') id: string,
-	) {
-		try {
-			await this.systemService.dropOption({
-				user: Validators.token('accessToken', accessToken, {
-					accesses: [ process['ACCESS_FILES_SYSTEM_DROP_OPTION'] ],
-					isRequired: true,
-				}),
-				id: Validators.id('id', id, {
-					isRequired: true,
-				}),
-			});
-
-			return true;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			
-			throw new HttpException(err.message, err.httpCode || 500);
-		}
-	}
-
 	@Post()
 	async create(
 		@AccessToken() accessToken: string,
@@ -211,37 +318,6 @@ export class SystemController {
 					max: 255,
 				}),
 				isNotDelete: Validators.bool('isNotDelete', isNotDelete),
-			});
-
-			return output;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			
-			throw new HttpException(err.message, err.httpCode || 500);
-		}
-	}
-
-	@Post(':id/option')
-	async createOption(
-		@AccessToken() accessToken: string,
-		@Param('id') id: string,
-		@Body('systemId') systemId: string,
-		@Body() data,
-	) {
-		try {
-			delete data['systemId'];
-
-			const output = await this.systemService.createOption({
-				user: Validators.token('accessToken', accessToken, {
-					accesses: [ process['ACCESS_FILES_SYSTEM_CREATE_OPTION'] ],
-					isRequired: true,
-				}),
-				id: Validators.id('id', id),
-				systemId: Validators.id('systemId', systemId, {
-					isRequired: true,
-				}),
-				data: Validators.obj('data', data) || {},
 			});
 
 			return output;

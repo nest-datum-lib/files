@@ -47,7 +47,7 @@ export class SystemModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/system`,
+				path: `system/option`,
 				method: RequestMethod.GET,
 			});
 		consumer
@@ -55,7 +55,7 @@ export class SystemModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/system/:id`,
+				path: `system/option/:id`,
 				method: RequestMethod.GET,
 			});
 		consumer
@@ -63,7 +63,7 @@ export class SystemModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/system/:id`,
+				path: `system/option/:id`,
 				method: RequestMethod.DELETE,
 			});
 		consumer
@@ -71,7 +71,31 @@ export class SystemModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/system/option/:id`,
+				path: `system/:id/option`,
+				method: RequestMethod.POST,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
+				path: `/system`,
+				method: RequestMethod.GET,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
+				path: `/system/:id`,
+				method: RequestMethod.GET,
+			});
+		consumer
+			.apply(
+				// ExampleMiddleware,
+			)
+			.forRoutes({
+				path: `/system/:id`,
 				method: RequestMethod.DELETE,
 			});
 		consumer
@@ -79,7 +103,7 @@ export class SystemModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/system`,
+				path: `/system`,
 				method: RequestMethod.POST,
 			});
 		consumer
@@ -87,15 +111,7 @@ export class SystemModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/system/:id/option`,
-				method: RequestMethod.POST,
-			});
-		consumer
-			.apply(
-				// ExampleMiddleware,
-			)
-			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/system/:id`,
+				path: `/system/:id`,
 				method: RequestMethod.PATCH,
 			});
 	}
