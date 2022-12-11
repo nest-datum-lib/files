@@ -112,7 +112,7 @@ export class ProviderController {
 		@Query('query') query: string,
 		@Query('filter') filter: string,
 		@Query('sort') sort: string,
-	): Promise<Array<any>> {
+	): Promise<any> {
 		try {
 			const many = await this.providerProviderOptionService.many({
 				user: Validators.token('accessToken', accessToken, {
