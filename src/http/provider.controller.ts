@@ -302,11 +302,11 @@ export class ProviderController {
 	) {
 		try {
 			const output = await this.providerProviderOptionService.create({
-				user: Validators.token('accessToken', payload['accessToken'], {
+				user: Validators.token('accessToken', accessToken, {
 					accesses: [ process['ACCESS_FILES_PROVIDER_OPTION_RELATION_CREATE'] ],
 					isRequired: true,
 				}),
-				id: Validators.id('id', payload['id']),
+				id: Validators.id('id', id),
 				providerId: Validators.id('providerId', id, {
 					isRequired: true,
 				}),
