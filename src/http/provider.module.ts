@@ -45,7 +45,7 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/provider/option`,
+				path: `provider/option`,
 				method: RequestMethod.GET,
 			});
 		consumer
@@ -53,7 +53,7 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/provider/option/:id`,
+				path: `provider/option/:id`,
 				method: RequestMethod.GET,
 			});
 		consumer
@@ -61,7 +61,7 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/provider/option/:id`,
+				path: `provider/option/:id`,
 				method: RequestMethod.DELETE,
 			});
 		consumer
@@ -69,7 +69,7 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/provider/:id/option`,
+				path: `provider/:id/option`,
 				method: RequestMethod.POST,
 			});
 		consumer
@@ -77,7 +77,7 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/provider`,
+				path: `provider`,
 				method: RequestMethod.GET,
 			});
 		consumer
@@ -85,7 +85,7 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/provider/:id`,
+				path: `provider/:id`,
 				method: RequestMethod.GET,
 			});
 		consumer
@@ -93,7 +93,7 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/provider/:id`,
+				path: `provider/:id`,
 				method: RequestMethod.DELETE,
 			});
 		consumer
@@ -101,7 +101,7 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/provider`,
+				path: `provider`,
 				method: RequestMethod.POST,
 			});
 		consumer
@@ -109,7 +109,7 @@ export class ProviderModule implements NestModule {
 				// ExampleMiddleware,
 			)
 			.forRoutes({
-				path: `${process.env.SERVICE_FILES}/provider/:id`,
+				path: `provider/:id`,
 				method: RequestMethod.PATCH,
 			});
 	}
