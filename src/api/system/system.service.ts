@@ -231,12 +231,22 @@ export class SystemService extends SqlService {
 				if (!parentFolder) {
 					throw new Error(`Parent folder by path "/" is undefined.`);
 				}
+				let name = `SYSTEM-(${beforeOutput['id']})`;
+
+				if (optionContent['content']
+					&& typeof optionContent['content'] === 'string') {
+					name = optionContent['content'].replace(/\//g, '');
+				}
+				if (!name) {
+					name = `SYSTEM-(${beforeOutput['id']})`;
+				}
+
 				await this.folderService.create({
 					user: (payload || {})['user'],
 					systemId: beforeOutput['id'],
 					parentId: parentFolder['id'],
-					path: `/SYSTEM-(${beforeOutput['id']})`,
-					name: `SYSTEM-(${beforeOutput['id']})`,
+					path: `/${name}`,
+					name,
 				});
 			}
 		}
