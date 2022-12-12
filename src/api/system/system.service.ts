@@ -243,6 +243,14 @@ export class SystemService extends SqlService {
 					name = `SYSTEM-(${beforeOutput['id']})`;
 				}
 
+				console.log('111', {
+					user: (payload || {})['user'],
+					systemId: beforeOutput['id'],
+					parentId: parentFolder['id'],
+					path: `/${name}`,
+					name,
+				});
+
 				await this.folderService.create({
 					user: (payload || {})['user'],
 					systemId: beforeOutput['id'],
