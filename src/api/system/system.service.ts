@@ -20,6 +20,7 @@ import {
 import { System } from './system.entity';
 import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
+import { Folder } from '../folder/folder.entity';
 import { FolderService } from '../folder/folder.service';
 
 @Injectable()
@@ -28,6 +29,7 @@ export class SystemService extends SqlService {
 		@InjectRepository(System) private readonly systemRepository: Repository<System>,
 		@InjectRepository(SystemSystemSystemOption) private readonly systemSystemSystemOptionRepository: Repository<SystemSystemSystemOption>,
 		@InjectRepository(SystemSystemOption) private readonly systemSystemOptionRepository: Repository<SystemSystemOption>,
+		@InjectRepository(Folder) private readonly folderRepository: Repository<Folder>,
 		private readonly connection: Connection,
 		private readonly cacheService: CacheService,
 		private readonly folderService: FolderService,
