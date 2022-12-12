@@ -245,7 +245,7 @@ export class SystemService extends SqlService {
 					user: (payload || {})['user'],
 					systemId: beforeOutput['id'],
 					parentId: parentFolder['id'],
-					path: `/${name}`,
+					path: '/',
 					name,
 				});
 			}
