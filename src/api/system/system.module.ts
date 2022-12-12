@@ -6,6 +6,7 @@ import {
 } from 'nest-datum/balancer/src';
 import { CacheService } from 'nest-datum/cache/src';
 import { SystemSystemOptionService } from '../system-system-option/system-system-option.service';
+import { FolderService } from '../folder/folder.service';
 import { Provider } from '../provider/provider.entity';
 import { Folder } from '../folder/folder.entity';
 import { File } from '../file/file.entity';
@@ -33,6 +34,7 @@ import { SystemController } from './system.controller';
 		BalancerRepository, 
 		BalancerService,
 		CacheService,
+		FolderService,
 		SystemSystemOptionService,
 		SystemService, 
 	],

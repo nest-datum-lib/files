@@ -20,6 +20,7 @@ import {
 import { System } from './system.entity';
 import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
+import { FolderService } from '../folder/folder.service';
 
 @Injectable()
 export class SystemService extends SqlService {
@@ -29,6 +30,7 @@ export class SystemService extends SqlService {
 		@InjectRepository(SystemSystemOption) private readonly systemSystemOptionRepository: Repository<SystemSystemOption>,
 		private readonly connection: Connection,
 		private readonly cacheService: CacheService,
+		private readonly folderService: FolderService,
 	) {
 		super();
 	}
@@ -182,6 +184,62 @@ export class SystemService extends SqlService {
 		}
 	}
 
+	async createOptionContentBefore(payload?: object): Promise<any> {
+		const system = await this.systemRepository.findOne({
+			select: {
+				id: true,
+				name: true,
+				providerId: true,
+			},
+			where: {
+				id: (payload || {})['id'],
+			},
+		});
+
+		if (!system) {
+			return new NotFoundException('Entity is undefined', getCurrentLine(), { ...(payload || {}) });
+		}
+		return system;
+	}
+
+	async createOptionContentAfter(beforeOutput, optionContent, payload?: object): Promise<any> {
+		if (beforeOutput['providerId'] === 'files-provider-local'
+			&& optionContent['systemSystemOptionId']) {
+			const systemSystemOption = await this.systemSystemOptionRepository.findOne({
+				select: {
+					id: true,
+					systemOptionId: true,
+				},
+				where:{
+					id: optionContent['systemSystemOptionId'],
+				},
+			});
+
+			if (systemSystemOption['systemOptionId'] === 'files-system-option-root') {
+				const parentFolder = await this.folderRepository.findOne({
+					select: {
+						id: true,
+						path: true,
+					},
+					where: {
+						path: '/',
+					},
+				});
+
+				if (!parentFolder) {
+					throw new Error(`Parent folder by path "/" is undefined.`);
+				}
+				await this.folderService.create({
+					user: (payload || {})['user'],
+					systemId: beforeOutput['id'],
+					parentId: parentFolder['id'],
+					path: `/SYSTEM-(${beforeOutput['id']})`,
+					name: `SYSTEM-(${beforeOutput['id']})`,
+				});
+			}
+		}
+	}
+
 	async createOptions({ user, id, data }): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner();
 
@@ -191,6 +249,8 @@ export class SystemService extends SqlService {
 			this.cacheService.clear([ 'system', 'option', 'many' ]);
 			this.cacheService.clear([ 'system', 'many' ]);
 			this.cacheService.clear([ 'system', 'one' ]);
+
+			const beforeOutput = await this.createOptionContentBefore({ user, id, data });
 
 			await this.systemSystemSystemOptionRepository.delete({
 				systemId: id,
@@ -218,6 +278,7 @@ export class SystemService extends SqlService {
 						systemSystemOptionId: entityOptionId,
 					});
 
+					await this.createOptionContentAfter(beforeOutput, output);
 					ii++;
 				}
 				i++;
