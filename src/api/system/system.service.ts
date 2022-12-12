@@ -206,7 +206,10 @@ export class SystemService extends SqlService {
 
 	async createOptionContentAfter(beforeOutput, optionContent, payload?: object): Promise<any> {
 		if (beforeOutput['providerId'] === 'files-provider-local'
-			&& optionContent['systemSystemOptionId']) {
+			&& optionContent['systemSystemOptionId']
+			&& optionContent['content']
+			&& typeof optionContent['content'] === 'string'
+			&& optionContent['content'] !== '/') {
 			const systemSystemOption = await this.systemSystemOptionRepository.findOne({
 				select: {
 					id: true,
@@ -231,22 +234,26 @@ export class SystemService extends SqlService {
 				if (!parentFolder) {
 					throw new Error(`Parent folder by path "/" is undefined.`);
 				}
-				let name = `SYSTEM-(${beforeOutput['id']})`;
+				const pathSplit = optionContent['content'].split('/');
 
-				if (optionContent['content']
-					&& typeof optionContent['content'] === 'string') {
-					name = optionContent['content'].replace(/\//g, '');
-				}
-				if (!name) {
-					name = `SYSTEM-(${beforeOutput['id']})`;
+				if (pathSplit.length < 2) {
+					throw new Error('Error folder path.');
 				}
 
 				await this.folderService.create({
 					user: (payload || {})['user'],
 					systemId: beforeOutput['id'],
 					parentId: parentFolder['id'],
-					path: '/',
-					name,
+					path: (pathSplit.length === 2)
+						? '/'
+						: (() => {
+							delete pathSplit[pathSplit.length - 1];
+
+							return pathSplit.join('/');
+						})(),
+					name: ((pathSplit.length === 2)
+						? pathSplit[1]
+						: pathSplit[pathSplit.length - 1]) || `SYSTEM-(${beforeOutput['id']})`,
 				});
 			}
 		}
