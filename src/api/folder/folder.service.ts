@@ -231,13 +231,14 @@ export class FolderService extends SqlService {
 			});
 			let output;
 			
-			if (parentFolder
-				&& payload['path'] !== '/') {
+			if (parentFolder) {
 				output = await this.folderRepository.save({
 					...payload,
 					userId: user['id'] || '',
 					parentId: parentFolder['id'],
-					path: `${payload['path'])}/${payload['name']}`,
+					path: `${(payload['path'] === '/' 
+						? '' 
+						: payload['path'])}/${payload['name']}`,
 				});
 			}
 			else {
