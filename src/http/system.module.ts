@@ -13,7 +13,7 @@ import { CacheService } from 'nest-datum/cache/src';
 import { SystemController } from './system.controller';
 import { SystemSystemOptionService } from '../api/system-system-option/system-system-option.service';
 import { SystemService } from '../api/system/system.service';
-import { FolderService } from '../folder/folder.service';
+import { FolderService } from '../api/folder/folder.service';
 import { Provider } from '../api/provider/provider.entity';
 import { Folder } from '../api/folder/folder.entity';
 import { File } from '../api/file/file.entity';
