@@ -187,8 +187,6 @@ export class SystemService extends SqlService {
 	}
 
 	async createOptionContentBefore(payload?: object): Promise<any> {
-		console.log('payload', payload);
-
 		const system = await this.systemRepository.findOne({
 			select: {
 				id: true,
@@ -200,8 +198,6 @@ export class SystemService extends SqlService {
 			},
 		});
 
-		console.log('system', system);
-
 		if (!system) {
 			return new NotFoundException('Entity is undefined', getCurrentLine(), { ...(payload || {}) });
 		}
@@ -209,10 +205,6 @@ export class SystemService extends SqlService {
 	}
 
 	async createOptionContentAfter(beforeOutput, optionContent, payload?: object): Promise<any> {
-		console.log('beforeOutput', beforeOutput);
-		console.log('payload', payload);
-		console.log('optionContent', optionContent);
-
 		if (beforeOutput['providerId'] === 'files-provider-local'
 			&& optionContent['systemSystemOptionId']) {
 			const systemSystemOption = await this.systemSystemOptionRepository.findOne({
@@ -224,8 +216,7 @@ export class SystemService extends SqlService {
 					id: optionContent['systemSystemOptionId'],
 				},
 			});
-			console.log('systemSystemOption', systemSystemOption);
-
+			
 			if (systemSystemOption['systemOptionId'] === 'files-system-option-root') {
 				const parentFolder = await this.folderRepository.findOne({
 					select: {
@@ -236,6 +227,8 @@ export class SystemService extends SqlService {
 						path: '/',
 					},
 				});
+
+				console.log('parentFolder', parentFolder, beforeOutput);
 
 				if (!parentFolder) {
 					throw new Error(`Parent folder by path "/" is undefined.`);
@@ -299,7 +292,7 @@ export class SystemService extends SqlService {
 						systemSystemOptionId: entityOptionId,
 					});
 
-					await this.createOptionContentAfter(beforeOutput, output);
+					await this.createOptionContentAfter(beforeOutput, output, { user, id, data });
 					ii++;
 				}
 				i++;
