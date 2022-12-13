@@ -193,7 +193,7 @@ export class FileService extends SqlService {
 			this.cacheService.clear([ 'file', 'many' ]);
 
 			if (!payload['path']) {
-				console.log('payload', payload);
+				console.log('payload', payload['systemId']);
 
 				const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
 					select: {
@@ -203,20 +203,20 @@ export class FileService extends SqlService {
 					where:{
 						systemId: payload['systemId'],
 					},
-					relations: {
-						system: true,
-						systemSystemOption: {
-							systemOption: true,
-						}
-					},
+					// relations: {
+					// 	system: true,
+					// 	systemSystemOption: {
+					// 		systemOption: true,
+					// 	}
+					// },
 				});
 
 				console.log('systemOptionContent', systemOptionContent);
 
-				if (!systemOptionContent
-					|| !systemOptionContent['system']) {
+				// if (!systemOptionContent
+				// 	|| !systemOptionContent['system']) {
 					return new NotFoundException('File system is undefined', getCurrentLine(), { user, ...payload });
-				}
+				// }
 				const provider = await this.providerProviderProviderOptionRepository.findOne({
 					select: {
 						providerId: true,
