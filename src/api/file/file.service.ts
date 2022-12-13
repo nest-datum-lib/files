@@ -201,16 +201,12 @@ export class FileService extends SqlService {
 						content: true,
 					},
 					where:{
-						system: {
-							id: payload['systemId'],
-						},
+						systemId: payload['systemId'],
+
 					},
-					// relations: {
-					// 	system: true,
-					// 	systemSystemOption: {
-					// 		systemOption: true,
-					// 	}
-					// },
+					relations: {
+						systemSystemOption: true,
+					},
 				});
 
 				console.log('systemOptionContent', systemOptionContent);
