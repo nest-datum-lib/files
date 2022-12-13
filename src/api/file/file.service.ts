@@ -203,13 +203,15 @@ export class FileService extends SqlService {
 					},
 					where:{
 						systemId: payload['systemId'],
+						systemSystemOption: {
+							systemOption: {
+								id: 'files-system-option-root',
+							},
+						}
 
 					},
 					relations: {
 						system: true,
-						systemSystemOption: {
-							systemOption: true,
-						}
 					},
 				});
 
