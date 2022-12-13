@@ -15,8 +15,8 @@ import { FolderService } from '../api/folder/folder.service';
 import { File } from '../api/file/file.entity';
 import { System } from '../api/system/system.entity';
 import { Folder } from '../api/folder/folder.entity';
-import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
-import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
+import { SystemSystemSystemOption } from '../api/system-system-system-option/system-system-system-option.entity';
+import { ProviderProviderProviderOption } from '../api/provider-provider-provider-option/provider-provider-provider-option.entity';
 
 @Module({
 	imports: [
