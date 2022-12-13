@@ -14,16 +14,20 @@ import { FileController } from './file.controller';
 import { FileService } from '../api/file/file.service';
 import { Folder } from '../api/folder/folder.entity';
 import { File } from '../api/file/file.entity';
-import { SystemSystemSystemOption } from '../api/system-system-system-option/system-system-system-option.entity';
 import { ProviderProviderProviderOption } from '../api/provider-provider-provider-option/provider-provider-provider-option.entity';
+import { ProviderProviderOption } from '../api/provider-provider-option/provider-provider-option.entity';
+import { SystemSystemSystemOption } from '../api/system-system-system-option/system-system-system-option.entity';
+import { SystemSystemOption } from '../api/system-system-option/system-system-option.entity';
 
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([ 
 			Folder,
 			File, 
-			SystemSystemSystemOption,
 			ProviderProviderProviderOption,
+			ProviderProviderOption,
+			SystemSystemSystemOption,
+			SystemSystemOption,
 		]),
 	],
 	controllers: [ FileController ],
