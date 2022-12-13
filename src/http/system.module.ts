@@ -18,6 +18,8 @@ import { Provider } from '../api/provider/provider.entity';
 import { Folder } from '../api/folder/folder.entity';
 import { File } from '../api/file/file.entity';
 import { SystemStatus } from '../api/system-status/system-status.entity';
+import { ProviderProviderProviderOption } from '../api/provider-provider-provider-option/provider-provider-provider-option.entity';
+import { ProviderProviderOption } from '../api/provider-provider-option/provider-provider-option.entity';
 import { SystemSystemSystemOption } from '../api/system-system-system-option/system-system-system-option.entity';
 import { SystemSystemOption } from '../api/system-system-option/system-system-option.entity';
 import { System } from '../api/system/system.entity';
@@ -26,6 +28,8 @@ import { System } from '../api/system/system.entity';
 	imports: [
 		TypeOrmModule.forFeature([ 
 			SystemStatus,
+			ProviderProviderProviderOption,
+			ProviderProviderOption,
 			SystemSystemSystemOption,
 			SystemSystemOption,
 			System,
