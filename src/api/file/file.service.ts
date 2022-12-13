@@ -191,6 +191,8 @@ export class FileService extends SqlService {
 			this.cacheService.clear([ 'file', 'many' ]);
 
 			if (!payload['path']) {
+				console.log('payload', payload);
+				
 				const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
 					select: {
 						systemId: true,
@@ -203,6 +205,8 @@ export class FileService extends SqlService {
 						system: true,
 					},
 				});
+
+				console.log('systemOptionContent', systemOptionContent);
 
 				if (!systemOptionContent
 					|| !systemOptionContent['system']) {
