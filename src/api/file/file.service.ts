@@ -201,7 +201,9 @@ export class FileService extends SqlService {
 						content: true,
 					},
 					where:{
-						systemId: payload['systemId'],
+						system: {
+							id: payload['systemId'],
+						},
 					},
 					// relations: {
 					// 	system: true,
