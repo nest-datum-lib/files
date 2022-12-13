@@ -207,9 +207,9 @@ export class FileService extends SqlService {
 					},
 					relations: {
 						system: true,
-						// systemSystemOption: {
-						// 	systemOption: true,
-						// }
+						systemSystemOption: {
+							systemOption: true,
+						}
 					},
 				});
 
