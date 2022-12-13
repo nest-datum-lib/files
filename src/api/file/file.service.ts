@@ -30,7 +30,6 @@ export class FileService extends SqlService {
 	constructor(
 		@InjectRepository(Folder) private readonly folderRepository: Repository<Folder>,
 		@InjectRepository(File) private readonly fileRepository: Repository<File>,
-		@InjectRepository(SystemSystemOption) private readonly systemSystemOptionRepository: Repository<SystemSystemOption>,
 		@InjectRepository(SystemSystemSystemOption) private readonly systemSystemSystemOptionRepository: Repository<SystemSystemSystemOption>,
 		@InjectRepository(ProviderProviderProviderOption) private readonly providerProviderProviderOptionRepository: Repository<ProviderProviderProviderOption>,
 		private readonly connection: Connection,
@@ -193,8 +192,6 @@ export class FileService extends SqlService {
 			this.cacheService.clear([ 'file', 'many' ]);
 
 			if (!payload['path']) {
-				console.log('payload', payload['systemId']);
-
 				const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
 					select: {
 						id: true,
@@ -207,7 +204,7 @@ export class FileService extends SqlService {
 							systemOption: {
 								id: 'files-system-option-root',
 							},
-						}
+						},
 
 					},
 					relations: {
@@ -215,19 +212,23 @@ export class FileService extends SqlService {
 					},
 				});
 
-				console.log('systemOptionContent', systemOptionContent);
-
-				// if (!systemOptionContent
-				// 	|| !systemOptionContent['system']) {
+				if (!systemOptionContent
+					|| !systemOptionContent['system']) {
 					return new NotFoundException('File system is undefined', getCurrentLine(), { user, ...payload });
-				// }
+				}
 				const provider = await this.providerProviderProviderOptionRepository.findOne({
 					select: {
+						id: true,
 						providerId: true,
 						content: true,
 					},
 					where:{
 						providerId: systemOptionContent['system']['providerId'],
+						providerProviderOption: {
+							providerOption: {
+								id: 'files-provider-option-root-path',
+							},
+						},
 					},
 				});
 
