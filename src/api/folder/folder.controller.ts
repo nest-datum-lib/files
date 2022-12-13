@@ -148,7 +148,6 @@ export class FolderController {
 				}),
 				parentId: Validators.id('parentId', payload['parentId']),
 				path: Validators.path('path', payload['path'], {
-					isRequired: true,
 					min: 1,
 					max: 255,
 				}),

@@ -19,6 +19,8 @@ import {
 	ErrorException,
 	NotFoundException, 
 } from 'nest-datum/exceptions/src';
+import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
+import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
 import { Folder } from '../folder/folder.entity';
 import { File } from './file.entity';
 
@@ -27,6 +29,8 @@ export class FileService extends SqlService {
 	constructor(
 		@InjectRepository(Folder) private readonly folderRepository: Repository<Folder>,
 		@InjectRepository(File) private readonly fileRepository: Repository<File>,
+		@InjectRepository(SystemSystemSystemOption) private readonly systemSystemSystemOptionRepository: Repository<SystemSystemSystemOption>,
+		@InjectRepository(ProviderProviderProviderOption) private readonly providerProviderProviderOptionRepository: Repository<ProviderProviderProviderOption>,
 		private readonly connection: Connection,
 		private readonly cacheService: CacheService,
 	) {
@@ -186,6 +190,41 @@ export class FileService extends SqlService {
 			this.cacheService.clear([ 'folder', 'many' ]);
 			this.cacheService.clear([ 'file', 'many' ]);
 
+			if (!payload['path']) {
+				const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
+					select: {
+						systemId: true,
+						content: true,
+					},
+					where:{
+						systemId: payload['systemId'],
+					},
+					relations: {
+						system: true,
+					},
+				});
+
+				if (!systemOptionContent
+					|| !systemOptionContent['system']) {
+					return new NotFoundException('File system is undefined', getCurrentLine(), { user, ...payload });
+				}
+				const provider = await this.providerProviderProviderOptionRepository.findOne({
+					select: {
+						providerId: true,
+						content: true,
+					},
+					where:{
+						providerId: systemOptionContent['system']['providerId'],
+					},
+				});
+
+				if (!provider) {
+					return new NotFoundException('Provider is undefined', getCurrentLine(), { user, ...payload });
+				}
+				payload['path'] = ((provider['content'] === '/')
+					? ''
+					: provider['content']) + systemOptionContent['content'];
+			}
 			const parentFolder = await this.folderRepository.findOne({
 				select: {
 					id: true,
