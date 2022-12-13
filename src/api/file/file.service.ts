@@ -19,6 +19,7 @@ import {
 	ErrorException,
 	NotFoundException, 
 } from 'nest-datum/exceptions/src';
+import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
 import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
 import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
 import { Folder } from '../folder/folder.entity';
@@ -29,6 +30,7 @@ export class FileService extends SqlService {
 	constructor(
 		@InjectRepository(Folder) private readonly folderRepository: Repository<Folder>,
 		@InjectRepository(File) private readonly fileRepository: Repository<File>,
+		@InjectRepository(SystemSystemOption) private readonly systemSystemOptionRepository: Repository<SystemSystemOption>,
 		@InjectRepository(SystemSystemSystemOption) private readonly systemSystemSystemOptionRepository: Repository<SystemSystemSystemOption>,
 		@InjectRepository(ProviderProviderProviderOption) private readonly providerProviderProviderOptionRepository: Repository<ProviderProviderProviderOption>,
 		private readonly connection: Connection,
@@ -192,7 +194,7 @@ export class FileService extends SqlService {
 
 			if (!payload['path']) {
 				console.log('payload', payload);
-				
+
 				const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
 					select: {
 						systemId: true,
@@ -203,6 +205,9 @@ export class FileService extends SqlService {
 					},
 					relations: {
 						system: true,
+						systemSystemOption: {
+							systemOption: true,
+						}
 					},
 				});
 
