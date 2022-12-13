@@ -197,6 +197,7 @@ export class FileService extends SqlService {
 
 				const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
 					select: {
+						id: true,
 						systemId: true,
 						content: true,
 					},
@@ -205,7 +206,10 @@ export class FileService extends SqlService {
 
 					},
 					relations: {
-						systemSystemOption: true,
+						system: true,
+						// systemSystemOption: {
+						// 	systemOption: true,
+						// }
 					},
 				});
 
