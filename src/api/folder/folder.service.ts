@@ -221,11 +221,18 @@ export class FolderService extends SqlService {
 			if (!payload['path']) {
 				const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
 					select: {
+						id: true,
 						systemId: true,
 						content: true,
 					},
 					where:{
 						systemId: payload['systemId'],
+						systemSystemOption: {
+							systemOption: {
+								id: 'files-system-option-root',
+							},
+						},
+
 					},
 					relations: {
 						system: true,
@@ -238,11 +245,17 @@ export class FolderService extends SqlService {
 				}
 				const provider = await this.providerProviderProviderOptionRepository.findOne({
 					select: {
+						id: true,
 						providerId: true,
 						content: true,
 					},
 					where:{
 						providerId: systemOptionContent['system']['providerId'],
+						providerProviderOption: {
+							providerOption: {
+								id: 'files-provider-option-root-path',
+							},
+						},
 					},
 				});
 
