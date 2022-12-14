@@ -186,7 +186,7 @@ export class FileService extends SqlService {
 
 		try {
 			await queryRunner.startTransaction();
-			
+
 			this.cacheService.clear([ 'folder', 'one' ]);
 			this.cacheService.clear([ 'folder', 'many' ]);
 			this.cacheService.clear([ 'file', 'many' ]);
@@ -267,9 +267,9 @@ export class FileService extends SqlService {
 						systemId: payload['systemId'],
 						userId: user['id'] || '',
 						parentId: parentFolder['id'],
-						path: `${(parentFolder['path'] === '/'
-							? ''
-							: parentFolder['path'])}/${fileName}`,
+						path: (parentFolder['path'] === '/')
+							? `/${fileName}`
+							: `${parentFolder['path']}/${fileName}`,
 						name: fileName,
 						type: extension,
 						size: payload['files'][i].size,
@@ -279,21 +279,6 @@ export class FileService extends SqlService {
 					fs.createWriteStream(`${process.env.APP_ROOT_PATH}/${parentFolder['path']}/${fileName}`).write(buffer);
 					i++;
 				}
-				await (new Promise(async (resolve, reject) => {
-					fs.exists(`${process.env.APP_ROOT_PATH}/${parentFolder['path']}`, async (existsFlag) => {
-						if (existsFlag) {
-							fs.mkdir(`${process.env.APP_ROOT_PATH}/${parentFolder['path']}`, { recursive: true }, async (err) => {
-								if (err) {
-									return reject(new Error(err.message));
-								}
-								return resolve(output);
-							});
-						}
-						else {
-							return reject(new Error('Folder is not exists.'));
-						}
-					});
-				}));
 			}
 			else {
 				throw new Error('Folder is not exists.');
