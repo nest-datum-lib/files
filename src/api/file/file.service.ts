@@ -264,31 +264,41 @@ export class FileService extends SqlService {
 					const extension = mimetypeSplit[mimetypeSplit.length - 1];
 					const fileName = payload['files'][i]['originalname'];
 					const buffer = Buffer.from(payload['files'][i]['buffer']);
-
-					console.log('?????????/', {
-						systemId: payload['systemId'],
-						userId: user['id'] || '',
-						parentId: parentFolder['id'],
-						path: (parentFolder['path'] === '/')
-							? `/${fileName}`
-							: `${parentFolder['path']}/${fileName}`,
-						name: fileName,
-						type: extension,
-						size: payload['files'][i].size,
+					const path = (parentFolder['path'] === '/')
+						? `/${fileName}`
+						: `${parentFolder['path']}/${fileName}`;
+					let file = await this.fileRepository.findOne({
+						where: {
+							path,
+						},
 					});
 
-					const file = await this.fileRepository.save({
-						systemId: payload['systemId'],
-						userId: user['id'] || '',
-						parentId: parentFolder['id'],
-						path: (parentFolder['path'] === '/')
-							? `/${fileName}`
-							: `${parentFolder['path']}/${fileName}`,
-						name: fileName,
-						type: extension,
-						size: payload['files'][i].size,
-					});
+					if (file) {
+						await this.fileRepository.update({
+							id: file['id'],
+						}, {
+							name: fileName,
+							type: extension,
+							size: payload['files'][i].size,
+						});
 
+						file['name'] = fileName;
+						file['type'] = extension;
+						file['size'] = payload['files'][i].size;
+					}
+					else {
+						file = await this.fileRepository.save({
+							systemId: payload['systemId'],
+							userId: user['id'] || '',
+							parentId: parentFolder['id'],
+							path: (parentFolder['path'] === '/')
+								? `/${fileName}`
+								: `${parentFolder['path']}/${fileName}`,
+							name: fileName,
+							type: extension,
+							size: payload['files'][i].size,
+						});
+					}
 					output.push(file);
 					fs.createWriteStream(`${process.env.APP_ROOT_PATH}/${parentFolder['path']}/${fileName}`).write(buffer);
 					i++;
