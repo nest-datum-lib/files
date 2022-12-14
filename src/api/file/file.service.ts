@@ -256,12 +256,26 @@ export class FileService extends SqlService {
 			let i = 0,
 				output = [];
 
+			console.log('parentFolder', parentFolder);
+
 			if (parentFolder) {
 				while (i < payload['files'].length) {
 					const mimetypeSplit = payload['files'][i].mimetype.split('/');
 					const extension = mimetypeSplit[mimetypeSplit.length - 1];
 					const fileName = payload['files'][i]['originalname'];
 					const buffer = Buffer.from(payload['files'][i]['buffer']);
+
+					console.log('?????????/', {
+						systemId: payload['systemId'],
+						userId: user['id'] || '',
+						parentId: parentFolder['id'],
+						path: (parentFolder['path'] === '/')
+							? `/${fileName}`
+							: `${parentFolder['path']}/${fileName}`,
+						name: fileName,
+						type: extension,
+						size: payload['files'][i].size,
+					});
 
 					const file = await this.fileRepository.save({
 						systemId: payload['systemId'],
