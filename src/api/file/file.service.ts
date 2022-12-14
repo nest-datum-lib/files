@@ -256,8 +256,6 @@ export class FileService extends SqlService {
 			let i = 0,
 				output = [];
 
-			console.log('parentFolder', parentFolder);
-
 			if (parentFolder) {
 				while (i < payload['files'].length) {
 					const mimetypeSplit = payload['files'][i].mimetype.split('/');
