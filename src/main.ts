@@ -11,12 +11,17 @@ import {
 	BalancerModule,
 	BalancerService, 
 } from 'nest-datum/balancer/src';
-import { getEnvValue } from 'nest-datum/common/src';
+import { 
+	getEnvValue,
+	onExit,
+	onWarning,
+	onUncaughtException, 
+} from 'nest-datum/common/src';
 import { AppModule } from './app.module';
 
-process.on('uncaughtException', (err) => {
-	console.error('CRITICAL uncaughtException', err);
-});
+process.on('exit', onExit);
+process.on('warning', onWarning);
+process.on('uncaughtException', onUncaughtException);
 
 async function createApp() {
 	const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {

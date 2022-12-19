@@ -103,8 +103,9 @@ export class SystemOptionService extends SqlService {
 			this.cacheService.clear([ 'system', 'option', 'many' ]);
 			this.cacheService.clear([ 'system', 'option', 'one', payload ]);
 
-			await this.systemSystemOptionRepository.delete({ systemOptionId: payload['id'] });
-			await this.dropByIsDeleted(this.systemOptionRepository, payload['id']);
+			await this.dropByIsDeleted(this.systemOptionRepository, payload['id'], async (entity) => {
+				await this.systemSystemOptionRepository.delete({ systemOptionId: entity['id'] });
+			});
 
 			await queryRunner.commitTransaction();
 
@@ -133,8 +134,9 @@ export class SystemOptionService extends SqlService {
 			let i = 0;
 
 			while (i < payload['ids'].length) {
-				await this.systemSystemOptionRepository.delete({ systemOptionId: payload['ids'][i] });
-				await this.dropByIsDeleted(this.systemOptionRepository, payload['ids'][i]);
+				await this.dropByIsDeleted(this.systemOptionRepository, payload['ids'][i], async (entity) => {
+					await this.systemSystemOptionRepository.delete({ systemOptionId: entity['id'] });
+				});
 				i++;
 			}
 			await queryRunner.commitTransaction();

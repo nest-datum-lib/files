@@ -107,9 +107,10 @@ export class SystemService extends SqlService {
 			this.cacheService.clear([ 'system', 'many' ]);
 			this.cacheService.clear([ 'system', 'one', payload ]);
 
-			await this.systemSystemSystemOptionRepository.delete({ systemId: payload['id'] });
-			await this.systemSystemOptionRepository.delete({ systemId: payload['id'] });
-			await this.dropByIsDeleted(this.systemRepository, payload['id']);
+			await this.dropByIsDeleted(this.systemRepository, payload['id'], async (entity) => {
+				await this.systemSystemSystemOptionRepository.delete({ systemId: entity['id'] });
+				await this.systemSystemOptionRepository.delete({ systemId: entity['id'] });
+			});
 
 			await queryRunner.commitTransaction();
 
@@ -138,9 +139,10 @@ export class SystemService extends SqlService {
 			let i = 0;
 
 			while (i < payload['ids'].length) {
-				await this.systemSystemSystemOptionRepository.delete({ systemId: payload['ids'][i] });
-				await this.systemSystemOptionRepository.delete({ systemId: payload['ids'][i] });
-				await this.dropByIsDeleted(this.systemRepository, payload['ids'][i]);
+				await this.dropByIsDeleted(this.systemRepository, payload['ids'][i], async (entity) => {
+					await this.systemSystemSystemOptionRepository.delete({ systemId: entity['id'] });
+					await this.systemSystemOptionRepository.delete({ systemId: entity['id'] });
+				});
 				i++;
 			}
 			await queryRunner.commitTransaction();

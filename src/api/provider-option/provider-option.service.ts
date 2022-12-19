@@ -103,8 +103,9 @@ export class ProviderOptionService extends SqlService {
 			this.cacheService.clear([ 'provider', 'option', 'many' ]);
 			this.cacheService.clear([ 'provider', 'option', 'one', payload ]);
 
-			await this.providerProviderOptionRepository.delete({ providerOptionId: payload['id'] });
-			await this.dropByIsDeleted(this.providerOptionRepository, payload['id']);
+			await this.dropByIsDeleted(this.providerOptionRepository, payload['id'], async (entity) => {
+				await this.providerProviderOptionRepository.delete({ providerOptionId: entity['id'] });
+			});
 
 			await queryRunner.commitTransaction();
 
@@ -133,8 +134,9 @@ export class ProviderOptionService extends SqlService {
 			let i = 0;
 
 			while (i < payload['ids'].length) {
-				await this.providerProviderOptionRepository.delete({ providerOptionId: payload['ids'][i] });
-				await this.dropByIsDeleted(this.providerOptionRepository, payload['ids'][i]);
+				await this.dropByIsDeleted(this.providerOptionRepository, payload['ids'][i], async (entity) => {
+					await this.providerProviderOptionRepository.delete({ providerOptionId: entity['id'] });
+				});
 				i++;
 			}
 			await queryRunner.commitTransaction();
