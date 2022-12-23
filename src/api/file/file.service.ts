@@ -259,8 +259,11 @@ export class FileService extends SqlService {
 			if (parentFolder) {
 				while (i < payload['files'].length) {
 					const mimetypeSplit = payload['files'][i].mimetype.split('/');
-					const extension = mimetypeSplit[mimetypeSplit.length - 1];
 					const fileName = payload['files'][i]['originalname'];
+					const fileNameSplit = fileName.split('.');
+					const extension = ((mimetypeSplit[mimetypeSplit.length - 1] === 'octet-stream')
+						? fileNameSplit[fileNameSplit.length - 1]
+						: mimetypeSplit[mimetypeSplit.length - 1]) || 'octet-stream';
 					const buffer = Buffer.from(payload['files'][i]['buffer']);
 					const path = (parentFolder['path'] === '/')
 						? `/${fileName}`
