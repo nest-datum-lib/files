@@ -42,6 +42,7 @@ export class FileService extends SqlService {
 		id: true,
 		userId: true,
 		parentId: true,
+		systemId: true,
 		path: true,
 		name: true,
 		description: true,
