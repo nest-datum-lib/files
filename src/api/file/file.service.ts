@@ -193,6 +193,8 @@ export class FileService extends SqlService {
 			this.cacheService.clear([ 'file', 'many' ]);
 			this.cacheService.clear([ 'file', 'one' ]);
 
+			console.log('?????????')
+
 			if (!payload['path']) {
 				const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
 					select: {
