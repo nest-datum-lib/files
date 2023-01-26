@@ -47,11 +47,11 @@ export class DownloadProcessor extends QueueService {
 				: http;
 			// const file = fs.createWriteStream(`${process.env.APP_ROOT_PATH}/${id}.pdf`);
 
-			const response = await request.get(payloadData['url'], {
+			const { data } = await request.get(payloadData['url'], {
 				responseType: 'blob',
 			});
 
-			console.log('payloadData', response);
+			console.log('payloadData', data);
 
 			/*await (new Promise((resolve, reject) => {
 				const fetch = request.get(payloadData['url'], (response) => {
