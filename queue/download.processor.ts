@@ -135,7 +135,7 @@ export class DownloadProcessor extends QueueService {
 				});
 
 				file.on('error', (errFile) => {
-					fs.unlink(`${process.env.APP_ROOT_PATH}/${id}.pdf`, (errUnlink) => {
+					fs.unlink(`${process.env.APP_ROOT_PATH}/${path}/${payloadData['name']}`, (errUnlink) => {
 						if (errUnlink) {
 							return reject(new Error(errUnlink.message));
 						}
