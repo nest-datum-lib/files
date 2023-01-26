@@ -27,7 +27,6 @@ export class DownloadProcessor extends QueueService {
 		@InjectRedis(process['REDIS_QUEUE']) public readonly queueRepository: Redis,
 		private readonly balancerService: BalancerService,
 		private readonly cacheService: CacheService,
-		// private readonly fileService: FileService,
 	) {
 		super(queueRepository);
 	}
@@ -153,10 +152,7 @@ export class DownloadProcessor extends QueueService {
 				});
 			}));
 			const stats = fs.statSync(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
-
-			console.log('stats', stats);
-
-			await this.fileRepository.save({
+			const fileData = await this.fileRepository.save({
 				systemId: payloadData['systemId'],
 				userId: '',
 				parentId: parentFolder['id'],
@@ -167,8 +163,22 @@ export class DownloadProcessor extends QueueService {
 				type: 'pdf',
 				size: stats.size,
 			});
+			const accessToken = generateAccessToken({
+				id: 'sso-user-admin',
+				roleId: 'sso-role-admin',
+				email: process.env.USER_ROOT_EMAIL,
+			}, Date.now());
+			
+			await this.balancerService.send({
+				name: process.env.SERVICE_CV, 
+				cmd: 'report.create',
+			}, {
+				accessToken,
+				reportStatusId: 'cv-report-status-started',
+				fileId: fileData['id'],
+			});
 
-			console.log('file', file)
+			console.log('fileData', fileData)
 		}
 		catch (err) {
 			console.error(err);
