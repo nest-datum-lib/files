@@ -27,11 +27,11 @@ console.log('typeormConfig', typeormConfig);
 	imports: [
 		TypeOrmModule.forRoot(typeormConfig),
 		TypeOrmModule.forFeature([ 
-			ProviderProviderProviderOption,
-			ProviderProviderOption,
-			SystemSystemSystemOption,
-			SystemSystemOption,
-			Folder,
+			// ProviderProviderProviderOption,
+			// ProviderProviderOption,
+			// SystemSystemSystemOption,
+			// SystemSystemOption,
+			// Folder,
 			File, 
 		]),
 		ServeStaticModule.forRoot({ rootPath: process.env.APP_ROOT_PATH }),
