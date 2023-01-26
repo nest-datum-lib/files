@@ -17,24 +17,23 @@ import { SystemSystemSystemOption } from 'src/api/system-system-system-option/sy
 import { SystemSystemOption } from 'src/api/system-system-option/system-system-option.entity';
 import { Folder } from 'src/api/folder/folder.entity';
 import { File } from 'src/api/file/file.entity';
-import { FileService } from 'src/api/file/file.service';
 import { ProcessorService } from './processor.service';
 import { DownloadProcessor } from './download.processor';
 
 @Module({
 	controllers: [],
 	imports: [
-		ServeStaticModule.forRoot({ rootPath: process.env.APP_ROOT_PATH }),
-		RedisModule.forRoot(redisConfig),
 		TypeOrmModule.forRoot(typeormConfig),
 		TypeOrmModule.forFeature([ 
 			ProviderProviderProviderOption,
 			ProviderProviderOption,
 			SystemSystemSystemOption,
-			// SystemSystemOption,
+			SystemSystemOption,
 			Folder,
 			File, 
 		]),
+		ServeStaticModule.forRoot({ rootPath: process.env.APP_ROOT_PATH }),
+		RedisModule.forRoot(redisConfig),
 		BalancerModule,
 		QueueModule,
 	],
