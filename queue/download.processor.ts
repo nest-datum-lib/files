@@ -127,8 +127,6 @@ export class DownloadProcessor extends QueueService {
 				});
 
 				file.on('finish', () => {
-					console.log('file', file)
-
 					file.close();
 
 					return resolve(true);
@@ -143,6 +141,8 @@ export class DownloadProcessor extends QueueService {
 					});
 				});
 			}));
+
+			console.log('file', file)
 		}
 		catch (err) {
 			console.error(err);
