@@ -17,6 +17,7 @@ import { SystemSystemSystemOption } from 'src/api/system-system-system-option/sy
 import { SystemSystemOption } from 'src/api/system-system-option/system-system-option.entity';
 import { Folder } from 'src/api/folder/folder.entity';
 import { File } from 'src/api/file/file.entity';
+import { FileService } from 'src/api/file/file.service';
 import { ProcessorService } from './processor.service';
 import { DownloadProcessor } from './download.processor';
 
@@ -38,9 +39,10 @@ import { DownloadProcessor } from './download.processor';
 		QueueModule,
 	],
 	providers: [ 
-		BalancerRepository,
-		BalancerService, 
+		BalancerRepository, 
+		BalancerService,
 		CacheService,
+		FileService, 
 		ProcessorService, 
 		DownloadProcessor,
 	],
