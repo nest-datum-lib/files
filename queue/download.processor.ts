@@ -99,9 +99,19 @@ export class DownloadProcessor extends QueueService {
 			if (!provider) {
 				return new Error(`Provider "${systemOptionContent['system']['providerId']}" is undefined`);
 			}
-			const path = ((provider['content'] === '/')
+			const path = (((provider['content'] === '/')
 				? ''
-				: provider['content']) + systemOptionContent['content'];
+				: provider['content']) + systemOptionContent['content']) || '/';
+			const parentFolder = await this.folderRepository.findOne({
+				select: {
+					id: true,
+					path: true,
+				},
+				where: {
+					path,
+				},
+			});
+
 			const request = (payloadData['url'].indexOf('https://') === 0)
 				? https
 				: http;
@@ -141,6 +151,21 @@ export class DownloadProcessor extends QueueService {
 					});
 				});
 			}));
+			const stats = fs.statSync(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
+
+			console.log('stats', stats);
+
+			await this.fileRepository.save({
+				systemId: payloadData['systemId'],
+				userId: '',
+				parentId: parentFolder['id'],
+				path: (parentFolder['path'] === '/')
+					? `/${payloadData['name']}`
+					: `${parentFolder['path']}/${payloadData['name']}`,
+				name: payloadData['name'],
+				type: 'pdf',
+				size: stats.size,
+			});
 
 			console.log('file', file)
 		}
