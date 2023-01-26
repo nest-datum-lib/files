@@ -178,8 +178,6 @@ export class DownloadProcessor extends QueueService {
 				reportStatusId: 'cv-report-status-started',
 				fileId: fileData['id'],
 			});
-
-			console.log('fileData', fileData)
 		}
 		catch (err) {
 			console.error(err);
