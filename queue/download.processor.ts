@@ -15,7 +15,7 @@ import { envPropsBySubstr } from 'nest-datum/common/src';
 @Injectable()
 export class DownloadProcessor extends QueueService {
 	constructor(
-		@InjectRepository(Report) private readonly reportRepository: Repository<Report>,
+		// @InjectRepository(Report) private readonly reportRepository: Repository<Report>,
 		@InjectRedis(process['REDIS_QUEUE']) public readonly queueRepository: Redis,
 		public readonly resumeParserProcessor: ResumeParserProcessor,
 		private readonly balancerService: BalancerService,
@@ -84,14 +84,6 @@ export class DownloadProcessor extends QueueService {
 		catch (err) {
 			console.error(err);
 
-			if (payloadData['id']) {
-				this.cacheService.clear([ 'report', 'many' ]);
-				this.cacheService.clear([ 'report', 'one' ]);
-
-				this.reportRepository.update({ id: payloadData['id'] }, {
-					reportStatusId: 'cv-report-status-failed',
-				});
-			}
 			throw new Error(err.message);
 		}
 	}
