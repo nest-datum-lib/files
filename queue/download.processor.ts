@@ -44,16 +44,14 @@ export class DownloadProcessor extends QueueService {
 				|| typeof payloadData['url'] !== 'string') {
 				throw new Error(`Payload "url (${(payloadData['url'] || '').toString()})" property is invalid format.`);
 			}
+			if (!payloadData['name']
+				|| typeof payloadData['name'] !== 'string') {
+				throw new Error(`Payload "name (${(payloadData['name'] || '').toString()})" property is invalid format.`);
+			}
 			if (!payloadData['systemId']
 				|| typeof payloadData['systemId'] !== 'string') {
 				throw new Error(`Payload "systemId (${(payloadData['systemId'] || '').toString()})" property is invalid format.`);
 			}
-			const request = (payloadData['url'].indexOf('https://') === 0)
-				? https
-				: http;
-			const fileName = uuidv4();
-			// const file = fs.createWriteStream(`${process.env.APP_ROOT_PATH}/${id}.pdf`);
-
 			this.cacheService.clear([ 'folder', 'one' ]);
 			this.cacheService.clear([ 'folder', 'many' ]);
 			this.cacheService.clear([ 'file', 'many' ]);
@@ -104,10 +102,13 @@ export class DownloadProcessor extends QueueService {
 			const path = ((provider['content'] === '/')
 				? ''
 				: provider['content']) + systemOptionContent['content'];
+			const request = (payloadData['url'].indexOf('https://') === 0)
+				? https
+				: http;
+			const fileName = uuidv4();
+			const file = fs.createWriteStream(`${process.env.APP_ROOT_PATH}/${path}/${payloadData['name']}`);
 
-			console.log('payloadData', path);
-
-			/*await (new Promise((resolve, reject) => {
+			await (new Promise((resolve, reject) => {
 				const fetch = request.get(payloadData['url'], (response) => {
 					if (response.statusCode !== 200
 						&& response.statusCode !== 201) {
@@ -117,7 +118,7 @@ export class DownloadProcessor extends QueueService {
 				});
 
 				fetch.on('error', (errRequest) => {
-					fs.unlink(`${process.env.APP_ROOT_PATH}/${id}.pdf`, (errUnlink) => {
+					fs.unlink(`${process.env.APP_ROOT_PATH}/${path}/${payloadData['name']}`, (errUnlink) => {
 						if (errUnlink) {
 							return reject(new Error(errUnlink.message));
 						}
@@ -126,6 +127,8 @@ export class DownloadProcessor extends QueueService {
 				});
 
 				file.on('finish', () => {
+					console.log('file', file)
+
 					file.close();
 
 					return resolve(true);
@@ -139,7 +142,7 @@ export class DownloadProcessor extends QueueService {
 						return reject(new Error(errFile.message));
 					});
 				});
-			}));*/
+			}));
 		}
 		catch (err) {
 			console.error(err);
