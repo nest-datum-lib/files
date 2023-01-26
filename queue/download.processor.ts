@@ -11,12 +11,17 @@ import { BalancerService } from 'nest-datum/balancer/src';
 import { CacheService } from 'nest-datum/cache/src';
 import { QueueService } from 'nest-datum/queue/src';
 import { envPropsBySubstr } from 'nest-datum/common/src';
-// import { FileService } from 'src/api/file/file.service';
+import { SystemSystemSystemOption } from 'src/api/system-system-system-option/system-system-system-option.entity';
+import { ProviderProviderProviderOption } from 'src/api/provider-provider-provider-option/provider-provider-provider-option.entity';
+import { Folder } from 'src/api/folder/folder.entity';
+import { File } from 'src/api/file/file.entity';
 
 @Injectable()
 export class DownloadProcessor extends QueueService {
 	constructor(
-		// @InjectRepository(Report) private readonly reportRepository: Repository<Report>,
+		@InjectRepository(File) private readonly fileRepository: Repository<File>,
+		@InjectRepository(SystemSystemSystemOption) private readonly systemSystemSystemOptionRepository: Repository<SystemSystemSystemOption>,
+		@InjectRepository(ProviderProviderProviderOption) private readonly providerProviderProviderOptionRepository: Repository<ProviderProviderProviderOption>,
 		@InjectRedis(process['REDIS_QUEUE']) public readonly queueRepository: Redis,
 		private readonly balancerService: BalancerService,
 		private readonly cacheService: CacheService,
@@ -45,14 +50,61 @@ export class DownloadProcessor extends QueueService {
 			const request = (payloadData['url'].indexOf('https://') === 0)
 				? https
 				: http;
+			const fileName = uuidv4();
 			// const file = fs.createWriteStream(`${process.env.APP_ROOT_PATH}/${id}.pdf`);
 
-			const { data } = await request.get(payloadData['url'], {
-				responseType: 'blob',
-				timeout: 30000,
+			this.cacheService.clear([ 'folder', 'one' ]);
+			this.cacheService.clear([ 'folder', 'many' ]);
+			this.cacheService.clear([ 'file', 'many' ]);
+			this.cacheService.clear([ 'file', 'one' ]);
+
+			const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
+				select: {
+					id: true,
+					systemId: true,
+					content: true,
+				},
+				where:{
+					systemId: payloadData['systemId'],
+					systemSystemOption: {
+						systemOption: {
+							id: 'files-system-option-root',
+						},
+					},
+				},
+				relations: {
+					system: true,
+				},
 			});
 
-			console.log('payloadData', data);
+			if (!systemOptionContent
+				|| !systemOptionContent['system']) {
+				return new NotFoundException('File system is undefined', getCurrentLine(), { user, ...payload });
+			}
+			const provider = await this.providerProviderProviderOptionRepository.findOne({
+				select: {
+					id: true,
+					providerId: true,
+					content: true,
+				},
+				where:{
+					providerId: systemOptionContent['system']['providerId'],
+					providerProviderOption: {
+						providerOption: {
+							id: 'files-provider-option-root-path',
+						},
+					},
+				},
+			});
+
+			if (!provider) {
+				return new NotFoundException('Provider is undefined', getCurrentLine(), { user, ...payload });
+			}
+			const path = ((provider['content'] === '/')
+				? ''
+				: provider['content']) + systemOptionContent['content'];
+
+			console.log('payloadData', path);
 
 			/*await (new Promise((resolve, reject) => {
 				const fetch = request.get(payloadData['url'], (response) => {

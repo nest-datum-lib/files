@@ -207,7 +207,6 @@ export class FileService extends SqlService {
 								id: 'files-system-option-root',
 							},
 						},
-
 					},
 					relations: {
 						system: true,
