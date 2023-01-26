@@ -43,7 +43,6 @@ console.log('typeormConfig', typeormConfig);
 		BalancerRepository, 
 		BalancerService,
 		CacheService,
-		FileService, 
 		ProcessorService, 
 		DownloadProcessor,
 	],
