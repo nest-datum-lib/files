@@ -21,8 +21,8 @@ import { File } from 'src/api/file/file.entity';
 export class DownloadProcessor extends QueueService {
 	constructor(
 		@InjectRepository(File) private readonly fileRepository: Repository<File>,
-		// @InjectRepository(SystemSystemSystemOption) private readonly systemSystemSystemOptionRepository: Repository<SystemSystemSystemOption>,
-		// @InjectRepository(ProviderProviderProviderOption) private readonly providerProviderProviderOptionRepository: Repository<ProviderProviderProviderOption>,
+		@InjectRepository(SystemSystemSystemOption) private readonly systemSystemSystemOptionRepository: Repository<SystemSystemSystemOption>,
+		@InjectRepository(ProviderProviderProviderOption) private readonly providerProviderProviderOptionRepository: Repository<ProviderProviderProviderOption>,
 		@InjectRedis(process['REDIS_QUEUE']) public readonly queueRepository: Redis,
 		private readonly balancerService: BalancerService,
 		private readonly cacheService: CacheService,
@@ -59,7 +59,7 @@ export class DownloadProcessor extends QueueService {
 			this.cacheService.clear([ 'file', 'many' ]);
 			this.cacheService.clear([ 'file', 'one' ]);
 
-			/*const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
+			const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
 				select: {
 					id: true,
 					systemId: true,
