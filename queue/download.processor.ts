@@ -11,7 +11,7 @@ import { BalancerService } from 'nest-datum/balancer/src';
 import { CacheService } from 'nest-datum/cache/src';
 import { QueueService } from 'nest-datum/queue/src';
 import { envPropsBySubstr } from 'nest-datum/common/src';
-import { FileService } from 'src/api/file/file.service';
+// import { FileService } from 'src/api/file/file.service';
 
 @Injectable()
 export class DownloadProcessor extends QueueService {
@@ -20,7 +20,7 @@ export class DownloadProcessor extends QueueService {
 		@InjectRedis(process['REDIS_QUEUE']) public readonly queueRepository: Redis,
 		private readonly balancerService: BalancerService,
 		private readonly cacheService: CacheService,
-		private readonly fileService: FileService,
+		// private readonly fileService: FileService,
 	) {
 		super(queueRepository);
 	}
