@@ -17,7 +17,6 @@ export class DownloadProcessor extends QueueService {
 	constructor(
 		// @InjectRepository(Report) private readonly reportRepository: Repository<Report>,
 		@InjectRedis(process['REDIS_QUEUE']) public readonly queueRepository: Redis,
-		public readonly resumeParserProcessor: ResumeParserProcessor,
 		private readonly balancerService: BalancerService,
 		private readonly cacheService: CacheService,
 	) {
@@ -41,7 +40,7 @@ export class DownloadProcessor extends QueueService {
 				|| typeof payloadData['systemId'] !== 'string') {
 				throw new Error(`Payload "systemId (${(payloadData['systemId'] || '').toString()})" property is invalid format.`);
 			}
-			const request = (url.indexOf('https://') === 0)
+			const request = (payloadData['url'].indexOf('https://') === 0)
 				? https
 				: http;
 
