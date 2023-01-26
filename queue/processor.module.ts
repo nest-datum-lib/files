@@ -20,7 +20,7 @@ import { File } from 'src/api/file/file.entity';
 import { ProcessorService } from './processor.service';
 import { DownloadProcessor } from './download.processor';
 
-console.log('typeormConfig', typeormConfig.replication.slaves);
+console.log('typeormConfig', ((typeormConfig || {})['replication'] || {})['slaves']);
 
 @Module({
 	controllers: [],
