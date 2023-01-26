@@ -12,6 +12,7 @@ import { BalancerService } from 'nest-datum/balancer/src';
 import { CacheService } from 'nest-datum/cache/src';
 import { QueueService } from 'nest-datum/queue/src';
 import { envPropsBySubstr } from 'nest-datum/common/src';
+import { SystemSystemOption } from 'src/api/system-system-option/system-system-option.entity';
 import { SystemSystemSystemOption } from 'src/api/system-system-system-option/system-system-system-option.entity';
 import { ProviderProviderProviderOption } from 'src/api/provider-provider-provider-option/provider-provider-provider-option.entity';
 import { Folder } from 'src/api/folder/folder.entity';
