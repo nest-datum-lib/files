@@ -128,7 +128,7 @@ export class QueueService {
 				: this.timeout;
 			payload['createdAt'] = new Date();
 
-			await this.redisQueue.rpush(this.constructor.name, JSON.stringify(payload));
+			await this.redisQueue.rpush(payload['queueName'] ?? this.constructor.name, JSON.stringify(payload));
 		}
 		catch (err) {
 			throw new Error(err.message);
