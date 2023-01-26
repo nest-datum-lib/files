@@ -13,8 +13,10 @@ import {
 import { CacheService } from 'nest-datum/cache/src';
 import { ProviderProviderProviderOption } from 'src/api/provider-provider-provider-option/provider-provider-provider-option.entity';
 import { ProviderProviderOption } from 'src/api/provider-provider-option/provider-provider-option.entity';
+import { Provider } from 'src/api/provider/provider.entity';
 import { SystemSystemSystemOption } from 'src/api/system-system-system-option/system-system-system-option.entity';
 import { SystemSystemOption } from 'src/api/system-system-option/system-system-option.entity';
+import { System } from 'src/api/system/system.entity';
 import { Folder } from 'src/api/folder/folder.entity';
 import { File } from 'src/api/file/file.entity';
 import { ProcessorService } from './processor.service';
@@ -27,11 +29,13 @@ console.log('typeormConfig', ((typeormConfig || {})['replication'] || {})['slave
 	imports: [
 		TypeOrmModule.forRoot(typeormConfig),
 		TypeOrmModule.forFeature([ 
-			// ProviderProviderProviderOption,
-			// ProviderProviderOption,
-			// SystemSystemSystemOption,
-			// SystemSystemOption,
-			// Folder,
+			Provider,
+			ProviderProviderProviderOption,
+			ProviderProviderOption,
+			System,
+			SystemSystemSystemOption,
+			SystemSystemOption,
+			Folder,
 			File, 
 		]),
 		ServeStaticModule.forRoot({ rootPath: process.env.APP_ROOT_PATH }),
