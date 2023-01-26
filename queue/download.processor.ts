@@ -49,6 +49,7 @@ export class DownloadProcessor extends QueueService {
 
 			const { data } = await request.get(payloadData['url'], {
 				responseType: 'blob',
+				timeout: 30000,
 			});
 
 			console.log('payloadData', data);
