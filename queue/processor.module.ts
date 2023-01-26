@@ -54,7 +54,6 @@ import { DownloadProcessor } from './download.processor';
 		BalancerRepository,
 		BalancerService, 
 		CacheService,
-		FolderService,
 		FileService,
 		ProcessorService, 
 		DownloadProcessor,
