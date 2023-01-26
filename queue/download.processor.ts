@@ -12,10 +12,8 @@ import { BalancerService } from 'nest-datum/balancer/src';
 import { CacheService } from 'nest-datum/cache/src';
 import { QueueService } from 'nest-datum/queue/src';
 import { envPropsBySubstr } from 'nest-datum/common/src';
-import { SystemSystemOption } from 'src/api/system-system-option/system-system-option.entity';
 import { SystemSystemSystemOption } from 'src/api/system-system-system-option/system-system-system-option.entity';
 import { ProviderProviderProviderOption } from 'src/api/provider-provider-provider-option/provider-provider-provider-option.entity';
-import { ProviderProviderOption } from 'src/api/provider-provider-option/provider-provider-option.entity';
 import { Folder } from 'src/api/folder/folder.entity';
 import { File } from 'src/api/file/file.entity';
 
@@ -24,9 +22,7 @@ export class DownloadProcessor extends QueueService {
 	constructor(
 		@InjectRepository(File) private readonly fileRepository: Repository<File>,
 		@InjectRepository(SystemSystemSystemOption) private readonly systemSystemSystemOptionRepository: Repository<SystemSystemSystemOption>,
-		@InjectRepository(SystemSystemOption) private readonly systemSystemOptionRepository: Repository<SystemSystemOption>,
 		@InjectRepository(ProviderProviderProviderOption) private readonly providerProviderProviderOptionRepository: Repository<ProviderProviderProviderOption>,
-		@InjectRepository(ProviderProviderOption) private readonly providerProviderOptionRepository: Repository<ProviderProviderOption>,
 		@InjectRedis(process['REDIS_QUEUE']) public readonly queueRepository: Redis,
 		private readonly balancerService: BalancerService,
 		private readonly cacheService: CacheService,
