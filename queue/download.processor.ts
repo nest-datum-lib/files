@@ -11,6 +11,7 @@ import { BalancerService } from 'nest-datum/balancer/src';
 import { CacheService } from 'nest-datum/cache/src';
 import { QueueService } from 'nest-datum/queue/src';
 import { envPropsBySubstr } from 'nest-datum/common/src';
+import { FileService } from 'src/api/file.service';
 
 @Injectable()
 export class DownloadProcessor extends QueueService {
@@ -19,6 +20,7 @@ export class DownloadProcessor extends QueueService {
 		@InjectRedis(process['REDIS_QUEUE']) public readonly queueRepository: Redis,
 		private readonly balancerService: BalancerService,
 		private readonly cacheService: CacheService,
+		private readonly fileService: FileService,
 	) {
 		super(queueRepository);
 	}
@@ -43,8 +45,13 @@ export class DownloadProcessor extends QueueService {
 			const request = (payloadData['url'].indexOf('https://') === 0)
 				? https
 				: http;
+			// const file = fs.createWriteStream(`${process.env.APP_ROOT_PATH}/${id}.pdf`);
 
-			console.log('payloadData', payloadData);
+			const response = await fetch(payloadData['url']);
+			const data = await response.blob();
+			const file = new File([ data ], 'test.pdf');
+
+			console.log('payloadData', file);
 
 			/*await (new Promise((resolve, reject) => {
 				const fetch = request.get(payloadData['url'], (response) => {
