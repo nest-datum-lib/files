@@ -23,7 +23,7 @@ export class DownloadProcessor extends QueueService {
 		@InjectRepository(File) private readonly fileRepository: Repository<File>,
 		// @InjectRepository(SystemSystemSystemOption) private readonly systemSystemSystemOptionRepository: Repository<SystemSystemSystemOption>,
 		// @InjectRepository(ProviderProviderProviderOption) private readonly providerProviderProviderOptionRepository: Repository<ProviderProviderProviderOption>,
-		// @InjectRedis(process['REDIS_QUEUE']) public readonly queueRepository: Redis,
+		@InjectRedis(process['REDIS_QUEUE']) public readonly queueRepository: Redis,
 		private readonly balancerService: BalancerService,
 		private readonly cacheService: CacheService,
 		// private readonly fileService: FileService,
