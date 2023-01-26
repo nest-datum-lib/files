@@ -24,6 +24,8 @@ import { SystemModule } from 'src/api/system/system.module';
 import { FolderModule } from 'src/api/folder/folder.module';
 import { FileModule } from 'src/api/file/file.module';
 import { SettingModule } from 'src/api/setting/setting.module';
+import { FolderService } from 'src/api/folder/folder.service';
+import { FileService } from 'src/api/file/file.service';
 import { ProcessorService } from './processor.service';
 import { DownloadProcessor } from './download.processor';
 
@@ -54,6 +56,8 @@ import { DownloadProcessor } from './download.processor';
 		CacheService,
 		ProcessorService, 
 		DownloadProcessor,
+		FileService,
+		FolderService,
 	],
 })
 export class ProcessorModule {
