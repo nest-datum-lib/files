@@ -3,6 +3,7 @@ const http = require('http');
 const fs = require('fs');
 
 import Redis from 'ioredis';
+import { v4 as uuidv4 } from 'uuid';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
@@ -79,7 +80,7 @@ export class DownloadProcessor extends QueueService {
 
 			if (!systemOptionContent
 				|| !systemOptionContent['system']) {
-				return new NotFoundException('File system is undefined', getCurrentLine(), { user, ...payload });
+				return new Error(`File system "${payloadData['systemId']}" is undefined`);
 			}
 			const provider = await this.providerProviderProviderOptionRepository.findOne({
 				select: {
@@ -98,7 +99,7 @@ export class DownloadProcessor extends QueueService {
 			});
 
 			if (!provider) {
-				return new NotFoundException('Provider is undefined', getCurrentLine(), { user, ...payload });
+				return new Error(`Provider "${systemOptionContent['system']['providerId']}" is undefined`);
 			}
 			const path = ((provider['content'] === '/')
 				? ''
