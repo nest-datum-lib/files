@@ -59,7 +59,7 @@ export class DownloadProcessor extends QueueService {
 			this.cacheService.clear([ 'file', 'many' ]);
 			this.cacheService.clear([ 'file', 'one' ]);
 
-			const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
+			/*const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
 				select: {
 					id: true,
 					systemId: true,
