@@ -1,6 +1,7 @@
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { redisConfig } from 'config/redis';
 import { typeormConfig } from 'config/typeorm';
 import { BalancerModule } from 'nest-datum/balancer/src';
@@ -9,6 +10,7 @@ import {
 	BalancerRepository,
 	BalancerService, 
 } from 'nest-datum/balancer/src';
+import { CacheService } from 'nest-datum/cache/src';
 import { ProviderStatusModule } from 'src/api/provider-status/provider-status.module';
 import { ProviderOptionModule } from 'src/api/provider-option/provider-option.module';
 import { ProviderProviderOptionModule } from 'src/api/provider-provider-option/provider-provider-option.module';
