@@ -167,8 +167,13 @@ export class DownloadProcessor extends QueueService {
 					}
 					if (!stdout
 						|| !(stdout || '').includes(`ext: '`)) {
-						fs.unlink(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
-
+						try {
+							fs.unlink(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`, (errUnlink) => {
+								if (errUnlink) {
+									console.log('errUnlink', errUnlink.message);
+								}
+							});
+						}
 						return reject(new Error('Extension is undefined'));
 					}
 					try {
@@ -206,7 +211,7 @@ export class DownloadProcessor extends QueueService {
 				}));
 			}
 			console.log('extension', extension);
-			
+
 			const stats = fs.statSync(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
 			const fileData = await this.fileRepository.save({
 				systemId: payloadData['systemId'],
