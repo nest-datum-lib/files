@@ -167,10 +167,13 @@ export class DownloadProcessor extends QueueService {
 					}
 					try {
 						const extSplit = stdout.split(`ext: '`);
+						const output = (extSplit[1].split(`', mime: '`))[0];
 						
-						return resolve((extSplit[1].split(`', mime: '`))[0]);
+						return resolve(output);
 					}
 					catch (err) {
+						console.log(`Extension error`, stdout);
+
 						return reject(err);
 					}
 				});
@@ -178,7 +181,7 @@ export class DownloadProcessor extends QueueService {
 
 			if (!extension
 				|| typeof extension !== 'string') {
-				new Error('Extension error');
+				new Error(`Extension error`);
 			}
 			if (extension !== 'pdf') {
 				await (new Promise((resolve, reject) => {
