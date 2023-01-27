@@ -167,6 +167,8 @@ export class DownloadProcessor extends QueueService {
 					}
 					if (!stdout
 						|| !(stdout || '').includes(`ext: '`)) {
+						fs.unlink(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
+
 						return reject(new Error('Extension is undefined'));
 					}
 					try {
@@ -188,8 +190,6 @@ export class DownloadProcessor extends QueueService {
 				new Error(`Extension error`);
 			}
 			if (extension !== 'pdf') {
-				console.log('extension', extension);
-
 				await (new Promise((resolve, reject) => {
 					exec(`node ${process.env.APP_FILE_UTILS_PATH}/src/convert.js ${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`, async (error, stdout, stderr) => {
 						if (error) {
@@ -205,6 +205,8 @@ export class DownloadProcessor extends QueueService {
 					});
 				}));
 			}
+			console.log('extension', extension);
+			
 			const stats = fs.statSync(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
 			const fileData = await this.fileRepository.save({
 				systemId: payloadData['systemId'],
@@ -233,6 +235,7 @@ export class DownloadProcessor extends QueueService {
 			});
 		}
 		catch (err) {
+			console.log('>>>>>');
 			console.error(err);
 
 			throw new Error(err.message);
