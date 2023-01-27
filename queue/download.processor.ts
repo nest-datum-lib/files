@@ -174,6 +174,8 @@ export class DownloadProcessor extends QueueService {
 								}
 							});
 						}
+						catch (err) {
+						}
 						return reject(new Error('Extension is undefined'));
 					}
 					try {
