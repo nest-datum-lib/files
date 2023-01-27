@@ -2,7 +2,6 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const util = require('util');
-const fileType = require('file-type-cjs');
 
 import Redis from 'ioredis';
 import libre from 'libreoffice-convert';
@@ -33,8 +32,6 @@ export class DownloadProcessor extends QueueService {
 		private readonly cacheService: CacheService,
 	) {
 		super(queueRepository);
-
-		console.log('fileType.fileTypeFromFile', fileType);
 	}
 
 	async callback(payload: object, currentTime): Promise<any> {
@@ -157,7 +154,9 @@ export class DownloadProcessor extends QueueService {
 					});
 				});
 			}));
-			/*const extension = await fileTypeFromFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
+			const { fileTypeFromFile } = await import('file-type');
+
+			const extension = await fileTypeFromFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
 
 			if (extension['ext'] !== 'pdf') {
 				libre['convertAsync'] = util.promisify(libre.convert);
@@ -168,7 +167,7 @@ export class DownloadProcessor extends QueueService {
 
 					await fs.promises.writeFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`, pdfBuf);
 				}
-			}*/
+			}
 			const stats = fs.statSync(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
 			const fileData = await this.fileRepository.save({
 				systemId: payloadData['systemId'],
