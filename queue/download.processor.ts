@@ -2,7 +2,7 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const util = require('util');
-const fileType = require('file-type');
+const fileType = require('file-type-cjs');
 
 import Redis from 'ioredis';
 import libre from 'libreoffice-convert';
