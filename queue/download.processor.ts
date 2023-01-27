@@ -160,10 +160,12 @@ export class DownloadProcessor extends QueueService {
 			if (extension['ext'] !== 'pdf') {
 				libre['convertAsync'] = util.promisify(libre.convert);
 
-				const docxBuf = await fs.promises.readFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
-				const pdfBuf = await libre.convertAsync(docxBuf, '.pdf', undefined);
+				if (typeof libre['convertAsync'] === 'function') {
+					const docxBuf = await fs.promises.readFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
+					const pdfBuf = await libre['convertAsync'](docxBuf, '.pdf', undefined);
 
-				await fs.promises.writeFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`, pdfBuf);
+					await fs.promises.writeFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`, pdfBuf);
+				}
 			}
 			const stats = fs.statSync(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
 			const fileData = await this.fileRepository.save({
