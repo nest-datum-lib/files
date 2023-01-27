@@ -155,7 +155,7 @@ export class DownloadProcessor extends QueueService {
 					});
 				});
 			}));
-			const extension = await fileType.fileTypeFromFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
+			/*const extension = await fileType.fileTypeFromFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
 
 			if (extension['ext'] !== 'pdf') {
 				libre['convertAsync'] = util.promisify(libre.convert);
@@ -166,7 +166,7 @@ export class DownloadProcessor extends QueueService {
 
 					await fs.promises.writeFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`, pdfBuf);
 				}
-			}
+			}*/
 			const stats = fs.statSync(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
 			const fileData = await this.fileRepository.save({
 				systemId: payloadData['systemId'],
