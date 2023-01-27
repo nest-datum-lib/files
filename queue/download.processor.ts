@@ -1,3 +1,4 @@
+const { exec } = require('child_process');
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
@@ -154,11 +155,33 @@ export class DownloadProcessor extends QueueService {
 					});
 				});
 			}));
-			const { fileTypeFromFile } = await import('file-type');
+			const extension = await (new Promise((resolve, reject) => {
+				exec(`node ${process.env.APP_FILE_UTILS_PATH}/src/format.js ${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`, async (error, stdout, stderr) => {
+					if (error) {
+						return reject(new Error(error.toString()));
+					}
+					if (stderr) {
+						return reject(new Error(stderr.toString()));
+					}
+					if (stdout.indexOf('Error:') === 0) {
+						return reject(new Error(stdout));
+					}
+					try {
+						const extSplit = stdout.split(`ext: '`);
+						
+						return resolve((extSplit[1].split(`', mime: '`))[0]);
+					}
+					catch (err) {
+						return reject(err);
+					}
+				});
+			}));
 
-			const extension = await fileTypeFromFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
-
-			if (extension['ext'] !== 'pdf') {
+			if (!extension
+				|| typeof extension !== 'string') {
+				new Error('Extension error');
+			}
+			if (extension !== 'pdf') {
 				libre['convertAsync'] = util.promisify(libre.convert);
 
 				if (typeof libre['convertAsync'] === 'function') {
