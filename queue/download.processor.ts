@@ -157,11 +157,8 @@ export class DownloadProcessor extends QueueService {
 			}));
 			const extension = await fileTypeFromFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
 
-			if (extension['ext'] === 'cfb'
-				|| extension['ext'] === 'x-cfb'
-				|| extension['ext'] === 'doc'
-				|| extension['ext'] === 'docx') {
-				libre.convertAsync = util.promisify(libre.convert);
+			if (extension['ext'] !== 'pdf') {
+				libre['convertAsync'] = util.promisify(libre.convert);
 
 				const docxBuf = await fs.promises.readFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
 				const pdfBuf = await libre.convertAsync(docxBuf, '.pdf', undefined);
