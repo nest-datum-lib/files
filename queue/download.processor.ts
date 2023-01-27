@@ -165,7 +165,8 @@ export class DownloadProcessor extends QueueService {
 					if (stdout.indexOf('Error:') === 0) {
 						return reject(new Error(stdout));
 					}
-					if (!stdout.includes(`ext: '`)) {
+					if (!stdout
+						|| !(stdout || '').includes(`ext: '`)) {
 						return reject(new Error('Extension is undefined'));
 					}
 					try {
