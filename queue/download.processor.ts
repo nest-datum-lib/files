@@ -1,9 +1,12 @@
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
+const util = require('util');
 
 import Redis from 'ioredis';
+import libre from 'libreoffice-convert';
 import { v4 as uuidv4 } from 'uuid';
+import { fileTypeFromFile } from 'file-type';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
@@ -152,6 +155,19 @@ export class DownloadProcessor extends QueueService {
 					});
 				});
 			}));
+			const extension = await fileTypeFromFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
+
+			if (extension['ext'] === 'cfb'
+				|| extension['ext'] === 'x-cfb'
+				|| extension['ext'] === 'doc'
+				|| extension['ext'] === 'docx') {
+				libre.convertAsync = util.promisify(libre.convert);
+
+				const docxBuf = await fs.promises.readFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
+				const pdfBuf = await libre.convertAsync(docxBuf, '.pdf', undefined);
+
+				await fs.promises.writeFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`, pdfBuf);
+			}
 			const stats = fs.statSync(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
 			const fileData = await this.fileRepository.save({
 				systemId: payloadData['systemId'],
