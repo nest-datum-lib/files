@@ -2,7 +2,7 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const util = require('util');
-const fileType = require('file-type-cjs');
+const { fileTypeFromFile } = require('file-type-cjs');
 
 import Redis from 'ioredis';
 import libre from 'libreoffice-convert';
@@ -34,7 +34,7 @@ export class DownloadProcessor extends QueueService {
 	) {
 		super(queueRepository);
 
-		console.log('fileType.fileTypeFromFile', fileType.fileTypeFromFile);
+		console.log('fileType.fileTypeFromFile', fileTypeFromFile);
 	}
 
 	async callback(payload: object, currentTime): Promise<any> {
