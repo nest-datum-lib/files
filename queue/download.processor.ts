@@ -5,8 +5,8 @@ const util = require('util');
 
 import Redis from 'ioredis';
 import libre from 'libreoffice-convert';
+import fileType from 'file-type';
 import { v4 as uuidv4 } from 'uuid';
-import { fileTypeFromFile } from 'file-type';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
@@ -155,7 +155,7 @@ export class DownloadProcessor extends QueueService {
 					});
 				});
 			}));
-			const extension = await fileTypeFromFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
+			const extension = await fileType.fileTypeFromFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
 
 			if (extension['ext'] !== 'pdf') {
 				libre['convertAsync'] = util.promisify(libre.convert);
