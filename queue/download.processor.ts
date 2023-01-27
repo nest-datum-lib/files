@@ -167,7 +167,7 @@ export class DownloadProcessor extends QueueService {
 					}
 					try {
 						const extSplit = stdout.split(`ext: '`);
-						const output = (extSplit[1].split(`', mime: '`))[0];
+						const output = (extSplit[1].split(`'`))[0];
 						
 						return resolve(output);
 					}
