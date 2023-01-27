@@ -1,12 +1,11 @@
-const { exec } = require('child_process');
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const util = require('util');
+const fileType = require('file-type');
 
 import Redis from 'ioredis';
 import libre from 'libreoffice-convert';
-import { fileTypeFromFile } from 'file-type';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -35,7 +34,7 @@ export class DownloadProcessor extends QueueService {
 	) {
 		super(queueRepository);
 
-		console.log('fileTypeFromFile', fileTypeFromFile);
+		console.log('fileType', fileType);
 	}
 
 	async callback(payload: object, currentTime): Promise<any> {

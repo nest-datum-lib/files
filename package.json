@@ -39,6 +39,7 @@
     "crypto-js": "^4.1.1",
     "dotenv": "^16.0.1",
     "file-type": "^18.2.0",
+    "file-type-cjs": "^1.0.7",
     "get-current-line": "^6.6.0",
     "hbs": "^4.2.0",
     "ioredis": "^5.2.3",
