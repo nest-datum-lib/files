@@ -5,7 +5,6 @@ const fs = require('fs');
 const util = require('util');
 
 import Redis from 'ioredis';
-import libre from 'libreoffice-convert';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -182,14 +181,20 @@ export class DownloadProcessor extends QueueService {
 				new Error('Extension error');
 			}
 			if (extension !== 'pdf') {
-				libre['convertAsync'] = util.promisify(libre.convert);
-
-				if (typeof libre['convertAsync'] === 'function') {
-					const docxBuf = await fs.promises.readFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
-					const pdfBuf = await libre['convertAsync'](docxBuf, '.pdf', undefined);
-
-					await fs.promises.writeFile(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`, pdfBuf);
-				}
+				await (new Promise((resolve, reject) => {
+					exec(`node ${process.env.APP_FILE_UTILS_PATH}/src/convert.js ${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`, async (error, stdout, stderr) => {
+						if (error) {
+							return reject(new Error(error.toString()));
+						}
+						if (stderr) {
+							return reject(new Error(stderr.toString()));
+						}
+						if (stdout.indexOf('Error:') === 0) {
+							return reject(new Error(stdout));
+						}
+						resolve(true);
+					});
+				}));
 			}
 			const stats = fs.statSync(`${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`);
 			const fileData = await this.fileRepository.save({
