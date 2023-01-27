@@ -33,6 +33,8 @@ export class DownloadProcessor extends QueueService {
 		private readonly cacheService: CacheService,
 	) {
 		super(queueRepository);
+
+		console.log('fileType', fileType);
 	}
 
 	async callback(payload: object, currentTime): Promise<any> {
