@@ -2,11 +2,11 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const util = require('util');
+const { fileTypeFromFile } = require('file-type');
 
 import Redis from 'ioredis';
 import libre from 'libreoffice-convert';
 import { v4 as uuidv4 } from 'uuid';
-import { fileTypeFromFile } from 'file-type';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
