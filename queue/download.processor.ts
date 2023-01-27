@@ -184,6 +184,8 @@ export class DownloadProcessor extends QueueService {
 				new Error(`Extension error`);
 			}
 			if (extension !== 'pdf') {
+				console.log('extension', extension);
+
 				await (new Promise((resolve, reject) => {
 					exec(`node ${process.env.APP_FILE_UTILS_PATH}/src/convert.js ${process.env.APP_ROOT_PATH}${path}/${payloadData['name']}`, async (error, stdout, stderr) => {
 						if (error) {
