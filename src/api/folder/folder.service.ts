@@ -46,6 +46,7 @@ export class FolderService extends SqlService {
 		path: true,
 		name: true,
 		description: true,
+		systemId: true,
 		isNotDelete: true,
 		isDeleted: true,
 		createdAt: true,
