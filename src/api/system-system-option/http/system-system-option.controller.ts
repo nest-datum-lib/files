@@ -22,12 +22,12 @@ export class SystemSystemOptionController extends NestDatumOptionOptionHttpContr
 	}
 
 	@Post(':id')
-	async create(
+	async createOption(
 		@AccessToken() accessToken: string,
 		@Param('id') systemOptionId: string,
 		@Body('systemId') systemId: string,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
+		return await this.serviceHandlerWrapper(async () => await this.service.createOption(await this.validateCreate({
 			accessToken,
 			systemOptionId,
 			systemId,
