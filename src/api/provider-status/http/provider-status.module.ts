@@ -2,8 +2,8 @@ import {
 	Module,
 	NestModule,
 	MiddlewareConsumer, 
-	RequestMethod,
 } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { 
 	ReplicaModule,
 	ReplicaService, 
@@ -12,17 +12,33 @@ import {
 	TransportModule,
 	TransportService, 
 } from '@nest-datum/transport';
+import {
+	CacheModule, 
+	CacheService, 
+} from '@nest-datum/cache';
+import { 
+	SqlModule,
+	SqlService, 
+} from '@nest-datum/sql';
 import { ProviderStatusController } from './provider-status.controller';
+import { ProviderStatusService } from '../provider-status.service';
+import { ProviderStatus } from '../provider-status.entity';
 
 @Module({
-	imports: [ 
-		ReplicaModule,
-		TransportModule, 
-	],
 	controllers: [ ProviderStatusController ],
-	providers: [ 
+	imports: [
+		TypeOrmModule.forFeature([ ProviderStatus ]),
+		ReplicaModule,
+		TransportModule,
+		CacheModule,
+		SqlModule,
+	],
+	providers: [
 		ReplicaService,
-		TransportService, 
+		TransportService,
+		CacheService,
+		SqlService,
+		ProviderStatusService, 
 	],
 })
 export class ProviderStatusModule implements NestModule {
