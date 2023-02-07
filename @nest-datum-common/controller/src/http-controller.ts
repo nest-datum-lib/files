@@ -65,10 +65,13 @@ export class HttpController extends Controller {
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.service.drop(await this.validateDrop({
-			accessToken,
-			id,
-		})));
+		return await this.serviceHandlerWrapper(async () => {
+			console.log('??????', id);
+			await this.service.drop(await this.validateDrop({
+				accessToken,
+				id,
+			}));
+		});
 	}
 
 	@Delete(':id')
