@@ -63,7 +63,7 @@ export class SystemController extends NestDatumHttpOptionController {
 		};
 	}
 
-	@Post(':id')
+	@Post(':id/option')
 	async createOption(
 		@AccessToken() accessToken: string,
 		@Param('id') systemOptionId: string,
