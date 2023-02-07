@@ -45,6 +45,9 @@ export class FolderController extends NestDatumTcpController {
 			...(options['path'] && utilsCheckStr(options['path'])) 
 				? { path: options['path'] } 
 				: {},
+			...(options['name'] && utilsCheckStrName(options['name'])) 
+				? { name: options['name'] } 
+				: {},
 		};
 	}
 

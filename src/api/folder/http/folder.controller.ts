@@ -62,6 +62,7 @@ export class FolderController extends NestDatumHttpController {
 		@Body('systemId') systemId: string,
 		@Body('parentId') parentId: string,
 		@Body('path') path: string,
+		@Body('name') name: string,
 	) {
 		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
 			accessToken,
@@ -70,6 +71,7 @@ export class FolderController extends NestDatumHttpController {
 			systemId,
 			parentId,
 			path,
+			name,
 		})));
 	}
 
