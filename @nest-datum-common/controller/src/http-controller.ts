@@ -26,16 +26,23 @@ export class HttpController extends Controller {
 		@Query('filter') filter: string,
 		@Query('sort') sort: string,
 	): Promise<any> {
-		return await this.serviceHandlerWrapper(async () => await this.service.many(await this.validateMany({
-			accessToken,
-			select,
-			relations,
-			page,
-			limit,
-			query,
-			filter,
-			sort,
-		})));
+		return await this.serviceHandlerWrapper(async () => {
+			const many = await this.service.many(await this.validateMany({
+				accessToken,
+				select,
+				relations,
+				page,
+				limit,
+				query,
+				filter,
+				sort,
+			}));
+
+			return {
+				data: many[0],
+				total: many[1],
+			};
+		});
 	}
 
 	@Get(':id')
