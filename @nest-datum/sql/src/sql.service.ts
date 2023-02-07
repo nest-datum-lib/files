@@ -333,7 +333,7 @@ export class SqlService {
 						...optionData
 					} = option[ii];
 
-					await queryRunner.manager.save(Object.assign(this.optionRelationConstructor, {
+					await queryRunner.manager.save(Object.assign(new this.optionRelationConstructor, {
 						...optionData,
 						[this.optionId]: entityId,
 						[this.optionOptionId]: entityOptionId,
