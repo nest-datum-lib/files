@@ -2,8 +2,8 @@ import {
 	Module,
 	NestModule,
 	MiddlewareConsumer, 
-	RequestMethod,
 } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { 
 	ReplicaModule,
 	ReplicaService, 
@@ -12,17 +12,41 @@ import {
 	TransportModule,
 	TransportService, 
 } from '@nest-datum/transport';
+import {
+	CacheModule, 
+	CacheService, 
+} from '@nest-datum/cache';
+import { 
+	SqlModule,
+	SqlService, 
+} from '@nest-datum/sql';
 import { SystemOptionController } from './system-option.controller';
+import { SystemOptionService } from '../system-option.service';
+import { SystemOption } from '../system-option.entity';
+import { SystemSystemSystemOption } from '../../system-system-system-option/system-system-system-option.entity';
+import { System } from '../../system/system.entity';
+import { SystemSystemOption } from '../../system-system-option/system-system-option.entity';
 
 @Module({
-	imports: [ 
-		ReplicaModule,
-		TransportModule, 
-	],
 	controllers: [ SystemOptionController ],
-	providers: [ 
+	imports: [
+		TypeOrmModule.forFeature([
+			SystemOption,
+			SystemSystemOption,
+			System,
+			SystemSystemSystemOption,
+		]),
+		ReplicaModule,
+		TransportModule,
+		CacheModule,
+		SqlModule,
+	],
+	providers: [
 		ReplicaService,
-		TransportService, 
+		TransportService,
+		CacheService,
+		SqlService,
+		SystemOptionService, 
 	],
 })
 export class SystemOptionModule implements NestModule {

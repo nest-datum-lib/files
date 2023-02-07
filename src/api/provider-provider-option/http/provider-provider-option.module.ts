@@ -2,8 +2,8 @@ import {
 	Module,
 	NestModule,
 	MiddlewareConsumer, 
-	RequestMethod,
 } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { 
 	ReplicaModule,
 	ReplicaService, 
@@ -12,20 +12,44 @@ import {
 	TransportModule,
 	TransportService, 
 } from '@nest-datum/transport';
-import { ProviderProviderOptionController } from './provider-provider-option.controller';
+import {
+	CacheModule, 
+	CacheService, 
+} from '@nest-datum/cache';
+import { 
+	SqlModule,
+	SqlService, 
+} from '@nest-datum/sql';
+import { ProviderOptionOptionController } from './provider-option-option.controller';
+import { ProviderOptionOptionService } from '../provider-option-option.service';
+import { ProviderOptionOption } from '../provider-option-option.entity';
+import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
+import { ProviderOption } from '../provider-option/provider-option.entity';
+import { Provider } from '../provider/provider.entity';
 
 @Module({
-	imports: [ 
+	controllers: [ ProviderOptionOptionController ],
+	imports: [
+		TypeOrmModule.forFeature([ 
+			ProviderOption,
+			ProviderProviderOption,
+			Provider,
+			ProviderProviderProviderOption, 
+		]),
 		ReplicaModule,
-		TransportModule, 
+		TransportModule,
+		CacheModule,
+		SqlModule,
 	],
-	controllers: [ ProviderProviderOptionController ],
-	providers: [ 
+	providers: [
 		ReplicaService,
-		TransportService, 
+		TransportService,
+		CacheService,
+		SqlService,
+		ProviderOptionOptionService, 
 	],
 })
-export class ProviderProviderOptionModule implements NestModule {
+export class ProviderOptionOptionModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
 	}
 }

@@ -2,8 +2,8 @@ import {
 	Module,
 	NestModule,
 	MiddlewareConsumer, 
-	RequestMethod,
 } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { 
 	ReplicaModule,
 	ReplicaService, 
@@ -12,17 +12,33 @@ import {
 	TransportModule,
 	TransportService, 
 } from '@nest-datum/transport';
+import {
+	CacheModule, 
+	CacheService, 
+} from '@nest-datum/cache';
+import { 
+	SqlModule,
+	SqlService, 
+} from '@nest-datum/sql';
 import { SettingController } from './setting.controller';
+import { SettingService } from '../setting.service';
+import { Setting } from '../setting.entity';
 
 @Module({
-	imports: [ 
-		ReplicaModule,
-		TransportModule, 
-	],
 	controllers: [ SettingController ],
-	providers: [ 
+	imports: [
+		TypeOrmModule.forFeature([ Setting ]),
+		ReplicaModule,
+		TransportModule,
+		CacheModule,
+		SqlModule,
+	],
+	providers: [
 		ReplicaService,
-		TransportService, 
+		TransportService,
+		CacheService,
+		SqlService,
+		SettingService, 
 	],
 })
 export class SettingModule implements NestModule {
