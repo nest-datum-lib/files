@@ -65,13 +65,10 @@ export class HttpController extends Controller {
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
 	) {
-		return await this.serviceHandlerWrapper(async () => {
-			console.log('??????', id);
-			await this.service.drop(await this.validateDrop({
-				accessToken,
-				id,
-			}));
-		});
+		return await this.serviceHandlerWrapper(async () => await this.service.drop(await this.validateDrop({
+			accessToken,
+			id,
+		})));
 	}
 
 	@Delete(':id')
@@ -83,57 +80,5 @@ export class HttpController extends Controller {
 			accessToken,
 			ids,
 		})));
-	}
-
-	// @AccessToken() accessToken: string,
-	// 	@Body('id') id: string,
-	// 	@Body('userId') userId: string,
-	// 	@Body('name') name: string,
-	// 	@Body('description') description: string,
-	// 	@Body('dataTypeId') dataTypeId: string,
-	// 	@Body('regex') regex: string,
-	// 	@Body('isNotDelete') isNotDelete: boolean,
-	@Post()
-	async create(...payload) {
-		console.log('HTTP create', payload);
-
-		// return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
-		// 	accessToken,
-		// 	id,
-		// 	userId,
-		// 	name,
-		// 	description,
-		// 	dataTypeId,
-		// 	regex,
-		// 	isNotDelete,
-		// })));
-	}
-
-	// @AccessToken() accessToken: string,
-	// 	@Param('id') id: string,
-	// 	@Body('id') newId: string,
-	// 	@Body('userId') userId: string,
-	// 	@Body('name') name: string,
-	// 	@Body('description') description: string,
-	// 	@Body('dataTypeId') dataTypeId: string,
-	// 	@Body('regex') regex: string,
-	// 	@Body('isNotDelete') isNotDelete: boolean,
-	// 	@Body('isDeleted') isDeleted: boolean,
-	@Patch(':id')
-	async update(...payload) {
-		console.log('HTTP update', payload);
-		
-		// return await this.serviceHandlerWrapper(async () => await this.service.update(await this.validateUpdate({
-		// 	accessToken,
-		// 	id,
-		// 	newId,
-		// 	userId,
-		// 	name,
-		// 	description,
-		// 	dataTypeId,
-		// 	regex,
-		// 	isNotDelete,
-		// 	isDeleted,
-		// })));
 	}
 }
