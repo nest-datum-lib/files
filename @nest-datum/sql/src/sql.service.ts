@@ -282,6 +282,8 @@ export class SqlService {
 			},
 		});
 
+		console.log('this.entityConstructor', entity['isDeleted'], this.entityConstructor);
+
 		(entity['isDeleted'] === true)
 			? await repository.delete(this.entityConstructor, { id })
 			: await repository.update(this.entityConstructor, id, { isDeleted: true });
