@@ -39,7 +39,7 @@ export class HttpController extends Controller {
 			}));
 
 			return {
-				data: many[0],
+				rows: many[0],
 				total: many[1],
 			};
 		});
