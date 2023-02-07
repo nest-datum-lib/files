@@ -42,6 +42,7 @@ export class SystemService extends SqlService {
 		id: true,
 		userId: true,
 		systemStatusId: true,
+		providerId: true,
 		name: true,
 		description: true,
 		isDeleted: true,
@@ -54,5 +55,6 @@ export class SystemService extends SqlService {
 		id: true,
 		name: true,
 		description: true,
+		providerId: true,
 	};
 }
