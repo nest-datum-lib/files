@@ -5,6 +5,7 @@ import {
 	Param,
 } from '@nestjs/common';
 import { TransportService } from '@nest-datum/transport';
+import { AccessToken } from '@nest-datum-common/decorators';
 import { OptionOptionHttpController as NestDatumOptionOptionHttpController } from '@nest-datum/option';
 import { SystemSystemOptionService } from '../system-system-option.service';
 
