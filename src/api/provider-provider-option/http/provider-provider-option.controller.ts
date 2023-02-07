@@ -1,4 +1,9 @@
-import { Controller } from '@nestjs/common';
+import { 
+	Controller,
+	Post,
+	Body,
+	Param,
+} from '@nestjs/common';
 import { TransportService } from '@nest-datum/transport';
 import { OptionOptionHttpController as NestDatumOptionOptionHttpController } from '@nest-datum/option';
 import { ProviderProviderOptionService } from '../provider-provider-option.service';
@@ -13,5 +18,18 @@ export class ProviderProviderOptionController extends NestDatumOptionOptionHttpC
 		public service: ProviderProviderOptionService,
 	) {
 		super();
+	}
+
+	@Post(':id')
+	async createOption(
+		@AccessToken() accessToken: string,
+		@Param('id') providerOptionId: string,
+		@Body('providerId') providerId: string,
+	) {
+		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
+			accessToken,
+			providerOptionId,
+			providerId,
+		})));
 	}
 }
