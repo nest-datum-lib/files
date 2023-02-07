@@ -1,35 +1,49 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { 
-	BalancerRepository,
-	BalancerService, 
-} from 'nest-datum/balancer/src';
-import { CacheService } from 'nest-datum/cache/src';
-import { ProviderProviderOptionService } from '../provider-provider-option/provider-provider-option.service';
-import { System } from '../system/system.entity';
-import { ProviderStatus } from '../provider-status/provider-status.entity';
-import { ProviderProviderOption } from '../provider-provider-option/provider-provider-option.entity';
-import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
-import { Provider } from './provider.entity';
+	ReplicaModule,
+	ReplicaService, 
+} from '@nest-datum/replica';
+import { 
+	TransportModule,
+	TransportService, 
+} from '@nest-datum/transport';
+import {
+	CacheModule, 
+	CacheService, 
+} from '@nest-datum/cache';
+import { 
+	SqlModule,
+	SqlService, 
+} from '@nest-datum/sql';
 import { ProviderService } from './provider.service';
 import { ProviderController } from './provider.controller';
+import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
+import { ProviderOption } from '../provider-option/provider-option.entity';
+import { ProviderProviderOption } from '../provider-provider-option/provider-provider-option.entity';
+import { System } from '../system/system.entity';
+import { Provider } from './provider.entity';
 
 @Module({
 	controllers: [ ProviderController ],
 	imports: [
 		TypeOrmModule.forFeature([ 
 			System,
-			ProviderStatus,
-			ProviderProviderProviderOption,
+			ProviderOption,
 			ProviderProviderOption,
 			Provider,
+			ProviderProviderProviderOption, 
 		]),
+		ReplicaModule,
+		TransportModule,
+		CacheModule,
+		SqlModule,
 	],
 	providers: [
-		BalancerRepository, 
-		BalancerService,
+		ReplicaService,
+		TransportService,
 		CacheService,
-		ProviderProviderOptionService,
+		SqlService,
 		ProviderService, 
 	],
 })

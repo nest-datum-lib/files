@@ -6,6 +6,7 @@ import {
 	UpdateDateColumn,
 	OneToMany,
 	ManyToOne,
+	Index,
 } from 'typeorm';
 import { File } from '../file/file.entity';
 import { System } from '../system/system.entity';
@@ -16,6 +17,7 @@ export class Folder {
 	public id: string;
 
 	@Column({ default: '' })
+	@Index()
 	public userId: string;
 
 	@Column({ default: '' })
@@ -25,15 +27,19 @@ export class Folder {
 	public system: System;
 
 	@Column({ default: '' })
+	@Index()
 	public parentId: string;
 
 	@Column({ unique: true })
+	@Index()
 	public path: string;
 
 	@Column()
+	@Index()
 	public name: string;
 
 	@Column({ default: '' })
+	@Index()
 	public description: string;
 
 	@Column('boolean', { default: false })

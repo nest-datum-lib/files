@@ -1,22 +1,14 @@
 import { 
-	Entity, 
-	Column,
-	PrimaryGeneratedColumn,
+	Entity,
+	Column, 
 	ManyToOne,
-	CreateDateColumn,
-	UpdateDateColumn,
 } from 'typeorm';
+import { OptionOptionOption as NestDatumOptionOptionOption } from '@nest-datum/option';
 import { ProviderProviderOption } from '../provider-provider-option/provider-provider-option.entity';
 import { Provider } from '../provider/provider.entity';
 
 @Entity()
-export class ProviderProviderProviderOption {
-	@PrimaryGeneratedColumn('uuid')
-	public id: string;
-
-	@Column({ default: '' })
-	public parentId: string;
-
+export class ProviderProviderProviderOption extends NestDatumOptionOptionOption {
 	@Column()
 	public providerProviderOptionId: string;
 
@@ -30,22 +22,4 @@ export class ProviderProviderProviderOption {
 
 	@ManyToOne(() => Provider, (provider) => provider.providerProviderProviderOptions)
 	public provider: Provider;
-
-	@Column('text')
-	public content: string;
-
-	@CreateDateColumn({ 
-		type: 'timestamp', 
-		precision: null,
-		default: () => 'CURRENT_TIMESTAMP', 
-	})
-	public createdAt: Date;
-
-	@UpdateDateColumn({ 
-		type: 'timestamp', 
-		precision: null,
-		default: () => 'CURRENT_TIMESTAMP',
-		onUpdate: 'CURRENT_TIMESTAMP', 
-	})
-	public updatedAt: Date;
 }

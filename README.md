@@ -1,2 +1,2 @@
-# files
-## Service for uploading files.
+# @nest-datum-lib/files
+## File manager.

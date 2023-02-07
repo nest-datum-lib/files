@@ -1,45 +1,53 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { 
-	BalancerRepository,
-	BalancerService, 
-} from 'nest-datum/balancer/src';
-import { CacheService } from 'nest-datum/cache/src';
-import { SystemSystemOptionService } from '../system-system-option/system-system-option.service';
-import { FolderService } from '../folder/folder.service';
+	ReplicaModule,
+	ReplicaService, 
+} from '@nest-datum/replica';
+import { 
+	TransportModule,
+	TransportService, 
+} from '@nest-datum/transport';
+import {
+	CacheModule, 
+	CacheService, 
+} from '@nest-datum/cache';
+import { 
+	SqlModule,
+	SqlService, 
+} from '@nest-datum/sql';
+import { SystemService } from './system.service';
+import { SystemController } from './system.controller';
 import { Provider } from '../provider/provider.entity';
 import { Folder } from '../folder/folder.entity';
 import { File } from '../file/file.entity';
-import { SystemStatus } from '../system-status/system-status.entity';
-import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
-import { ProviderProviderOption } from '../provider-provider-option/provider-provider-option.entity';
 import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
+import { SystemOption } from '../system-option/system-option.entity';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
 import { System } from './system.entity';
-import { SystemService } from './system.service';
-import { SystemController } from './system.controller';
 
 @Module({
 	controllers: [ SystemController ],
 	imports: [
 		TypeOrmModule.forFeature([ 
-			SystemStatus,
-			ProviderProviderProviderOption,
-			ProviderProviderOption,
-			SystemSystemSystemOption,
-			SystemSystemOption,
-			System,
 			Provider,
 			Folder,
 			File,
+			SystemOption,
+			SystemSystemOption,
+			System,
+			SystemSystemSystemOption, 
 		]),
+		ReplicaModule,
+		TransportModule,
+		CacheModule,
+		SqlModule,
 	],
 	providers: [
-		BalancerRepository, 
-		BalancerService,
+		ReplicaService,
+		TransportService,
 		CacheService,
-		FolderService,
-		SystemSystemOptionService,
+		SqlService,
 		SystemService, 
 	],
 })

@@ -1,240 +1,95 @@
-import getCurrentLine from 'get-current-line';
-import { Controller } from '@nestjs/common';
 import { 
 	MessagePattern,
 	EventPattern, 
 } from '@nestjs/microservices';
-import { BalancerService } from 'nest-datum/balancer/src';
-import * as Validators from 'nest-datum/validators/src';
+import { Controller } from '@nestjs/common';
+import { WarningException } from '@nest-datum-common/exceptions';
+import { TransportService } from '@nest-datum/transport';
+import { TcpOptionController as NestDatumTcpOptionController } from '@nest-datum-common/controller';
+import { 
+	bool as utilsCheckBool,
+	exists as utilsCheckExists,
+	str as utilsCheckStr,
+	strId as utilsCheckStrId,
+	strName as utilsCheckStrName,
+	strEmail as utilsCheckStrEmail,
+	strPassword as utilsCheckStrPassword,
+	strDescription as utilsCheckStrDescription,
+	strRegex as utilsCheckStrRegex,
+	strDate as utilsCheckStrDate,
+} from '@nest-datum-utils/check';
+import { 
+	checkToken,
+	getUser, 
+} from '@nest-datum/jwt';
 import { SystemService } from './system.service';
 
 @Controller()
-export class SystemController {
+export class SystemController extends NestDatumTcpOptionController {
 	constructor(
-		private readonly systemService: SystemService,
-		private readonly balancerService: BalancerService,
+		public transportService: TransportService,
+		public service: SystemService,
 	) {
+		super();
+	}
+
+	async validateCreate(options) {
+		if (!utilsCheckStrName(options['name'])) {
+			throw new WarningException(`Property "name" is not valid.`);
+		}
+		if (!utilsCheckStrId(options['providerId'])) {
+			throw new WarningException(`Property "providerId" is not valid.`);
+		}
+		if (!utilsCheckStrId(options['systemStatusId'])) {
+			throw new WarningException(`Property "systemStatusId" is not valid.`);
+		}
+		return await this.validateUpdate(options);
+	}
+
+	async validateUpdate(options) {
+		return {
+			...await super.validateUpdate(options),
+			...(options['providerId'] && utilsCheckStrId(options['providerId'])) 
+				? { providerId: options['providerId'] } 
+				: {},
+			...(options['systemStatusId'] && utilsCheckStrId(options['systemStatusId'])) 
+				? { systemStatusId: options['systemStatusId'] } 
+				: {},
+		};
 	}
 
 	@MessagePattern({ cmd: 'system.many' })
 	async many(payload) {
-		try {
-			const many = await this.systemService.many({
-				user: Validators.token('accessToken', payload['accessToken'], {
-					accesses: [ process['ACCESS_FILES_SYSTEM_MANY'] ],
-					isRequired: true,
-				}),
-				relations: Validators.obj('relations', payload['relations']),
-				select: Validators.obj('select', payload['select']),
-				sort: Validators.obj('sort', payload['sort']),
-				filter: Validators.obj('filter', payload['filter']),
-				query: Validators.str('query', payload['query'], {
-					min: 1,
-					max: 255,
-				}),
-				page: Validators.int('page', payload['page'], {
-					min: 1,
-					default: 1,
-				}),
-				limit: Validators.int('limit', payload['limit'], {
-					min: 1,
-					default: 20,
-				}),
-			});
-
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return {
-				total: many[1],
-				rows: many[0],
-			};
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return err;
-		}
+		return await super.many(payload);
 	}
 
 	@MessagePattern({ cmd: 'system.one' })
 	async one(payload) {
-		try {
-			const output = await this.systemService.one({
-				user: Validators.token('accessToken', payload['accessToken'], {
-					accesses: [ process['ACCESS_FILES_SYSTEM_ONE'] ],
-					isRequired: true,
-				}),
-				relations: Validators.obj('relations', payload['relations']),
-				select: Validators.obj('select', payload['select']),
-				id: Validators.id('id', payload['id'], {
-					isRequired: true,
-				}),
-			});
-
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return output;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return err;
-		}
+		return await super.one(payload);
 	}
 
 	@EventPattern('system.drop')
 	async drop(payload) {
-		try {
-			await this.systemService.drop({
-				user: Validators.token('accessToken', payload['accessToken'], {
-					accesses: [ process['ACCESS_FILES_SYSTEM_DROP'] ],
-					isRequired: true,
-				}),
-				id: Validators.id('id', payload['id'], {
-					isRequired: true,
-				}),
-			});
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return true;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return err;
-		}
+		return await super.drop(payload);
 	}
 
 	@EventPattern('system.dropMany')
 	async dropMany(payload) {
-		try {
-			await this.systemService.dropMany({
-				user: Validators.token('accessToken', payload['accessToken'], {
-					accesses: [ process['ACCESS_FILES_SYSTEM_DROP_MANY'] ],
-					isRequired: true,
-				}),
-				ids: Validators.arr('ids', payload['ids'], {
-					isRequired: true,
-					min: 1,
-				}),
-			});
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return true;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return err;
-		}
-	}
-
-	@EventPattern('system.create')
-	async create(payload) {
-		try {
-			const output = await this.systemService.create({
-				user: Validators.token('accessToken', payload['accessToken'], {
-					accesses: [ process['ACCESS_FILES_SYSTEM_CREATE'] ],
-					isRequired: true,
-				}),
-				id: Validators.id('id', payload['id']),
-				userId: Validators.id('userId', payload['userId']),
-				systemStatusId: Validators.id('systemStatusId', payload['systemStatusId'], {
-					isRequired: true,
-				}),
-				providerId: Validators.id('providerId', payload['providerId'], {
-					isRequired: true,
-				}),
-				name: Validators.str('name', payload['name'], {
-					isRequired: true,
-					min: 1,
-					max: 255,
-				}),
-				description: Validators.str('description', payload['description'], {
-					min: 1,
-					max: 255,
-				}),
-				isNotDelete: Validators.bool('isNotDelete', payload['isNotDelete']),
-			});
-
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return output;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return err;
-		}
+		return await super.dropMany(payload);
 	}
 
 	@EventPattern('system.createOptions')
 	async createOptions(payload) {
-		try {
-			const output = await this.systemService.createOptions({
-				user: Validators.token('accessToken', payload['accessToken'], {
-					accesses: [ process['ACCESS_FILES_SYSTEM_CREATE_OPTIONS'] ],
-					isRequired: true,
-				}),
-				id: Validators.id('id', payload['id']),
-				data: Validators.arr('data', payload['data'], {
-					isRequired: true,
-				}),
-			});
+		return await super.createOptions(payload);
+	}
 
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return output;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return err;
-		}
+	@EventPattern('system.create')
+	async create(payload) {
+		return await super.create(payload);
 	}
 
 	@EventPattern('system.update')
 	async update(payload) {
-		try {
-			await this.systemService.update({
-				user: Validators.token('accessToken', payload['accessToken'], {
-					accesses: [ process['ACCESS_FILES_SYSTEM_UPDATE'] ],
-					isRequired: true,
-				}),
-				id: Validators.id('id', payload['id']),
-				newId: Validators.id('newId', payload['newId']),
-				userId: Validators.id('userId', payload['userId']),
-				systemStatusId: Validators.id('systemStatusId', payload['systemStatusId']),
-				providerId: Validators.id('providerId', payload['providerId'], {
-					isRequired: true,
-				}),
-				name: Validators.str('name', payload['name'], {
-					min: 1,
-					max: 255,
-				}),
-				description: Validators.str('description', payload['description'], {
-					min: 1,
-					max: 255,
-				}),
-				isNotDelete: Validators.bool('isNotDelete', payload['isNotDelete']),
-				isDeleted: Validators.bool('isDeleted', payload['isDeleted']),
-				createdAt: Validators.date('createdAt', payload['createdAt']),
-			});
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return true;
-		}
-		catch (err) {
-			this.balancerService.log(err);
-			this.balancerService.decrementServiceResponseLoadingIndicator();
-
-			return err;
-		}
+		return await super.update(payload);
 	}
 }

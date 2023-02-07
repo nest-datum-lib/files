@@ -5,6 +5,7 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	ManyToOne,
+	Index,
 } from 'typeorm';
 import { Folder } from '../folder/folder.entity';
 import { System } from '../system/system.entity';
@@ -15,6 +16,7 @@ export class File {
 	public id: string;
 
 	@Column({ default: '' })
+	@Index()
 	public userId: string;
 
 	@Column({ default: '' })
@@ -30,12 +32,15 @@ export class File {
 	public parent: Folder;
 
 	@Column({ unique: true })
+	@Index()
 	public path: string;
 
 	@Column()
+	@Index()
 	public name: string;
 
 	@Column({ default: '' })
+	@Index()
 	public description: string;
 
 	@Column()

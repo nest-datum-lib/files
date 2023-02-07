@@ -1,38 +1,39 @@
-import { v4 as uuidv4 } from 'uuid';
-import Redis from 'ioredis';
-import getCurrentLine from 'get-current-line';
-import { 
-	Inject,
-	Injectable, 
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { 
 	Repository,
 	Connection, 
 } from 'typeorm';
-import { SqlService } from 'nest-datum/sql/src';
-import { CacheService } from 'nest-datum/cache/src';
 import { 
 	ErrorException,
-	NotFoundException, 
-} from 'nest-datum/exceptions/src';
-import { System } from './system.entity';
+	WarningException, 
+	NotFoundException,
+} from '@nest-datum-common/exceptions';
+import { SqlService } from '@nest-datum/sql';
+import { CacheService } from '@nest-datum/cache';
+import {
+	encryptPassword,
+	generateVerifyKey,
+	generateTokens,
+	checkPassword,
+} from '@nest-datum/jwt';
 import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
-import { Folder } from '../folder/folder.entity';
-import { FolderService } from '../folder/folder.service';
+import { System } from './system.entity';
 
 @Injectable()
 export class SystemService extends SqlService {
+	public entityName = 'system';
+	public entityConstructor = System;
+	public optionId = 'systemId';
+	public optionOptionId = 'systemSystemOptionId';
+	public optionRelationConstructor = SystemSystemSystemOption;
+
 	constructor(
-		@InjectRepository(System) private readonly systemRepository: Repository<System>,
-		@InjectRepository(SystemSystemSystemOption) private readonly systemSystemSystemOptionRepository: Repository<SystemSystemSystemOption>,
-		@InjectRepository(SystemSystemOption) private readonly systemSystemOptionRepository: Repository<SystemSystemOption>,
-		@InjectRepository(Folder) private readonly folderRepository: Repository<Folder>,
-		private readonly connection: Connection,
-		private readonly cacheService: CacheService,
-		private readonly folderService: FolderService,
+		@InjectRepository(System) public repository: Repository<System>,
+		@InjectRepository(SystemSystemSystemOption) public repositoryOptionRelation: Repository<SystemSystemSystemOption>,
+		public connection: Connection,
+		public cacheService: CacheService,
 	) {
 		super();
 	}
@@ -40,7 +41,6 @@ export class SystemService extends SqlService {
 	protected selectDefaultMany = {
 		id: true,
 		userId: true,
-		providerId: true,
 		systemStatusId: true,
 		name: true,
 		description: true,
@@ -55,292 +55,4 @@ export class SystemService extends SqlService {
 		name: true,
 		description: true,
 	};
-
-	async many({ user, ...payload }): Promise<any> {
-		try {
-			const cachedData = await this.cacheService.get([ 'system', 'many', payload ]);
-
-			if (cachedData) {
-				return cachedData;
-			}
-			const output = await this.systemRepository.findAndCount(await this.findMany(payload));
-
-			await this.cacheService.set([ 'system', 'many', payload ], output);
-			
-			return output;
-		}
-		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-
-		return [ [], 0 ];
-	}
-
-	async one({ user, ...payload }): Promise<any> {
-		try {
-			const cachedData = await this.cacheService.get([ 'system', 'one', payload ]);
-
-			if (cachedData) {
-				return cachedData;
-			}
-			const output = await this.systemRepository.findOne(await this.findOne(payload));
-		
-			if (output) {
-				await this.cacheService.set([ 'system', 'one', payload ], output);
-			}
-			if (!output) {
-				return new NotFoundException('Entity is undefined', getCurrentLine(), { user, ...payload });
-			}
-			return output;
-		}
-		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-	}
-
-	async drop({ user, ...payload }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ 'system', 'many' ]);
-			this.cacheService.clear([ 'system', 'one', payload ]);
-
-			await this.dropByIsDeleted(this.systemRepository, payload['id'], async (entity) => {
-				await this.systemSystemSystemOptionRepository.delete({ systemId: entity['id'] });
-				await this.systemSystemOptionRepository.delete({ systemId: entity['id'] });
-			});
-
-			await queryRunner.commitTransaction();
-
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
-	async dropMany({ user, ...payload }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ 'system', 'many' ]);
-			this.cacheService.clear([ 'system', 'one', payload ]);
-
-			let i = 0;
-
-			while (i < payload['ids'].length) {
-				await this.dropByIsDeleted(this.systemRepository, payload['ids'][i], async (entity) => {
-					await this.systemSystemSystemOptionRepository.delete({ systemId: entity['id'] });
-					await this.systemSystemOptionRepository.delete({ systemId: entity['id'] });
-				});
-				i++;
-			}
-			await queryRunner.commitTransaction();
-
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
-	async create({ user, ...payload }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ 'system', 'many' ]);
-
-			const output = await this.systemRepository.save({
-				...payload,
-				userId: payload['userId'] || user['id'] || '',
-			});
-
-			await queryRunner.commitTransaction();
-
-			return output;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
-	async createOptionContentBefore(payload?: object): Promise<any> {
-		const system = await this.systemRepository.findOne({
-			select: {
-				id: true,
-				name: true,
-				providerId: true,
-			},
-			where: {
-				id: (payload || {})['id'],
-			},
-		});
-
-		if (!system) {
-			return new NotFoundException('Entity is undefined', getCurrentLine(), { ...(payload || {}) });
-		}
-		return system;
-	}
-
-	async createOptionContentAfter(beforeOutput, optionContent, payload?: object): Promise<any> {
-		if (beforeOutput['providerId'] === 'files-provider-local'
-			&& optionContent['systemSystemOptionId']
-			&& optionContent['content']
-			&& typeof optionContent['content'] === 'string'
-			&& optionContent['content'] !== '/') {
-			const systemSystemOption = await this.systemSystemOptionRepository.findOne({
-				select: {
-					id: true,
-					systemOptionId: true,
-				},
-				where:{
-					id: optionContent['systemSystemOptionId'],
-				},
-			});
-			
-			if (systemSystemOption['systemOptionId'] === 'files-system-option-root') {
-				const parentFolder = await this.folderRepository.findOne({
-					select: {
-						id: true,
-						path: true,
-					},
-					where: {
-						path: '/',
-					},
-				});
-
-				if (!parentFolder) {
-					throw new Error(`Parent folder by path "/" is undefined.`);
-				}
-				const pathSplit = optionContent['content'].split('/');
-
-				if (pathSplit.length < 2) {
-					throw new Error('Error folder path.');
-				}
-
-				await this.folderService.create({
-					user: (payload || {})['user'],
-					systemId: beforeOutput['id'],
-					parentId: parentFolder['id'],
-					path: (pathSplit.length === 2)
-						? '/'
-						: (() => {
-							delete pathSplit[pathSplit.length - 1];
-
-							return pathSplit.join('/');
-						})(),
-					name: ((pathSplit.length === 2)
-						? pathSplit[1]
-						: pathSplit[pathSplit.length - 1]) || `SYSTEM-(${beforeOutput['id']})`,
-				});
-			}
-		}
-	}
-
-	async createOptions({ user, id, data }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner();
-
-		try {
-			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ 'system', 'option', 'many' ]);
-			this.cacheService.clear([ 'system', 'many' ]);
-			this.cacheService.clear([ 'system', 'one' ]);
-
-			const beforeOutput = await this.createOptionContentBefore({ user, id, data });
-
-			await this.systemSystemSystemOptionRepository.delete({
-				systemId: id,
-			});
-
-			let i = 0,
-				ii = 0;
-
-			while (i < data.length) {
-				ii = 0;
-
-				const option = data[i];
-
-				while (ii < option.length) {
-					const {
-						entityOptionId,
-						entityId,
-						id: itemId,
-						...optionData
-					} = option[ii];
-
-					const output = await this.systemSystemSystemOptionRepository.save({
-						...optionData,
-						systemId: id,
-						systemSystemOptionId: entityOptionId,
-					});
-
-					await this.createOptionContentAfter(beforeOutput, output, { user, id, data });
-					ii++;
-				}
-				i++;
-			}
-			await queryRunner.commitTransaction();
-			
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, id, data });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
-	async update({ user, ...payload }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			this.cacheService.clear([ 'system', 'many' ]);
-			this.cacheService.clear([ 'system', 'one' ]);
-			
-			await this.updateWithId(this.systemRepository, payload);
-			
-			await queryRunner.commitTransaction();
-			
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
 }

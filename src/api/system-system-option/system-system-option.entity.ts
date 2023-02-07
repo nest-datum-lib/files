@@ -1,21 +1,16 @@
 import { 
-	Entity, 
-	Column,
-	PrimaryGeneratedColumn,
+	Entity,
+	Column, 
 	ManyToOne,
 	OneToMany,
-	CreateDateColumn,
-	UpdateDateColumn,
 } from 'typeorm';
+import { OptionOption as NestDatumOptionOption } from '@nest-datum/option';
 import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
 import { SystemOption } from '../system-option/system-option.entity';
 import { System } from '../system/system.entity';
 
 @Entity()
-export class SystemSystemOption {
-	@PrimaryGeneratedColumn('uuid')
-	public id: string;
-
+export class SystemSystemOption extends NestDatumOptionOption {
 	@Column()
 	public systemOptionId: string;
 
@@ -27,21 +22,6 @@ export class SystemSystemOption {
 
 	@ManyToOne(() => System, (system) => system.systemSystemOptions)
 	public system: System;
-
-	@CreateDateColumn({ 
-		type: 'timestamp', 
-		precision: null,
-		default: () => 'CURRENT_TIMESTAMP', 
-	})
-	public createdAt: Date;
-
-	@UpdateDateColumn({ 
-		type: 'timestamp', 
-		precision: null,
-		default: () => 'CURRENT_TIMESTAMP',
-		onUpdate: 'CURRENT_TIMESTAMP', 
-	})
-	public updatedAt: Date;
 
 	@OneToMany(() => SystemSystemSystemOption, (systemSystemSystemOption) => systemSystemSystemOption.systemSystemOption)
 	public systemSystemSystemOptions: SystemSystemSystemOption[];

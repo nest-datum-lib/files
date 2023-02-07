@@ -1,32 +1,24 @@
-import { v4 as uuidv4 } from 'uuid';
-import Redis from 'ioredis';
-import getCurrentLine from 'get-current-line';
-import { 
-	Inject,
-	Injectable, 
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { 
 	Repository,
 	Connection, 
 } from 'typeorm';
-import { SqlService } from 'nest-datum/sql/src';
-import { CacheService } from 'nest-datum/cache/src';
-import { 
-	ErrorException,
-	NotFoundException, 
-} from 'nest-datum/exceptions/src';
+import { OptionOptionService as NestDatumOptionOptionService } from '@nest-datum/option';
+import { CacheService } from '@nest-datum/cache';
 import { ProviderProviderOption } from './provider-provider-option.entity';
 
 @Injectable()
-export class ProviderProviderOptionService extends SqlService {
+export class ProviderProviderOptionService extends NestDatumOptionOptionService {
+	public entityName = 'providerProviderOption';
+	public entityConstructor = ProviderProviderOption;
+
 	constructor(
-		@InjectRepository(ProviderProviderOption) private readonly providerProviderOptionRepository: Repository<ProviderProviderOption>,
-		private readonly connection: Connection,
-		private readonly cacheService: CacheService,
+		@InjectRepository(ProviderProviderOption) public repository: Repository<ProviderProviderOption>,
+		public connection: Connection,
+		public cacheService: CacheService,
 	) {
-		super();
+		super(repository, connection, cacheService);
 	}
 
 	protected selectDefaultMany = {
@@ -36,141 +28,4 @@ export class ProviderProviderOptionService extends SqlService {
 		createdAt: true,
 		updatedAt: true,
 	};
-
-	protected queryDefaultMany = {
-		id: true,
-	};
-
-	async many({ user, ...payload }): Promise<any> {
-		try {
-			const cachedData = await this.cacheService.get([ 'provider', 'option', 'relation', 'many', payload ]);
-
-			if (cachedData) {
-				return cachedData;
-			}
-			const output = await this.providerProviderOptionRepository.findAndCount(await this.findMany(payload));
-
-			this.cacheService.set([ 'provider', 'option', 'relation', 'many', payload ], output);
-			
-			return output;
-		}
-		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-
-		return [ [], 0 ];
-	}
-
-	async one({ user, ...payload }): Promise<any> {
-		try {
-			const cachedData = await this.cacheService.get([ 'provider', 'option', 'relation', 'one' , payload ]);
-
-			if (cachedData) {
-				return cachedData;
-			}
-			const output = await this.providerProviderOptionRepository.findOne(await this.findOne(payload));
-		
-			if (output) {
-				this.cacheService.set([ 'provider', 'option', 'relation', 'one', payload ], output);
-			}
-			else {
-				return new NotFoundException('Entity is undefined', getCurrentLine(), { user, ...payload });
-			}
-			return output;
-		}
-		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-	}
-
-	async drop({ user, id }): Promise<any> {
-		try {
-			this.cacheService.clear([ 'provider', 'option', 'relation', 'many' ]);
-			this.cacheService.clear([ 'provider', 'option', 'relation', 'one', id ]);
-			this.cacheService.clear([ 'provider', 'option', 'many' ]);
-			this.cacheService.clear([ 'provider', 'option', 'one' ]);
-			this.cacheService.clear([ 'provider', 'one' ]);
-
-			await this.providerProviderOptionRepository.delete({ id });
-
-			return true;
-		}
-		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), { user, id });
-		}
-	}
-
-	async dropMany({ user, ...payload }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ 'provider', 'option', 'relation', 'many' ]);
-			this.cacheService.clear([ 'provider', 'option', 'relation', 'one', payload ]);
-			this.cacheService.clear([ 'provider', 'option', 'many' ]);
-			this.cacheService.clear([ 'provider', 'many' ]);
-
-			let i = 0;
-
-			while (i < payload['ids'].length) {
-				await this.dropByIsDeleted(this.providerProviderOptionRepository, payload['ids'][i]);
-				i++;
-			}
-			await queryRunner.commitTransaction();
-
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
-	async create({ user, id, providerId, providerOptionId }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-
-			this.cacheService.clear([ 'provider', 'option', 'relation', 'many' ]);
-			this.cacheService.clear([ 'provider', 'option', 'many' ]);
-			this.cacheService.clear([ 'provider', 'option', 'one' ]);
-			this.cacheService.clear([ 'provider', 'many' ]);
-			this.cacheService.clear([ 'provider', 'one' ]);
-
-			const userId = (user
-				&& typeof user === 'object')
-				? (user['id'] || '')
-				: '';
-			const providerOptionRelation = await this.providerProviderOptionRepository.save({
-				id: id || uuidv4(),
-				userId,
-				providerId,
-				providerOptionId,
-			});
-			
-			providerOptionRelation['userId'] = userId;
-
-			await queryRunner.commitTransaction();
-
-			return providerOptionRelation;
-		}
-		catch (err) {
-			console.log('errr', err);
-
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, id, providerId, providerOptionId });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
 }

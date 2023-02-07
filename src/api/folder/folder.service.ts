@@ -1,40 +1,45 @@
 const fs = require('fs-extra');
 const { chmod } = require('node:fs/promises');
 
-import Redis from 'ioredis';
-import getCurrentLine from 'get-current-line';
 import { v4 as uuidv4 } from 'uuid';
-import { 
-	Inject,
-	Injectable, 
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { 
 	Repository,
 	Connection, 
 	Like,
 } from 'typeorm';
-import { SqlService } from 'nest-datum/sql/src';
-import { CacheService } from 'nest-datum/cache/src';
 import { 
 	ErrorException,
-	NotFoundException, 
-} from 'nest-datum/exceptions/src';
+	WarningException, 
+	NotFoundException,
+} from '@nest-datum-common/exceptions';
+import { SqlService } from '@nest-datum/sql';
+import { CacheService } from '@nest-datum/cache';
+import {
+	encryptPassword,
+	generateVerifyKey,
+	generateTokens,
+	checkPassword,
+} from '@nest-datum/jwt';
+import { strId as utilsCheckStrId } from '@nest-datum-utils/check';
+import { File } from '../file/file.entity';
 import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
 import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
-import { File } from '../file/file.entity';
 import { Folder } from './folder.entity';
 
 @Injectable()
 export class FolderService extends SqlService {
+	public entityName = 'folder';
+	public entityConstructor = Folder;
+
 	constructor(
-		@InjectRepository(Folder) private readonly folderRepository: Repository<Folder>,
+		@InjectRepository(Folder) public repository: Repository<Folder>,
 		@InjectRepository(File) private readonly fileRepository: Repository<File>,
 		@InjectRepository(SystemSystemSystemOption) private readonly systemSystemSystemOptionRepository: Repository<SystemSystemSystemOption>,
 		@InjectRepository(ProviderProviderProviderOption) private readonly providerProviderProviderOptionRepository: Repository<ProviderProviderProviderOption>,
-		private readonly connection: Connection,
-		private readonly cacheService: CacheService,
+		public connection: Connection,
+		public cacheService: CacheService,
 	) {
 		super();
 	}
@@ -60,164 +65,45 @@ export class FolderService extends SqlService {
 		description: true,
 	};
 
-	async many({ user, ...payload }): Promise<any> {
-		try {
-			const cachedData = await this.cacheService.get([ 'folder', 'many', payload ]);
-
-			if (cachedData) {
-				return cachedData;
-			}
-			const output = await this.folderRepository.findAndCount(await this.findMany(payload));
-
-			await this.cacheService.set([ 'folder', 'many', payload ], output);
-			
-			return output;
-		}
-		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		return [ [], 0 ];
-	}
-
-	async one({ user, ...payload }): Promise<any> {
-		try {
-			const cachedData = await this.cacheService.get([ 'folder', 'one', payload ]);
-
-			if (cachedData) {
-				return cachedData;
-			}
-			const output = await this.folderRepository.findOne(await this.findOne(payload));
+	async dropIsDeletedRows(repository, id: string): Promise<any> {
+		const folder = await super.dropIsDeletedRows(repository, id);
+		const folderChildren = await this.repository.find({
+			select: {
+				id: true,
+				path: true,
+			},
+			where: {
+				path: Like(`${folder['path']}/%`),
+			},
+		});
 		
-			if (output) {
-				await this.cacheService.set([ 'folder', 'one', payload ], output);
-			}
-			if (!output) {
-				return new NotFoundException('Entity is undefined', getCurrentLine(), { user, ...payload });
-			}
-			return output;
-		}
-		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-	}
-
-	async drop({ user, ...payload }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ 'folder', 'many' ]);
-			this.cacheService.clear([ 'folder', 'one', payload ]);
-
-			const folder = await this.dropByIsDeleted(this.folderRepository, payload['id'], async (folder) => {
-				const filderChildItems = await this.folderRepository.find({
-					select: {
-						id: true,
-						path: true,
-					},
-					where: {
-						path: Like(`${folder['path']}/%`),
+		await repository.delete(Folder, folderChildren.map(({ id }) => id));
+	
+		if (folder['isDeleted']) {
+			await (new Promise((resolve, reject) => {
+				fs.rmdir(`${process.env.APP_ROOT_PATH}${folder['path']}`, { recursive: true }, async (err) => {
+					if (err) {
+						return reject(new Error(err.message));
+					}
+					else {
+						return resolve(true);
 					}
 				});
-				let i = 0;
-
-				while (i < filderChildItems.length) {
-					await this.folderRepository.delete({ id: filderChildItems[i].id });
-					i++;
-				}
-			});
-			
-			if (folder['isDeleted']) {
-				await (new Promise((resolve, reject) => {
-					fs.rmdir(`${process.env.APP_ROOT_PATH}${folder['path']}`, { recursive: true }, async (err) => {
-						if (err) {
-							return reject(new Error(err.message));
-						}
-						else {
-							return resolve(true);
-						}
-					});
-				}));
-			}
-			await queryRunner.commitTransaction();
-
-			return true;
+			}));
 		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		finally {
-			await queryRunner.release();
-		}
+		return folder;
 	}
 
-	async dropMany({ user, ...payload }): Promise<any> {
+	async create(payload: object = {}): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
 			await queryRunner.startTransaction();
+
+			delete payload['accessToken'];
+			delete payload['refreshToken'];
 			
-			this.cacheService.clear([ 'folder', 'many' ]);
-			this.cacheService.clear([ 'folder', 'one', payload ]);
-
-			let i = 0;
-
-			while (i < payload['ids'].length) {
-				const folder = await this.dropByIsDeleted(this.folderRepository, payload['ids'][i], async (folder) => {
-					const filderChildItems = await this.folderRepository.find({
-						select: {
-							id: true,
-							path: true,
-						},
-						where: {
-							path: Like(`${folder['path']}/%`),
-						}
-					});
-					let i = 0;
-
-					while (i < filderChildItems.length) {
-						await this.folderRepository.delete({ id: filderChildItems[i].id });
-						i++;
-					}
-				});
-				await (new Promise((resolve, reject) => {
-					fs.remove(`${process.env.APP_ROOT_PATH}/${folder['path']}`, async (err) => {
-						if (err) {
-							return reject(new Error(err.message));
-						}
-						else {
-							return resolve(true);
-						}
-					});
-				}));
-				i++;
-			}
-			await queryRunner.commitTransaction();
-
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
-	async create({ user, ...payload }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ 'folder', 'many' ]);
+			this.cacheService.clear([ this.entityName, 'many' ]);
 
 			if (!payload['path']) {
 				const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
@@ -233,7 +119,6 @@ export class FolderService extends SqlService {
 								id: 'files-system-option-root',
 							},
 						},
-
 					},
 					relations: {
 						system: true,
@@ -242,7 +127,7 @@ export class FolderService extends SqlService {
 
 				if (!systemOptionContent
 					|| !systemOptionContent['system']) {
-					return new NotFoundException('File system is undefined', getCurrentLine(), { user, ...payload });
+					return new NotFoundException('File system is undefined');
 				}
 				const provider = await this.providerProviderProviderOptionRepository.findOne({
 					select: {
@@ -261,13 +146,13 @@ export class FolderService extends SqlService {
 				});
 
 				if (!provider) {
-					return new NotFoundException('Provider is undefined', getCurrentLine(), { user, ...payload });
+					return new NotFoundException('Provider is undefined');
 				}
 				payload['path'] = ((provider['content'] === '/')
 					? ''
 					: provider['content']) + systemOptionContent['content'];
 			}
-			const parentFolder = await this.folderRepository.findOne({
+			const parentFolder = await this.repository.findOne({
 				select: {
 					id: true,
 					path: true,
@@ -283,16 +168,15 @@ export class FolderService extends SqlService {
 				},
 			});
 			let output;
-			
+
 			if (parentFolder) {
-				output = await this.folderRepository.save({
+				output = await queryRunner.manager.save(Object.assign(new Folder, {
 					...payload,
-					userId: user['id'] || '',
 					parentId: parentFolder['id'],
 					path: (payload['path'] === '/')
 						? `/${payload['name']}`
 						: `${payload['path']}/${payload['name']}`,
-				});
+				}));
 			}
 			else {
 				throw new Error(`Parent folder is not exists.`);
@@ -327,25 +211,30 @@ export class FolderService extends SqlService {
 		}
 		catch (err) {
 			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
+			throw err;
 		}
 		finally {
 			await queryRunner.release();
 		}
 	}
 
-	async update({ user, ...payload }): Promise<any> {
+	async update(payload: object = {}): Promise<any> {
 		const queryRunner = await this.connection.createQueryRunner(); 
 
 		try {
 			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ 'folder', 'many' ]);
-			this.cacheService.clear([ 'folder', 'one' ]);
 
-			const currentFolder = await this.folderRepository.findOne({ 
+			const newId = utilsCheckStrId(payload['newId']) && payload['newId'];
+
+			delete payload['accessToken'];
+			delete payload['refreshToken'];
+			delete payload['newId'];
+
+			this.cacheService.clear([ this.entityName, 'many' ]);
+			this.cacheService.clear([ this.entityName, 'one' ]);
+
+			const currentFolder = await this.repository.findOne({ 
 				select: {
 					id: true,
 					name: true,
@@ -356,12 +245,17 @@ export class FolderService extends SqlService {
 				},
 			});
 
-			await this.updateWithId(this.folderRepository, payload);
+			await queryRunner.manager.update(Folder, payload['id'], {
+				...payload,
+				...newId
+					? { id: newId }
+					: {},
+			});
 
 			if (typeof payload['path'] === 'string'
 				&& payload['path'] !== currentFolder['path']) {
 				const newPath = (payload['path'] || '/');
-				const folderChildItems = await this.folderRepository.find({
+				const folderChildren = await this.repository.find({
 					select: {
 						id: true,
 						path: true,
@@ -370,7 +264,7 @@ export class FolderService extends SqlService {
 						path: Like(`${currentFolder['path']}/%`),
 					},
 				});
-				const fileChildItems = await this.fileRepository.find({
+				const fileChildren = await this.fileRepository.find({
 					select: {
 						id: true,
 						path: true,
@@ -381,26 +275,20 @@ export class FolderService extends SqlService {
 				});
 				let i = 0;
 
-				await this.updateWithId(this.folderRepository, {
-					id: payload['id'],
-					path: payload['path'],
-				});
-
-				while (i < folderChildItems.length) {
-					await this.folderRepository.update({ id: folderChildItems[i]['id'] }, {
-						path: folderChildItems[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`),
+				while (i < folderChildren.length) {
+					await queryRunner.manager.update(Folder, folderChildren[i]['id'], {
+						path: folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`),
 					});
 					i++;
 				}
 				i = 0;
 
-				while (i < fileChildItems.length) {
-					await this.fileRepository.update({ id: fileChildItems[i]['id'] }, {
-						path: fileChildItems[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`),
+				while (i < fileChildren.length) {
+					await queryRunner.manager.update(File, fileChildren[i]['id'], {
+						path: fileChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`),
 					});
 					i++;
 				}
-
 				await (new Promise((resolve, reject) => {
 					fs.exists(`${process.env.APP_ROOT_PATH}/${newPath}`, async (existsFlag) => {
 						if (existsFlag) {
@@ -437,7 +325,7 @@ export class FolderService extends SqlService {
 				&& (payload['path'] === currentFolder['path']
 					|| typeof payload['path'] !== 'string')) {
 				const folderPathSplit = currentFolder['path'].split('/');
-				const folderChildItems = await this.folderRepository.find({
+				const folderChildren = await this.repository.find({
 					select: {
 						id: true,
 						path: true,
@@ -446,7 +334,7 @@ export class FolderService extends SqlService {
 						path: Like(`${currentFolder['path']}/%`),
 					},
 				});
-				const fileChildItems = await this.fileRepository.find({
+				const fileChildren = await this.fileRepository.find({
 					select: {
 						id: true,
 						path: true,
@@ -461,22 +349,20 @@ export class FolderService extends SqlService {
 				
 				const newPath = folderPathSplit.join('/');
 
-				await this.updateWithId(this.folderRepository, {
-					id: payload['id'],
-					path: newPath,
+				await queryRunner.manager.update(Folder, payload['id'], {
+					path: folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`),
 				});
-
-				while (i < folderChildItems.length) {
-					await this.folderRepository.update({ id: folderChildItems[i]['id'] }, {
-						path: folderChildItems[i]['path'].replace(`${currentFolder['path']}/`, `${newPath}/`),
+				while (i < folderChildren.length) {
+					await queryRunner.manager.update(Folder, folderChildren[i]['id'], {
+						path: folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${newPath}/`),
 					});
 					i++;
 				}
 				i = 0;
 
-				while (i < fileChildItems.length) {
-					await this.fileRepository.update({ id: fileChildItems[i]['id'] }, {
-						path: fileChildItems[i]['path'].replace(`${currentFolder['path']}/`, `${newPath}/`),
+				while (i < fileChildren.length) {
+					await queryRunner.manager.update(File, { id: fileChildren[i]['id'] }, {
+						path: fileChildren[i]['path'].replace(`${currentFolder['path']}/`, `${newPath}/`),
 					});
 					i++;
 				}
@@ -496,14 +382,13 @@ export class FolderService extends SqlService {
 				}));
 			}
 			await queryRunner.commitTransaction();
-			
+
 			return true;
 		}
 		catch (err) {
 			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
 
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
+			throw err;
 		}
 		finally {
 			await queryRunner.release();
