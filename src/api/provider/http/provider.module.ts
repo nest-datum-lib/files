@@ -25,8 +25,10 @@ import { ProviderService } from '../provider.service';
 import { Provider } from '../provider.entity';
 import { ProviderProviderProviderOption } from '../../provider-provider-provider-option/provider-provider-provider-option.entity';
 import { ProviderOption } from '../../provider-option/provider-option.entity';
-import { ProviderProviderOption } from '../../provider-provider-option/provider-provider-option.entity';
 import { System } from '../../system/system.entity';
+import { ProviderProviderOption } from '../../provider-provider-option/provider-provider-option.entity';
+import { ProviderProviderOptionModule } from '../../provider-provider-option/provider-provider-option.module';
+import { ProviderProviderOptionService } from '../../provider-provider-option/provider-provider-option.service';
 
 @Module({
 	controllers: [ ProviderController ],
@@ -42,12 +44,14 @@ import { System } from '../../system/system.entity';
 		TransportModule,
 		CacheModule,
 		SqlModule,
+		ProviderProviderOptionModule,
 	],
 	providers: [
 		ReplicaService,
 		TransportService,
 		CacheService,
 		SqlService,
+		ProviderProviderOptionService,
 		ProviderService, 
 	],
 })

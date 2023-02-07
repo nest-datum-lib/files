@@ -29,6 +29,8 @@ import { File } from '../../file/file.entity';
 import { SystemSystemSystemOption } from '../../system-system-system-option/system-system-system-option.entity';
 import { SystemOption } from '../../system-option/system-option.entity';
 import { SystemSystemOption } from '../../system-system-option/system-system-option.entity';
+import { SystemSystemOptionModule } from '../../system-system-option/system-system-option.module';
+import { SystemSystemOptionService } from '../../system-system-option/system-system-option.service';
 
 @Module({
 	controllers: [ SystemController ],
@@ -46,12 +48,14 @@ import { SystemSystemOption } from '../../system-system-option/system-system-opt
 		TransportModule,
 		CacheModule,
 		SqlModule,
+		SystemSystemOptionModule,
 	],
 	providers: [
 		ReplicaService,
 		TransportService,
 		CacheService,
 		SqlService,
+		SystemSystemOptionService,
 		SystemService, 
 	],
 })
