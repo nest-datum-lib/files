@@ -22,7 +22,7 @@ export class ProviderProviderOptionController extends NestDatumOptionOptionHttpC
 	}
 
 	@Post(':id')
-	async createOption(
+	async create(
 		@AccessToken() accessToken: string,
 		@Param('id') providerOptionId: string,
 		@Body('providerId') providerId: string,

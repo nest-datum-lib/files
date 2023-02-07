@@ -22,7 +22,7 @@ export class SystemSystemOptionController extends NestDatumOptionOptionHttpContr
 	}
 
 	@Post(':id')
-	async createOption(
+	async create(
 		@AccessToken() accessToken: string,
 		@Param('id') systemOptionId: string,
 		@Body('systemId') systemId: string,
