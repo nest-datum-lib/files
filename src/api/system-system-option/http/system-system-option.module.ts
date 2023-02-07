@@ -20,15 +20,15 @@ import {
 	SqlModule,
 	SqlService, 
 } from '@nest-datum/sql';
-import { SystemOptionOptionController } from './system-option-option.controller';
-import { SystemOptionOptionService } from '../system-option-option.service';
-import { SystemOptionOption } from '../system-option-option.entity';
-import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
-import { SystemOption } from '../system-option/system-option.entity';
-import { System } from '../system/system.entity';
+import { SystemSystemOptionController } from './system-system-option.controller';
+import { SystemSystemOptionService } from '../system-system-option.service';
+import { SystemSystemOption } from '../system-system-option.entity';
+import { SystemSystemSystemOption } from '../../system-system-system-option/system-system-system-option.entity';
+import { SystemOption } from '../../system-option/system-option.entity';
+import { System } from '../../system/system.entity';
 
 @Module({
-	controllers: [ SystemOptionOptionController ],
+	controllers: [ SystemSystemOptionController ],
 	imports: [
 		TypeOrmModule.forFeature([ 
 			SystemOption,
@@ -41,15 +41,15 @@ import { System } from '../system/system.entity';
 		CacheModule,
 		SqlModule,
 	],
-	Systems: [
+	providers: [
 		ReplicaService,
 		TransportService,
 		CacheService,
 		SqlService,
-		SystemOptionOptionService, 
+		SystemSystemOptionService, 
 	],
 })
-export class SystemOptionOptionModule implements NestModule {
+export class SystemSystemOptionModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
 	}
 }

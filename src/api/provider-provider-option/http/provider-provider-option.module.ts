@@ -20,15 +20,15 @@ import {
 	SqlModule,
 	SqlService, 
 } from '@nest-datum/sql';
-import { ProviderOptionOptionController } from './provider-option-option.controller';
-import { ProviderOptionOptionService } from '../provider-option-option.service';
-import { ProviderOptionOption } from '../provider-option-option.entity';
-import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
-import { ProviderOption } from '../provider-option/provider-option.entity';
-import { Provider } from '../provider/provider.entity';
+import { ProviderProviderOptionController } from './provider-provider-option.controller';
+import { ProviderProviderOptionService } from '../provider-provider-option.service';
+import { ProviderProviderOption } from '../provider-provider-option.entity';
+import { ProviderProviderProviderOption } from '../../provider-provider-provider-option/provider-provider-provider-option.entity';
+import { ProviderOption } from '../../provider-option/provider-option.entity';
+import { Provider } from '../../provider/provider.entity';
 
 @Module({
-	controllers: [ ProviderOptionOptionController ],
+	controllers: [ ProviderProviderOptionController ],
 	imports: [
 		TypeOrmModule.forFeature([ 
 			ProviderOption,
@@ -46,10 +46,10 @@ import { Provider } from '../provider/provider.entity';
 		TransportService,
 		CacheService,
 		SqlService,
-		ProviderOptionOptionService, 
+		ProviderProviderOptionService, 
 	],
 })
-export class ProviderOptionOptionModule implements NestModule {
+export class ProviderProviderOptionModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
 	}
 }

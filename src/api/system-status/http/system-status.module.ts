@@ -33,7 +33,7 @@ import { SystemStatus } from '../system-status.entity';
 		CacheModule,
 		SqlModule,
 	],
-	Systems: [
+	providers: [
 		ReplicaService,
 		TransportService,
 		CacheService,
