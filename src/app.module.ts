@@ -1,3 +1,4 @@
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
@@ -47,6 +48,7 @@ import { SettingModule as HttpSettingModule } from './api/setting/http/setting.m
 
 @Module({
 	imports: [
+		ServeStaticModule.forRoot({ rootPath: process.env.APP_ROOT_PATH }),
 		TypeOrmModule.forRoot(sql),
 		RedisModule.forRoot(redis),
 		ReplicaModule,
