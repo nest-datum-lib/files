@@ -19,14 +19,26 @@ import { TransportService } from '@nest-datum/transport';
 import { AccessToken } from '@nest-datum-common/decorators';
 import { HttpOptionController as NestDatumHttpOptionController } from '@nest-datum-common/controller';
 import { ProviderService } from '../provider.service';
+import { ProviderProviderOptionService } from '../../provider-provider-option/provider-provider-option.service';
 
 @Controller(`provider`)
 export class ProviderController extends NestDatumHttpOptionController {
 	constructor(
 		public transportService: TransportService,
 		public service: ProviderService,
+		public providerProviderOptionService: ProviderProviderOptionService,
 	) {
 		super();
+	}
+
+	async validateCreateOption(options) {
+		if (!utilsCheckStrId(options['providerOptionId'])) {
+			throw new HttpException(`Property "providerOptionId" is not valid.`, 403);
+		}
+		if (!utilsCheckStrId(options['providerId'])) {
+			throw new HttpException(`Property "providerId" is not valid.`, 403);
+		}
+		return await this.validateUpdate(options);
 	}
 
 	async validateCreate(options) {
@@ -46,6 +58,19 @@ export class ProviderController extends NestDatumHttpOptionController {
 				? { providerStatusId: options['providerStatusId'] } 
 				: {},
 		};
+	}
+
+	@Post(':id')
+	async createOption(
+		@AccessToken() accessToken: string,
+		@Param('id') providerOptionId: string,
+		@Body('providerId') providerId: string,
+	) {
+		return await this.serviceHandlerWrapper(async () => await this.providerProviderOptionService.create(await this.validateCreateOption({
+			accessToken,
+			providerOptionId,
+			providerId,
+		})));
 	}
 
 	@Post()

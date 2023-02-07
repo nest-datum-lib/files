@@ -16,14 +16,26 @@ import { TransportService } from '@nest-datum/transport';
 import { AccessToken } from '@nest-datum-common/decorators';
 import { HttpOptionController as NestDatumHttpOptionController } from '@nest-datum-common/controller';
 import { SystemService } from '../system.service';
+import { SystemSystemOptionService } from '../../system-system-option/system-system-option.service';
 
 @Controller(`system`)
 export class SystemController extends NestDatumHttpOptionController {
 	constructor(
 		public transportService: TransportService,
 		public service: SystemService,
+		public systemSystemOptionService: SystemSystemOptionService,
 	) {
 		super();
+	}
+
+	async validateCreateOption(options) {
+		if (!utilsCheckStrId(options['systemOptionId'])) {
+			throw new HttpException(`Property "systemOptionId" is not valid.`, 403);
+		}
+		if (!utilsCheckStrId(options['systemId'])) {
+			throw new HttpException(`Property "systemId" is not valid.`, 403);
+		}
+		return await this.validateUpdate(options);
 	}
 
 	async validateCreate(options) {
@@ -49,6 +61,19 @@ export class SystemController extends NestDatumHttpOptionController {
 				? { systemStatusId: options['systemStatusId'] } 
 				: {},
 		};
+	}
+
+	@Post(':id')
+	async createOption(
+		@AccessToken() accessToken: string,
+		@Param('id') systemOptionId: string,
+		@Body('systemId') systemId: string,
+	) {
+		return await this.serviceHandlerWrapper(async () => await this.systemSystemOptionService.create(await this.validateCreateOption({
+			accessToken,
+			systemOptionId,
+			systemId,
+		})));
 	}
 
 	@Post()
