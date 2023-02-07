@@ -28,7 +28,6 @@ import { ProviderStatus } from './provider-status.entity';
 		TransportModule,
 		CacheModule,
 		SqlModule,
-		ProviderStatusService,
 	],
 	providers: [
 		ReplicaService,
