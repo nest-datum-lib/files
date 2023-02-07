@@ -31,7 +31,6 @@ export class Folder {
 	public parentId: string;
 
 	@Column({ unique: true })
-	@Index()
 	public path: string;
 
 	@Column()

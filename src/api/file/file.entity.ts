@@ -32,7 +32,6 @@ export class File {
 	public parent: Folder;
 
 	@Column({ unique: true })
-	@Index()
 	public path: string;
 
 	@Column()
