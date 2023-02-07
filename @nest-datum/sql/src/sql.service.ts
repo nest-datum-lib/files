@@ -211,8 +211,6 @@ export class SqlService {
 	}
 
 	async drop({ user, ...payload }, withTwoStepRemoval = true): Promise<any> {
-		console.log('0000000', withTwoStepRemoval, { user, ...payload });
-
 		const queryRunner = await this.connection.createQueryRunner();
 
 		try {
@@ -220,8 +218,6 @@ export class SqlService {
 			
 			this.cacheService.clear([ this.entityName, 'many' ]);
 			this.cacheService.clear([ this.entityName, 'one', payload ]);
-
-			console.log('withTwoStepRemoval', withTwoStepRemoval);
 
 			(withTwoStepRemoval)
 				? await this.dropIsDeletedRows(queryRunner.manager, payload['id'])
@@ -280,13 +276,11 @@ export class SqlService {
 	}
 
 	async dropIsDeletedRows(repository, id: string): Promise<any> {
-		const entity = await repository.findOne({
+		const entity = await this.repository.findOne({
 			where: {
 				id,
 			},
 		});
-
-		console.log('this.entityConstructor', entity['isDeleted'], this.entityConstructor);
 
 		(entity['isDeleted'] === true)
 			? await repository.delete(this.entityConstructor, { id })
