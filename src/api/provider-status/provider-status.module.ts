@@ -34,7 +34,7 @@ import { ProviderStatus } from './provider-status.entity';
 		TransportService,
 		CacheService,
 		SqlService,
-		ProviderStatusService, 
+		// ProviderStatusService, 
 	],
 })
 export class ProviderStatusModule {
