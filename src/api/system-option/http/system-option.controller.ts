@@ -3,7 +3,7 @@ import { TransportService } from '@nest-datum/transport';
 import { HttpController as NestDatumHttpController } from '@nest-datum-common/controller';
 import { SystemOptionService } from '../system-option.service';
 
-@Controller(`${process.env.SERVICE_FILES}/system-option`)
+@Controller(`system-option`)
 export class SystemOptionController extends NestDatumHttpController {
 	public serviceName = process.env.SERVICE_FILES;
 	public entityName = 'systemOption';

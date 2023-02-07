@@ -20,7 +20,7 @@ import { AccessToken } from '@nest-datum-common/decorators';
 import { HttpController as NestDatumHttpController } from '@nest-datum-common/controller';
 import { FolderService } from '../folder.service';
 
-@Controller(`${process.env.SERVICE_FILES}/folder`)
+@Controller(`folder`)
 export class FolderController extends NestDatumHttpController {
 	constructor(
 		public transportService: TransportService,

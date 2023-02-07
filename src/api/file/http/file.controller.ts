@@ -19,7 +19,7 @@ import { AccessToken } from '@nest-datum-common/decorators';
 import { HttpController as NestDatumHttpController } from '@nest-datum-common/controller';
 import { FileService } from '../file.service';
 
-@Controller(`${process.env.SERVICE_FILES}/file`)
+@Controller(`file`)
 export class FileController extends NestDatumHttpController {
 	constructor(
 		public transportService: TransportService,

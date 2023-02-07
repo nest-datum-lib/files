@@ -20,7 +20,7 @@ import { AccessToken } from '@nest-datum-common/decorators';
 import { HttpOptionController as NestDatumHttpOptionController } from '@nest-datum-common/controller';
 import { ProviderService } from '../provider.service';
 
-@Controller(`${process.env.SERVICE_FILES}/provider`)
+@Controller(`provider`)
 export class ProviderController extends NestDatumHttpOptionController {
 	constructor(
 		public transportService: TransportService,

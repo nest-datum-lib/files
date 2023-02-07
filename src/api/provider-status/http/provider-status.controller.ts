@@ -3,7 +3,7 @@ import { TransportService } from '@nest-datum/transport';
 import { StatusHttpController as NestDatumStatusHttpController } from '@nest-datum/status';
 import { ProviderStatusService } from '../provider-status.service';
 
-@Controller(`${process.env.SERVICE_FILES}/provider-status`)
+@Controller(`provider-status`)
 export class ProviderStatusController extends NestDatumStatusHttpController {
 	constructor(
 		public transportService: TransportService,

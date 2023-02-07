@@ -17,7 +17,7 @@ import { AccessToken } from '@nest-datum-common/decorators';
 import { HttpOptionController as NestDatumHttpOptionController } from '@nest-datum-common/controller';
 import { SystemService } from '../system.service';
 
-@Controller(`${process.env.SERVICE_FILES}/system`)
+@Controller(`system`)
 export class SystemController extends NestDatumHttpOptionController {
 	constructor(
 		public transportService: TransportService,
