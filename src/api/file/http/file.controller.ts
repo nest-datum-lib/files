@@ -67,6 +67,8 @@ export class FileController extends NestDatumHttpController {
 		@Body('path') path: string,
 		@UploadedFiles() files: Array<any>,
 	) {
+		console.log('systemId', systemId);
+
 		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
 			accessToken,
 			id,
