@@ -246,12 +246,9 @@ export class FolderService extends SqlService {
 					id: payload['id'],
 				},
 			});
-			const clearPayload = { ...payload };
-
-			delete clearPayload['path'];
-
+			
 			await queryRunner.manager.update(Folder, payload['id'], {
-				...clearPayload,
+				...payload,
 				...newId
 					? { id: newId }
 					: {},
