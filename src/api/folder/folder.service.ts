@@ -353,7 +353,7 @@ export class FolderService extends SqlService {
 				
 				const newPath = folderPathSplit.join('/');
 
-				console.log('000000', payload);
+				console.log('000000', currentFolder, payload);
 
 				await queryRunner.manager.update(Folder, payload['id'], {
 					path: folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`),
