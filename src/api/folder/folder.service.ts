@@ -298,7 +298,7 @@ export class FolderService extends SqlService {
 				i = 0;
 
 				while (i < fileChildren.length) {
-					console.log('333333', fileChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`);
+					console.log('333333', fileChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`));
 
 					await queryRunner.manager.update(File, fileChildren[i]['id'], {
 						path: fileChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`),
