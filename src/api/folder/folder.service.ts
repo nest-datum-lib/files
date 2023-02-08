@@ -236,6 +236,8 @@ export class FolderService extends SqlService {
 			this.cacheService.clear([ this.entityName, 'many' ]);
 			this.cacheService.clear([ this.entityName, 'one' ]);
 
+			console.log('11111111', payload);
+
 			const currentFolder = await this.repository.findOne({ 
 				select: {
 					id: true,
@@ -350,6 +352,8 @@ export class FolderService extends SqlService {
 				folderPathSplit[folderPathSplit.length - 1] = payload['name'];
 				
 				const newPath = folderPathSplit.join('/');
+
+				console.log('000000', payload);
 
 				await queryRunner.manager.update(Folder, payload['id'], {
 					path: folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`),
