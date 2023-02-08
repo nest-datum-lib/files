@@ -62,10 +62,8 @@ export class FileService extends SqlService {
 
 	protected queryDefaultMany = {
 		id: true,
-		path: true,
 		name: true,
 		description: true,
-		type: true,
 	};
 
 	async dropIsDeletedRows(repository, id: string): Promise<any> {
