@@ -359,6 +359,8 @@ export class FolderService extends SqlService {
 					path: folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`),
 				});
 				while (i < folderChildren.length) {
+					console.log('--------', folderChildren[i]);
+
 					await queryRunner.manager.update(Folder, folderChildren[i]['id'], {
 						path: folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${newPath}/`),
 					});
