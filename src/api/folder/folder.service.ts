@@ -76,8 +76,10 @@ export class FolderService extends SqlService {
 				path: Like(`${folder['path']}/%`),
 			},
 		});
-		
-		await repository.delete(Folder, folderChildren.map(({ id }) => id));
+
+		if (folderChildren.length > 0) {
+			await repository.delete(Folder, folderChildren.map(({ id }) => id));
+		}
 	
 		if (folder['isDeleted']) {
 			await (new Promise((resolve, reject) => {
