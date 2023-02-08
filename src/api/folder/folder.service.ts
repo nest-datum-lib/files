@@ -255,6 +255,8 @@ export class FolderService extends SqlService {
 				},
 			});
 
+			console.log('11111111', { ...payload });
+
 			await queryRunner.manager.update(Folder, payload['id'], {
 				...payload,
 				...newId
@@ -286,6 +288,8 @@ export class FolderService extends SqlService {
 				let i = 0;
 
 				while (i < folderChildren.length) {
+					console.log('22222', folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`));
+
 					await queryRunner.manager.update(Folder, folderChildren[i]['id'], {
 						path: folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`),
 					});
@@ -294,6 +298,8 @@ export class FolderService extends SqlService {
 				i = 0;
 
 				while (i < fileChildren.length) {
+					console.log('333333', fileChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`);
+
 					await queryRunner.manager.update(File, fileChildren[i]['id'], {
 						path: fileChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`),
 					});
@@ -359,10 +365,14 @@ export class FolderService extends SqlService {
 				
 				const newPath = folderPathSplit.join('/');
 
+				console.log('444444444444444', folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`));
+
 				await queryRunner.manager.update(Folder, payload['id'], {
 					path: folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${payload['path']}/`),
 				});
 				while (i < folderChildren.length) {
+					console.log('555555', folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${newPath}/`));
+
 					await queryRunner.manager.update(Folder, folderChildren[i]['id'], {
 						path: folderChildren[i]['path'].replace(`${currentFolder['path']}/`, `${newPath}/`),
 					});
@@ -371,6 +381,8 @@ export class FolderService extends SqlService {
 				i = 0;
 
 				while (i < fileChildren.length) {
+					console.log('66666666', fileChildren[i]['path'].replace(`${currentFolder['path']}/`, `${newPath}/`));
+
 					await queryRunner.manager.update(File, { id: fileChildren[i]['id'] }, {
 						path: fileChildren[i]['path'].replace(`${currentFolder['path']}/`, `${newPath}/`),
 					});
