@@ -169,6 +169,16 @@ export class FolderService extends SqlService {
 			});
 			let output;
 
+			console.log('??', {
+					...(payload['parentId']
+						&& typeof payload['parentId'] === 'string')
+						? { id: payload['parentId'] }
+						: ((payload['path']
+							&& typeof payload['path'] === 'string')
+							? { path: (payload['path'] || '/') }
+							: {}),
+				});
+
 			if (parentFolder) {
 				output = await queryRunner.manager.save(Object.assign(new Folder, {
 					...payload,
