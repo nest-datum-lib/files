@@ -40,8 +40,6 @@ export class FolderController extends NestDatumHttpController {
 	}
 
 	async validateUpdate(options) {
-		console.log('validateUpdate', options)
-
 		return {
 			...await super.validateUpdate(options),
 			...(options['systemId'] && utilsCheckStrId(options['systemId'])) 
