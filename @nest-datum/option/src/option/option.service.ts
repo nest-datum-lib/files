@@ -52,15 +52,8 @@ export class OptionService extends SqlService {
 		});
 
 		if (entity['isDeleted'] === true) {
-			console.log('this.entityColumnOption', entity, this.entityColumnOption, id);
-
 			await this.repositoryOptionOption.delete({ [this.entityColumnOption]: id });
-			
-			console.log('11111111');
-
 			await this.repository.delete({ id });
-
-			console.log('22222222');
 		}
 		else {
 			await repository.save(Object.assign(new this.entityConstructor(), { id, isDeleted: true }));
