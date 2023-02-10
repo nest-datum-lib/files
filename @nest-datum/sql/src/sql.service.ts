@@ -18,7 +18,10 @@ import {
 	Repository,
 	Connection, 
 } from 'typeorm';
-import { NotFoundException } from '@nest-datum-common/exceptions';
+import {
+	NotFoundException,
+	ErrorException,
+} from '@nest-datum-common/exceptions';
 import { 
 	arr as utilsCheckArr,
 	arrFilled as utilsCheckArrFilled, 
@@ -211,29 +214,12 @@ export class SqlService {
 	}
 
 	async drop({ user, ...payload }, withTwoStepRemoval = true): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner();
+		this.cacheService.clear([ this.entityName, 'many' ]);
+		this.cacheService.clear([ this.entityName, 'one', payload ]);
 
-		try {
-			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ this.entityName, 'many' ]);
-			this.cacheService.clear([ this.entityName, 'one', payload ]);
-
-			(withTwoStepRemoval)
-				? await this.dropIsDeletedRows(queryRunner.manager, payload['id'])
-				: await queryRunner.manager.delete(this.entityConstructor, { id: payload['id'] });
-			await queryRunner.commitTransaction();
-
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-
-			throw err;
-		}
-		finally {
-			await queryRunner.release();
-		}
+		(withTwoStepRemoval)
+			? await this.dropIsDeletedRows(this.repository, payload['id'])
+			: await this.repository.delete({ id: payload['id'] });
 
 		return true;
 	}
@@ -268,7 +254,7 @@ export class SqlService {
 		catch (err) {
 			await queryRunner.rollbackTransaction();
 
-			throw err;
+			throw new ErrorException(err.message);
 		}
 		finally {
 			await queryRunner.release();
@@ -276,15 +262,15 @@ export class SqlService {
 	}
 
 	async dropIsDeletedRows(repository, id: string): Promise<any> {
-		const entity = await this.repository.findOne({
+		const entity = await repository.findOne({
 			where: {
 				id,
 			},
 		});
 
 		(entity['isDeleted'] === true)
-			? await repository.delete(this.entityConstructor, { id })
-			: await repository.update(this.entityConstructor, id, { isDeleted: true });
+			? await this.repository.delete({ id })
+			: await repository.save(Object.assign(new this.entityConstructor(), { id, isDeleted: true }));
 		return entity;
 	}
 
@@ -300,7 +286,9 @@ export class SqlService {
 
 		return await this.repository.save(await this.createProps({
 			...payload,
-			userId: payload['userId'] || process.env.USER_ID,
+			...payload['userId']
+				? { userId: payload['userId'] }
+				: {},
 		}));
 	}
 
@@ -367,7 +355,7 @@ export class SqlService {
 		this.cacheService.clear([ this.entityName, 'one' ]);
 
 		await this.repository.update({ id: payload['id'] }, {
-			...payload,
+			...await this.createProps({ ...payload }),
 			...newId
 				? { id: newId }
 				: {},

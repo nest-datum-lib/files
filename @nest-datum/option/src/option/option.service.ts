@@ -45,7 +45,7 @@ export class OptionService extends SqlService {
 	};
 
 	async dropIsDeletedRows(repository, id: string): Promise<any> {
-		const entity = await repository.findOne({
+		const entity = await this.repository.findOne({
 			where: {
 				id,
 			},
