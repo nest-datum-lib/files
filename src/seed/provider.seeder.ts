@@ -6,12 +6,17 @@ import {
 } from 'typeorm';
 import { Promise as Bluebird } from 'bluebird';
 import { v4 as uuidv4 } from 'uuid';
-import { Setting } from 'src/api/setting/setting.entity';
+import { Provider } from '../api/provider/provider.entity';
+import {
+	PROVIDER_LOCAL_ID,
+	PROVIDER_STATUS_ACTIVE_ID,
+	USER_DEFAULT_ID,
+} from './consts';
 
-export class SettingSeeder {
+export class ProviderSeeder {
 	constructor(
 		private readonly connection: Connection,
-		@InjectRepository(Setting) private readonly settingRepository: Repository<Setting>,
+		@InjectRepository(Provider) private readonly providerRepository: Repository<Provider>,
 	) {
 	}
 
@@ -22,20 +27,20 @@ export class SettingSeeder {
 			// new transaction
 			await queryRunner.startTransaction();
 			await Bluebird.each([{
-				id: 'files-setting-app-id',
-				name: 'App id',
-				description: 'App id.',
-				dataTypeId: 'data-type-type-text',
-				value: process.env.APP_ID,
+				id: PROVIDER_LOCAL_ID,
+				userId: USER_DEFAULT_ID,
+				providerStatusId: PROVIDER_STATUS_ACTIVE_ID,
+				name: 'Local',
+				description: 'Local storage.',
 				isNotDelete: true,
 			}], async (data) => {
 				try {
-					await this.settingRepository.insert(data);
+					await this.providerRepository.insert(data);
 				}
 				catch (err) {
 					await queryRunner.rollbackTransaction();
 
-					console.error(`ERROR: setting 2: ${err.message}`);
+					console.error(`ERROR: Provider 2: ${err.message}`);
 				}
 			});
 			await queryRunner.commitTransaction();
@@ -43,7 +48,7 @@ export class SettingSeeder {
 		catch (err) {
 			await queryRunner.rollbackTransaction();
 
-			console.error(`ERROR: setting 1: ${err.message}`);
+			console.error(`ERROR: Provider 1: ${err.message}`);
 		}
 		finally {
 			await queryRunner.release();

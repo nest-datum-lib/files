@@ -1,52 +1,39 @@
 import { 
 	Controller,
-	Get, 
-	Delete,
 	Post,
 	Patch,
 	Body,
 	Param,
-	Query,
-	HttpException,
+	ForbiddenException,
 } from '@nestjs/common';
 import { 
-	str as utilsCheckStr,
 	strId as utilsCheckStrId,
 	strName as utilsCheckStrName,
-	file as utilsCheckFile,
 } from '@nest-datum-utils/check';
+import { HttpOptionController } from '@nest-datum/controller';
 import { TransportService } from '@nest-datum/transport';
 import { AccessToken } from '@nest-datum-common/decorators';
-import { HttpOptionController as NestDatumHttpOptionController } from '@nest-datum-common/controller';
 import { ProviderService } from '../provider.service';
 import { ProviderProviderOptionService } from '../../provider-provider-option/provider-provider-option.service';
+import { ProviderOptionService } from '../../provider-option/provider-option.service';
 
 @Controller(`provider`)
-export class ProviderController extends NestDatumHttpOptionController {
+export class ProviderController extends HttpOptionController {
 	constructor(
-		public transportService: TransportService,
-		public service: ProviderService,
-		public providerProviderOptionService: ProviderProviderOptionService,
+		protected transportService: TransportService,
+		protected entityService: ProviderService,
+		protected entityOptionService: ProviderOptionService,
+		protected entityOptionContentService: ProviderProviderOptionService,
 	) {
 		super();
 	}
 
-	async validateCreateOption(options) {
-		if (!utilsCheckStrId(options['providerOptionId'])) {
-			throw new HttpException(`Property "providerOptionId" is not valid.`, 403);
-		}
-		if (!utilsCheckStrId(options['providerId'])) {
-			throw new HttpException(`Property "providerId" is not valid.`, 403);
-		}
-		return await this.validateUpdate(options);
-	}
-
 	async validateCreate(options) {
 		if (!utilsCheckStrName(options['name'])) {
-			throw new HttpException(`Property "name" is not valid.`, 403);
+			throw new ForbiddenException(`Property "name" is not valid.`);
 		}
 		if (!utilsCheckStrId(options['providerStatusId'])) {
-			throw new HttpException(`Property "providerStatusId" is not valid.`, 403);
+			throw new ForbiddenException(`Property "providerStatusId" is not valid.`);
 		}
 		return await this.validateUpdate(options);
 	}
@@ -60,19 +47,6 @@ export class ProviderController extends NestDatumHttpOptionController {
 		};
 	}
 
-	@Post(':id/option')
-	async createOption(
-		@AccessToken() accessToken: string,
-		@Param('id') providerOptionId: string,
-		@Body('providerId') providerId: string,
-	) {
-		return await this.serviceHandlerWrapper(async () => await this.providerProviderOptionService.create(await this.validateCreateOption({
-			accessToken,
-			providerOptionId,
-			providerId,
-		})));
-	}
-
 	@Post()
 	async create(
 		@AccessToken() accessToken: string,
@@ -83,7 +57,7 @@ export class ProviderController extends NestDatumHttpOptionController {
 		@Body('description') description: string,
 		@Body('isNotDelete') isNotDelete: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
+		return await this.serviceHandlerWrapper(async () => await this.entityService.create(await this.validateCreate({
 			accessToken,
 			id,
 			userId,
@@ -106,7 +80,7 @@ export class ProviderController extends NestDatumHttpOptionController {
 		@Body('isNotDelete') isNotDelete: boolean,
 		@Body('isDeleted') isDeleted: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.service.update(await this.validateUpdate({
+		return await this.serviceHandlerWrapper(async () => await this.entityService.update(await this.validateUpdate({
 			accessToken,
 			id,
 			newId,

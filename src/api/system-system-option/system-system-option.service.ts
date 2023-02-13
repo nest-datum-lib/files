@@ -4,28 +4,23 @@ import {
 	Repository,
 	Connection, 
 } from 'typeorm';
-import { OptionOptionService as NestDatumOptionOptionService } from '@nest-datum/option';
+import { OptionOptionService } from '@nest-datum/option';
 import { CacheService } from '@nest-datum/cache';
 import { SystemSystemOption } from './system-system-option.entity';
 
 @Injectable()
-export class SystemSystemOptionService extends NestDatumOptionOptionService {
-	public entityName = 'systemSystemOption';
-	public entityConstructor = SystemSystemOption;
+export class SystemSystemOptionService extends OptionOptionService {
+	protected entityName = 'systemSystemOption';
+	protected entityConstructor = SystemSystemOption;
+	protected entityOptionId = 'systemOptionId';
+	protected entityId = 'systemId';
+	protected entityOptionName = 'systemOption';
 
 	constructor(
-		@InjectRepository(SystemSystemOption) public repository: Repository<SystemSystemOption>,
-		public connection: Connection,
-		public cacheService: CacheService,
+		@InjectRepository(SystemSystemOption) protected entityRepository: Repository<SystemSystemOption>,
+		protected connection: Connection,
+		protected cacheService: CacheService,
 	) {
-		super(repository, connection, cacheService);
+		super();
 	}
-
-	protected selectDefaultMany = {
-		id: true,
-		systemId: true,
-		systemOptionId: true,
-		createdAt: true,
-		updatedAt: true,
-	};
 }

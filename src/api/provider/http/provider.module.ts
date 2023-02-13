@@ -29,6 +29,8 @@ import { System } from '../../system/system.entity';
 import { ProviderProviderOption } from '../../provider-provider-option/provider-provider-option.entity';
 import { ProviderProviderOptionModule } from '../../provider-provider-option/provider-provider-option.module';
 import { ProviderProviderOptionService } from '../../provider-provider-option/provider-provider-option.service';
+import { ProviderOptionModule } from '../../provider-option/provider-option.module';
+import { ProviderOptionService } from '../../provider-option/provider-option.service';
 
 @Module({
 	controllers: [ ProviderController ],
@@ -45,6 +47,7 @@ import { ProviderProviderOptionService } from '../../provider-provider-option/pr
 		CacheModule,
 		SqlModule,
 		ProviderProviderOptionModule,
+		ProviderOptionModule,
 	],
 	providers: [
 		ReplicaService,
@@ -52,7 +55,8 @@ import { ProviderProviderOptionService } from '../../provider-provider-option/pr
 		CacheService,
 		SqlService,
 		ProviderProviderOptionService,
-		ProviderService, 
+		ProviderOptionService, 
+		ProviderService,
 	],
 })
 export class ProviderModule implements NestModule {

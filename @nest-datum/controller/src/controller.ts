@@ -1,37 +1,33 @@
-import { Controller as NestjsController } from '@nestjs/common';
-import { WarningException } from '@nest-datum-common/exceptions';
 import { SqlService } from '@nest-datum/sql';
 import { TransportService } from '../../../@nest-datum/transport/src';
 import {
 	func as utilsCheckFunc,
 	obj as utilsCheckObj,
+	arr as utilsCheckArr,
 	exists as utilsCheckExists,
 	bool as utilsCheckBool,
 	strId as utilsCheckStrId,
+	strArr as utilsCheckStrArr,
 	strName as utilsCheckStrName,
 	strDescription as utilsCheckStrDescription,
 	strRegex as utilsCheckStrRegex,
 	strDataType as utilsCheckStrDataType,
 	numericInt as utilsCheckNumericInt,
-	arr as utilsCheckArr,
 } from '@nest-datum-utils/check';
 import { 
 	checkToken,
 	getUser, 
 } from '@nest-datum/jwt';
 
-interface ControllerInterface {
-	transportService: TransportService;
-}
-
-@NestjsController()
-export class Controller implements ControllerInterface {
-	public transportService;
-	public service;
+export class Controller {
+	protected disabledUserId;
+	protected exceptionConstructor;
+	protected transportService;
+	protected entityService;
 
 	async validateMany(options: object = {}) {
 		if (!checkToken(options['accessToken'], process.env.JWT_SECRET_ACCESS_KEY)) {
-			throw new WarningException(`User is undefined or token is not valid.`);
+			throw new this.exceptionConstructor(`User is undefined or token is not valid.`);
 		}
 		const user = getUser(options['accessToken']);
 
@@ -56,7 +52,8 @@ export class Controller implements ControllerInterface {
 		catch (err) {
 		}
 		return {
-			user,
+			accessToken: options['accessToken'],
+			userId: user['id'],
 			...utilsCheckNumericInt(options['page'])
 				? { page: Number(options['page'] || 1) }
 				: { page: 1 },
@@ -83,10 +80,10 @@ export class Controller implements ControllerInterface {
 
 	async validateOne(options: object = {}) {
 		if (!utilsCheckStrId(options['id'])) {
-			throw new WarningException(`Property "id" is not valid.`);
+			throw new this.exceptionConstructor(`Property "id" is not valid.`);
 		}
 		if (!checkToken(options['accessToken'], process.env.JWT_SECRET_ACCESS_KEY)) {
-			throw new WarningException(`User is undefined or token is not valid.`);
+			throw new this.exceptionConstructor(`User is undefined or token is not valid.`);
 		}
 		const user = getUser(options['accessToken']);
 
@@ -101,7 +98,8 @@ export class Controller implements ControllerInterface {
 		catch (err) {
 		}
 		return {
-			user,
+			accessToken: options['accessToken'],
+			userId: user['id'],
 			id: options['id'],
 			...utilsCheckObj(options['select']) 
 				? { select: options['select'] } 
@@ -114,53 +112,39 @@ export class Controller implements ControllerInterface {
 
 	async validateDrop(options: object = {}) {
 		if (!utilsCheckStrId(options['id'])) {
-			throw new WarningException(`Property "id" is not valid.`);
+			throw new this.exceptionConstructor(`Property "id" is not valid.`);
 		}
 		if (!checkToken(options['accessToken'], process.env.JWT_SECRET_ACCESS_KEY)) {
-			throw new WarningException(`User is undefined or token is not valid.`);
+			throw new this.exceptionConstructor(`User is undefined or token is not valid.`);
 		}
 		const user = getUser(options['accessToken']);
 
 		return {
-			user,
+			accessToken: options['accessToken'],
+			userId: user['id'],
 			id: options['id'],
 		};
 	}
 
 	async validateDropMany(options: object = {}) {
 		if (!checkToken(options['accessToken'], process.env.JWT_SECRET_ACCESS_KEY)) {
-			throw new WarningException(`User is undefined or token is not valid.`);
+			throw new this.exceptionConstructor(`User is undefined or token is not valid.`);
 		}
 		const user = getUser(options['accessToken']);
 
-		return {
-			user,
-			ids: JSON.parse(options['ids']),
-		};
-	}
+		if (!utilsCheckStrArr(options['ids'])) {
+			throw new this.exceptionConstructor(`Property "ids" is not valid.`);
+		}
+		const ids = JSON.parse(options['ids']);
 
-	async validateOptions(options: object = {}) {
-		if (!checkToken(options['accessToken'], process.env.JWT_SECRET_ACCESS_KEY)) {
-			throw new WarningException(`User is undefined or token is not valid.`);
-		}
-		const user = getUser(options['accessToken']);
-
-		if (!utilsCheckStrId(options['id'])) {
-			throw new WarningException(`Property "id" is nt valid.`);
-		}
-		try {
-			options['data'] = JSON.parse(options['data']);
-		}
-		catch (err) {
-		}
-		if (!utilsCheckArr(options['data'])) {
-			throw new WarningException(`Property "data" is nt valid.`);
+		if (!utilsCheckArr(ids)) {
+			throw new this.exceptionConstructor(`Property "ids" is not valid.`);
 		}
 
 		return {
+			accessToken: options['accessToken'],
 			userId: user['id'],
-			id: options['id'],
-			data: options['data'],
+			ids,
 		};
 	}
 
@@ -170,7 +154,7 @@ export class Controller implements ControllerInterface {
 
 	async validateUpdate(options) {
 		if (!checkToken(options['accessToken'], process.env.JWT_SECRET_ACCESS_KEY)) {
-			throw new WarningException(`User is undefined or token is not valid.`);
+			throw new this.exceptionConstructor(`User is undefined or token is not valid.`);
 		}
 		const user = getUser(options['accessToken']);
 		const data = {
@@ -179,7 +163,7 @@ export class Controller implements ControllerInterface {
 		};
 
 		if (!user) {
-			throw new WarningException(`User is undefined or token is not valid.`);
+			throw new this.exceptionConstructor(`User is undefined or token is not valid.`);
 		}
 		delete options['user'];
 
@@ -223,9 +207,21 @@ export class Controller implements ControllerInterface {
 			data['isDeleted'] = options['isDeleted'];
 			delete options['isDeleted'];
 		}
-
+		if (!options['userId']) {
+			options['userId'] = user['id'];
+		}
+		if (this.disabledUserId) {
+			options['userId'] = undefined;
+			data['userId'] = undefined;
+			
+			delete options['userId'];
+			delete data['userId'];
+		}
 		return {
-			userId: user['id'],
+			accessToken: options['accessToken'],
+			...!this.disabledUserId
+				? { userId: user['id'] }
+				: {},
 			...options,
 			...data,
 		};
@@ -247,19 +243,27 @@ export class Controller implements ControllerInterface {
 
 	async serviceHandlerWrapper(callback = () => {}) {
 		try {
-			const output = callback
+			const output: any = callback
 				? (await callback())
 				: (await this.serviceHandlerWrapperDefault());
 
-			this.transportService.decrementLoadingIndicator();
-
+			if (output instanceof Error) {
+				throw new this.exceptionConstructor(output.message);
+			}
+			else if (output instanceof this.exceptionConstructor) {
+				throw output;
+			}
 			return output;
 		}
 		catch (err) {
-			this.log(err);
-			this.transportService.decrementLoadingIndicator();
+			console.log('Controller error: ', err);
 
-			return err;
+			this.log(err);
+
+			throw new this.exceptionConstructor(utilsCheckObj(err['response'])
+				&& utilsCheckNumericInt(err['response']['statusCode'])
+				? err['response']['message']
+				: err.message);
 		}
 	}
 }

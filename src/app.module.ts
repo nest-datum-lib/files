@@ -48,7 +48,7 @@ import { SettingModule as HttpSettingModule } from './api/setting/http/setting.m
 
 @Module({
 	imports: [
-		ServeStaticModule.forRoot({ rootPath: process.env.APP_ROOT_PATH }),
+		ServeStaticModule.forRoot({ rootPath: process.env.PATH_ROOT }),
 		TypeOrmModule.forRoot(sql),
 		RedisModule.forRoot(redis),
 		ReplicaModule,

@@ -6,15 +6,15 @@ import {
 	Body,
 	Param,
 	Query,
-	HttpException,
+	ForbiddenException,
 } from '@nestjs/common';
 import { AccessToken } from '@nest-datum-common/decorators';
-import { HttpController } from './http-controller';
+import { Controller } from './controller';
 
-export class HttpTcpController extends HttpController {
-	public transportService;
-	public serviceName = process.env.SERVICE_HTTP;
-	public entityName = 'setting';
+export class HttpController extends Controller {
+	protected exceptionConstructor = ForbiddenException;
+	protected transportService;
+	protected entityService;
 
 	@Get()
 	async many(
@@ -27,10 +27,7 @@ export class HttpTcpController extends HttpController {
 		@Query('filter') filter: string,
 		@Query('sort') sort: string,
 	): Promise<any> {
-		return await this.serviceHandlerWrapper(async () => await this.transportService.send({
-			name: this.serviceName, 
-			cmd: `${this.entityName}.many`,
-		}, await this.validateMany({
+		return await this.serviceHandlerWrapper(async () => await this.entityService.many(await this.validateMany({
 			accessToken,
 			select,
 			relations,
@@ -49,10 +46,7 @@ export class HttpTcpController extends HttpController {
 		@Query('relations') relations: string,
 		@Param('id') id: string,
 	): Promise<any> {
-		return await this.serviceHandlerWrapper(async () => await this.transportService.send({
-			name: this.serviceName, 
-			cmd: `${this.entityName}.one`,
-		}, await this.validateOne({
+		return await this.serviceHandlerWrapper(async () => await this.entityService.one(await this.validateOne({
 			accessToken,
 			select,
 			relations,
@@ -65,10 +59,7 @@ export class HttpTcpController extends HttpController {
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.transportService.send({
-			name: this.serviceName, 
-			cmd: `${this.entityName}.drop`,
-		}, await this.validateDrop({
+		return await this.serviceHandlerWrapper(async () => await this.entityService.drop(await this.validateDrop({
 			accessToken,
 			id,
 		})));
@@ -79,10 +70,7 @@ export class HttpTcpController extends HttpController {
 		@AccessToken() accessToken: string,
 		@Param('ids') ids: string,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.transportService.send({
-			name: this.serviceName, 
-			cmd: `${this.entityName}.dropMany`,
-		}, await this.validateDropMany({
+		return await this.serviceHandlerWrapper(async () => await this.entityService.dropMany(await this.validateDropMany({
 			accessToken,
 			ids,
 		})));

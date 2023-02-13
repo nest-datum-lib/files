@@ -31,6 +31,8 @@ import { SystemOption } from '../../system-option/system-option.entity';
 import { SystemSystemOption } from '../../system-system-option/system-system-option.entity';
 import { SystemSystemOptionModule } from '../../system-system-option/system-system-option.module';
 import { SystemSystemOptionService } from '../../system-system-option/system-system-option.service';
+import { SystemOptionModule } from '../../system-option/system-option.module';
+import { SystemOptionService } from '../../system-option/system-option.service';
 
 @Module({
 	controllers: [ SystemController ],
@@ -48,6 +50,7 @@ import { SystemSystemOptionService } from '../../system-system-option/system-sys
 		TransportModule,
 		CacheModule,
 		SqlModule,
+		SystemOptionModule,
 		SystemSystemOptionModule,
 	],
 	providers: [
@@ -56,7 +59,8 @@ import { SystemSystemOptionService } from '../../system-system-option/system-sys
 		CacheService,
 		SqlService,
 		SystemSystemOptionService,
-		SystemService, 
+		SystemOptionService, 
+		SystemService,
 	],
 })
 export class SystemModule implements NestModule {

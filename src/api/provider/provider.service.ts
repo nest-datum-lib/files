@@ -4,55 +4,44 @@ import {
 	Repository,
 	Connection, 
 } from 'typeorm';
-import { 
-	ErrorException,
-	WarningException, 
-	NotFoundException,
-} from '@nest-datum-common/exceptions';
-import { SqlService } from '@nest-datum/sql';
+import { OptionEntityService } from '@nest-datum/option';
 import { CacheService } from '@nest-datum/cache';
-import {
-	encryptPassword,
-	generateVerifyKey,
-	generateTokens,
-	checkPassword,
-} from '@nest-datum/jwt';
-import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
 import { ProviderProviderOption } from '../provider-provider-option/provider-provider-option.entity';
 import { Provider } from './provider.entity';
 
 @Injectable()
-export class ProviderService extends SqlService {
-	public entityName = 'provider';
-	public entityConstructor = Provider;
-	public optionId = 'providerId';
-	public optionOptionId = 'providerProviderOptionId';
-	public optionRelationConstructor = ProviderProviderProviderOption;
+export class ProviderService extends OptionEntityService {
+	protected entityName = 'provider';
+	protected entityConstructor = Provider;
+	protected entityOptionConstructor = ProviderProviderOption;
+	protected entityId = 'providerId';
 
 	constructor(
-		@InjectRepository(Provider) public repository: Repository<Provider>,
-		@InjectRepository(ProviderProviderProviderOption) public repositoryOptionRelation: Repository<ProviderProviderProviderOption>,
-		public connection: Connection,
-		public cacheService: CacheService,
+		@InjectRepository(Provider) protected entityRepository: Repository<Provider>,
+		@InjectRepository(ProviderProviderOption) protected entityOptionRepository: Repository<ProviderProviderOption>,
+		protected connection: Connection,
+		protected cacheService: CacheService,
 	) {
 		super();
 	}
 
-	protected selectDefaultMany = {
-		id: true,
-		userId: true,
-		providerStatusId: true,
-		name: true,
-		description: true,
-		isDeleted: true,
-		isNotDelete: true,
-		createdAt: true,
-		updatedAt: true,
-	};
+	protected manyGetColumns(customColumns: object = {}) {
+		return ({
+			...super.manyGetColumns(customColumns),
+			userId: true,
+			providerStatusId: true,
+			name: true,
+			description: true,
+			isDeleted: true,
+			isNotDelete: true,
+		});
+	}
 
-	protected queryDefaultMany = {
-		id: true,
-		name: true,
-		description: true,
-	};
+	protected manyGetQueryColumns(customColumns: object = {}) {
+		return ({
+			...super.manyGetQueryColumns(customColumns),
+			name: true,
+			description: true,
+		});
+	}
 }

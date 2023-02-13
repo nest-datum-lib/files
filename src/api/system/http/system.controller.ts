@@ -4,49 +4,39 @@ import {
 	Patch,
 	Body,
 	Param,
-	HttpException,
+	ForbiddenException,
 } from '@nestjs/common';
 import { 
-	str as utilsCheckStr,
 	strId as utilsCheckStrId,
 	strName as utilsCheckStrName,
-	file as utilsCheckFile,
 } from '@nest-datum-utils/check';
+import { HttpOptionController } from '@nest-datum/controller';
 import { TransportService } from '@nest-datum/transport';
 import { AccessToken } from '@nest-datum-common/decorators';
-import { HttpOptionController as NestDatumHttpOptionController } from '@nest-datum-common/controller';
 import { SystemService } from '../system.service';
 import { SystemSystemOptionService } from '../../system-system-option/system-system-option.service';
+import { SystemOptionService } from '../../system-option/system-option.service';
 
 @Controller(`system`)
-export class SystemController extends NestDatumHttpOptionController {
+export class SystemController extends HttpOptionController {
 	constructor(
-		public transportService: TransportService,
-		public service: SystemService,
-		public systemSystemOptionService: SystemSystemOptionService,
+		protected transportService: TransportService,
+		protected entityService: SystemService,
+		protected entityOptionService: SystemOptionService,
+		protected entityOptionContentService: SystemSystemOptionService,
 	) {
 		super();
 	}
 
-	async validateCreateOption(options) {
-		if (!utilsCheckStrId(options['systemOptionId'])) {
-			throw new HttpException(`Property "systemOptionId" is not valid.`, 403);
-		}
-		if (!utilsCheckStrId(options['systemId'])) {
-			throw new HttpException(`Property "systemId" is not valid.`, 403);
-		}
-		return await this.validateUpdate(options);
-	}
-
 	async validateCreate(options) {
 		if (!utilsCheckStrName(options['name'])) {
-			throw new HttpException(`Property "name" is not valid.`, 403);
+			throw new ForbiddenException(`Property "name" is not valid.`);
 		}
 		if (!utilsCheckStrId(options['providerId'])) {
-			throw new HttpException(`Property "providerId" is not valid.`, 403);
+			throw new ForbiddenException(`Property "providerId" is not valid.`);
 		}
 		if (!utilsCheckStrId(options['systemStatusId'])) {
-			throw new HttpException(`Property "systemStatusId" is not valid.`, 403);
+			throw new ForbiddenException(`Property "systemStatusId" is not valid.`);
 		}
 		return await this.validateUpdate(options);
 	}
@@ -63,19 +53,6 @@ export class SystemController extends NestDatumHttpOptionController {
 		};
 	}
 
-	@Post(':id/option')
-	async createOption(
-		@AccessToken() accessToken: string,
-		@Param('id') systemOptionId: string,
-		@Body('systemId') systemId: string,
-	) {
-		return await this.serviceHandlerWrapper(async () => await this.systemSystemOptionService.create(await this.validateCreateOption({
-			accessToken,
-			systemOptionId,
-			systemId,
-		})));
-	}
-
 	@Post()
 	async create(
 		@AccessToken() accessToken: string,
@@ -87,7 +64,7 @@ export class SystemController extends NestDatumHttpOptionController {
 		@Body('description') description: string,
 		@Body('isNotDelete') isNotDelete: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
+		return await this.serviceHandlerWrapper(async () => await this.entityService.create(await this.validateCreate({
 			accessToken,
 			id,
 			userId,
@@ -112,7 +89,7 @@ export class SystemController extends NestDatumHttpOptionController {
 		@Body('isNotDelete') isNotDelete: boolean,
 		@Body('isDeleted') isDeleted: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.service.update(await this.validateUpdate({
+		return await this.serviceHandlerWrapper(async () => await this.entityService.update(await this.validateUpdate({
 			accessToken,
 			id,
 			newId,

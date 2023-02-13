@@ -1,6 +1,8 @@
 import { OptionModule } from './src/option/option.module';
 import { OptionService } from './src/option/option.service';
+import { OptionEntityService } from './src/option/option-entity.service';
 import { OptionHttpController } from './src/option/option-http.controller';
+import { OptionHttpTcpController } from './src/option/option-http-tcp.controller';
 import { OptionTcpController } from './src/option/option-tcp.controller';
 import { Option } from './src/option/option.entity';
 import { OptionOptionModule } from './src/option-option/option-option.module';
@@ -13,8 +15,10 @@ import { OptionOptionOption } from './src/option-option-option/option-option-opt
 export {
 	OptionModule,
 	OptionHttpController,
+	OptionHttpTcpController,
 	OptionTcpController,
 	OptionService,
+	OptionEntityService,
 	Option,
 	OptionOptionModule,
 	OptionOptionService,

@@ -9,9 +9,13 @@ import func from './src/func';
 import numeric from './src/numeric';
 import numericInt from './src/numeric/int';
 import obj from './src/obj';
+import objQueryRunnerManager from './src/obj/queryRunnerManager';
+import objQueryRunner from './src/obj/queryRunner';
 import objFileList from './src/obj/fileList';
 import objFilled from './src/obj/filled';
 import str from './src/str';
+import strQueue from './src/str/queue';
+import strArr from './src/str/arr';
 import strBool from './src/str/bool';
 import strDate from './src/str/date';
 import strDescription from './src/str/description';
@@ -43,9 +47,13 @@ export {
 	numeric,
 	numericInt,
 	obj,
+	objQueryRunnerManager,
+	objQueryRunner,
 	objFileList,
 	objFilled,
 	str,
+	strQueue,
+	strArr,
 	strBool,
 	strDate,
 	strDescription,

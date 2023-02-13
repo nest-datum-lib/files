@@ -1,13 +1,13 @@
 import { Controller } from '@nestjs/common';
 import { TransportService } from '@nest-datum/transport';
-import { SettingHttpController as NestDatumSettingHttpController } from '@nest-datum/setting';
+import { SettingHttpController } from '@nest-datum/setting';
 import { SettingService } from '../setting.service';
 
 @Controller(`setting`)
-export class SettingController extends NestDatumSettingHttpController {
+export class SettingController extends SettingHttpController {
 	constructor(
-		public transportService: TransportService,
-		public service: SettingService,
+		protected transportService: TransportService,
+		protected entityService: SettingService,
 	) {
 		super();
 	}

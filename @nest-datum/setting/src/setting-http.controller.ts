@@ -3,22 +3,19 @@ import {
 	Patch,
 	Body,
 	Param,
-	HttpException,
 } from '@nestjs/common';
 import { Controller } from '@nestjs/common';
 import { AccessToken } from '@nest-datum-common/decorators';
-import { HttpController as NestDatumHttpController } from '../../../@nest-datum-common/controller/src';
+import { HttpController as NestDatumHttpController } from '../../controller/src';
 import { strName as utilsCheckStrName } from '@nest-datum-utils/check';
 
 @Controller()
 export class SettingHttpController extends NestDatumHttpController {
-	public transportService;
-	public serviceName;
-	public entityName;
+	protected entityService;
 
 	async validateCreate(options) {
 		if (!utilsCheckStrName(options['name'])) {
-			throw new HttpException(`Property "name" is not valid.`, 403);
+			throw new this.exceptionConstructor(`Property "name" is not valid.`);
 		}
 		return await this.validateUpdate(options);
 	}
@@ -42,7 +39,7 @@ export class SettingHttpController extends NestDatumHttpController {
 		@Body('value') value: string,
 		@Body('isNotDelete') isNotDelete: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
+		return await this.serviceHandlerWrapper(async () => await this.entityService.create(await this.validateCreate({
 			accessToken,
 			id,
 			userId,
@@ -69,7 +66,7 @@ export class SettingHttpController extends NestDatumHttpController {
 		@Body('isNotDelete') isNotDelete: boolean,
 		@Body('isDeleted') isDeleted: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.service.update(await this.validateUpdate({
+		return await this.serviceHandlerWrapper(async () => await this.entityService.update(await this.validateUpdate({
 			accessToken,
 			id,
 			newId,

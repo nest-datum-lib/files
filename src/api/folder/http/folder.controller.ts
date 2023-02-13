@@ -1,40 +1,36 @@
 import { 
 	Controller,
-	Get, 
-	Delete,
 	Post,
 	Patch,
 	Body,
 	Param,
-	Query,
-	HttpException,
+	ForbiddenException,
 } from '@nestjs/common';
 import { 
 	str as utilsCheckStr,
 	strId as utilsCheckStrId,
 	strName as utilsCheckStrName,
-	file as utilsCheckFile,
 } from '@nest-datum-utils/check';
 import { TransportService } from '@nest-datum/transport';
 import { AccessToken } from '@nest-datum-common/decorators';
-import { HttpController as NestDatumHttpController } from '@nest-datum-common/controller';
+import { HttpController } from '@nest-datum/controller';
 import { FolderService } from '../folder.service';
 
 @Controller(`folder`)
-export class FolderController extends NestDatumHttpController {
+export class FolderController extends HttpController {
 	constructor(
-		public transportService: TransportService,
-		public service: FolderService,
+		protected transportService: TransportService,
+		protected entityService: FolderService,
 	) {
 		super();
 	}
 
 	async validateCreate(options) {
 		if (!utilsCheckStrName(options['name'])) {
-			throw new HttpException(`Property "name" is not valid.`, 403);
+			throw new ForbiddenException(`Property "name" is not valid.`);
 		}
 		if (!utilsCheckStrId(options['systemId'])) {
-			throw new HttpException(`Property "systemId" is not valid.`, 403);
+			throw new ForbiddenException(`Property "systemId" is not valid.`);
 		}
 		return await this.validateUpdate(options);
 	}
@@ -64,7 +60,7 @@ export class FolderController extends NestDatumHttpController {
 		@Body('path') path: string,
 		@Body('name') name: string,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
+		return await this.serviceHandlerWrapper(async () => await this.entityService.create(await this.validateCreate({
 			accessToken,
 			id,
 			userId,
@@ -89,7 +85,7 @@ export class FolderController extends NestDatumHttpController {
 		@Body('isNotDelete') isNotDelete: boolean,
 		@Body('isDeleted') isDeleted: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.service.update(await this.validateUpdate({
+		return await this.serviceHandlerWrapper(async () => await this.entityService.update(await this.validateUpdate({
 			accessToken,
 			id,
 			newId,

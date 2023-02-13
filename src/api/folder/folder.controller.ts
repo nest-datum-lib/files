@@ -5,7 +5,7 @@ import {
 import { Controller } from '@nestjs/common';
 import { WarningException } from '@nest-datum-common/exceptions';
 import { TransportService } from '@nest-datum/transport';
-import { TcpController as NestDatumTcpController } from '@nest-datum-common/controller';
+import { TcpController } from '@nest-datum/controller';
 import { 
 	str as utilsCheckStr,
 	strId as utilsCheckStrId,
@@ -15,10 +15,10 @@ import {
 import { FolderService } from './folder.service';
 
 @Controller()
-export class FolderController extends NestDatumTcpController {
+export class FolderController extends TcpController {
 	constructor(
-		public transportService: TransportService,
-		public service: FolderService,
+		protected transportService: TransportService,
+		protected entityService: FolderService,
 	) {
 		super();
 	}

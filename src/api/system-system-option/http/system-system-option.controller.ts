@@ -1,16 +1,16 @@
 import { Controller } from '@nestjs/common';
 import { TransportService } from '@nest-datum/transport';
-import { OptionOptionHttpController as NestDatumOptionOptionHttpController } from '@nest-datum/option';
+import { OptionOptionHttpController } from '@nest-datum/option';
 import { SystemSystemOptionService } from '../system-system-option.service';
 
 @Controller(`system/option`)
-export class SystemSystemOptionController extends NestDatumOptionOptionHttpController {
-	public columnOptionId = 'systemId';
-	public columnOptionOptionId = 'systemOptionId';
+export class SystemSystemOptionController extends OptionOptionHttpController {
+	protected entityId = 'systemId';
+	protected entityOptionId = 'systemOptionId';
 
 	constructor(
-		public transportService: TransportService,
-		public service: SystemSystemOptionService,
+		protected transportService: TransportService,
+		protected entityService: SystemSystemOptionService,
 	) {
 		super();
 	}
