@@ -17,6 +17,11 @@ import {
 	FOLDER_CV_AVATARS_ID,
 	USER_DEFAULT_ID,
 	SYSTEM_DEFAULT_ID,
+	SYSTEM_AVATARS_ID,
+	SYSTEM_CV_LENSA_ID,
+	SYSTEM_CV_ID,
+	SYSTEM_EMAIL_VIEWS_ID,
+	SYSTEM_PAGE_VIEWS_ID,
 } from './consts';
 
 export class FolderSeeder {
@@ -45,7 +50,7 @@ export class FolderSeeder {
 			}, {
 				id: FOLDER_CV_ID,
 				userId: USER_DEFAULT_ID,
-				systemId: SYSTEM_DEFAULT_ID,
+				systemId: SYSTEM_CV_ID,
 				parentId: FOLDER_ROOT_ID,
 				path: `/cv`,
 				name: 'cv',
@@ -55,7 +60,7 @@ export class FolderSeeder {
 			}, {
 				id: FOLDER_CV_LENSA_ID,
 				userId: USER_DEFAULT_ID,
-				systemId: SYSTEM_DEFAULT_ID,
+				systemId: SYSTEM_CV_LENSA_ID,
 				parentId: FOLDER_ROOT_ID,
 				path: `/cv-lensa`,
 				name: 'cv-lensa',
@@ -65,7 +70,7 @@ export class FolderSeeder {
 			}, {
 				id: FOLDER_CV_PAGE_VIEWS_ID,
 				userId: USER_DEFAULT_ID,
-				systemId: SYSTEM_DEFAULT_ID,
+				systemId: SYSTEM_PAGE_VIEWS_ID,
 				parentId: FOLDER_ROOT_ID,
 				path: `/page-views`,
 				name: 'page-views',
@@ -75,7 +80,7 @@ export class FolderSeeder {
 			}, {
 				id: FOLDER_CV_EMAIL_VIEWS_ID,
 				userId: USER_DEFAULT_ID,
-				systemId: SYSTEM_DEFAULT_ID,
+				systemId: SYSTEM_EMAIL_VIEWS_ID,
 				parentId: FOLDER_ROOT_ID,
 				path: `/email-views`,
 				name: 'email-views',
@@ -85,7 +90,7 @@ export class FolderSeeder {
 			}, {
 				id: FOLDER_CV_AVATARS_ID,
 				userId: USER_DEFAULT_ID,
-				systemId: SYSTEM_DEFAULT_ID,
+				systemId: SYSTEM_AVATARS_ID,
 				parentId: FOLDER_ROOT_ID,
 				path: `/avatars`,
 				name: 'avatars',
