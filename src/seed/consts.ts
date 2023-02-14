@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 export const SETTING_APP_ID = `${process.env.APP_NAME}-setting-app-id`;
 
 export const USER_DEFAULT_ID = process.env.USER_ID;
-export const DATA_TYPE_TEXT = 'data-type-type-text';
+export const DATA_TYPE_TEXT_ID = 'data-type-type-text';
 
 export const SYSTEM_STATUS_ACTIVE_ID = uuidv4();
 
@@ -34,3 +34,11 @@ export const PROVIDER_STATUS_ACTIVE_ID = 'files-provider-local';
 export const PROVIDER_LOCAL_ID = uuidv4();
 
 export const FOLDER_ROOT_ID = 'files-folder-root';
+export const FOLDER_CV_ID = 'files-folder-cv';
+export const FOLDER_CV_LENSA_ID = 'files-folder-cv-lensa';
+export const FOLDER_CV_PAGE_VIEWS_ID = 'files-folder-page-views';
+export const FOLDER_CV_EMAIL_VIEWS_ID = 'files-folder-email-views';
+export const FOLDER_CV_AVATARS_ID = 'files-folder-avatars';
+
+export const FILE_VIEW_RECOVERY_ID = 'files-file-view-recovery';
+export const FILE_VIEW_REGISTRATION_ID = 'files-file-view-registration';

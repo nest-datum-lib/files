@@ -40,6 +40,7 @@ import { SystemSystemSystemOptionSeeder } from './system-system-system-option.se
 import { ProviderSeeder } from './provider.seeder';
 import { SystemSeeder } from './system.seeder';
 import { FolderSeeder } from './folder.seeder';
+import { FileSeeder } from './file.seeder';
 
 @Module({
 	controllers: [],
@@ -79,6 +80,7 @@ import { FolderSeeder } from './folder.seeder';
 		SystemSystemOptionSeeder,
 		SystemSystemSystemOptionSeeder,
 		FolderSeeder,
+		FileSeeder,
 	]
 })
 

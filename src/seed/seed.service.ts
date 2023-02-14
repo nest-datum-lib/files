@@ -14,6 +14,7 @@ import { SystemSystemOptionSeeder } from './system-system-option.seeder';
 import { SystemSystemSystemOptionSeeder } from './system-system-system-option.seeder';
 import { SystemSeeder } from './system.seeder';
 import { FolderSeeder } from './folder.seeder';
+import { FileSeeder } from './file.seeder';
 
 @Injectable()
 export class SeedService {
@@ -32,6 +33,7 @@ export class SeedService {
 		private readonly systemSystemOption: SystemSystemOptionSeeder,
 		private readonly systemSystemSystemOption: SystemSystemSystemOptionSeeder,
 		private readonly folder: FolderSeeder,
+		private readonly file: FileSeeder,
 	) {
 		this.seeders = [
 			this.settings,
@@ -43,6 +45,7 @@ export class SeedService {
 			this.systemSystemOption,
 			this.systemSystemSystemOption,
 			this.folder,
+			this.file,
 		];
 	}
 
@@ -62,6 +65,8 @@ export class SeedService {
 			await this.cacheService.clear([ 'system', 'one' ]);
 			await this.cacheService.clear([ 'folder', 'many' ]);
 			await this.cacheService.clear([ 'folder', 'one' ]);
+			await this.cacheService.clear([ 'file', 'many' ]);
+			await this.cacheService.clear([ 'file', 'one' ]);
 
 			await Bluebird.each(this.seeders, async (seeder) => {
 				this.logger.log(`Seeding ${seeder.constructor.name}`);

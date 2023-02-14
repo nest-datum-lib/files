@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { SystemOption } from '../api/system-option/system-option.entity';
 import {
 	SYSTEM_OPTION_ROOT_ID,
-	DATA_TYPE_TEXT,
+	DATA_TYPE_TEXT_ID,
 	USER_DEFAULT_ID,
 } from './consts';
 
@@ -31,7 +31,7 @@ export class SystemOptionSeeder {
 				userId: USER_DEFAULT_ID,
 				name: 'Root path',
 				description: 'Path to system folder.',
-				dataTypeId: DATA_TYPE_TEXT,
+				dataTypeId: DATA_TYPE_TEXT_ID,
 				defaultValue: '/',
 				isRequired: true,
 				isNotDelete: true,

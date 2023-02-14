@@ -8,8 +8,9 @@ import { Promise as Bluebird } from 'bluebird';
 import { v4 as uuidv4 } from 'uuid';
 import { Setting } from '../api/setting/setting.entity';
 import {
+	USER_DEFAULT_ID,
 	SETTING_APP_ID,
-	DATA_TYPE_TEXT,
+	DATA_TYPE_TEXT_ID,
 } from './consts';
 
 export class SettingSeeder {
@@ -27,9 +28,10 @@ export class SettingSeeder {
 			await queryRunner.startTransaction();
 			await Bluebird.each([{
 				id: SETTING_APP_ID,
+				userId: USER_DEFAULT_ID,
 				name: 'App id',
 				description: 'App id.',
-				dataTypeId: DATA_TYPE_TEXT,
+				dataTypeId: DATA_TYPE_TEXT_ID,
 				value: process.env.APP_ID,
 				isNotDelete: true,
 			}], async (data) => {
