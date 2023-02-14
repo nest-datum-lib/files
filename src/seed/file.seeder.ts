@@ -12,7 +12,7 @@ import {
 	FILE_VIEW_REGISTRATION_ID,
 	FOLDER_CV_EMAIL_VIEWS_ID,
 	USER_DEFAULT_ID,
-	SYSTEM_DEFAULT_ID,
+	SYSTEM_EMAIL_VIEWS_ID,
 } from './consts';
 
 export class FileSeeder {
@@ -31,7 +31,7 @@ export class FileSeeder {
 			await Bluebird.each([{
 				id: FILE_VIEW_RECOVERY_ID,
 				userId: USER_DEFAULT_ID,
-				systemId: SYSTEM_DEFAULT_ID,
+				systemId: SYSTEM_EMAIL_VIEWS_ID,
 				parentId: FOLDER_CV_EMAIL_VIEWS_ID,
 				path: `/email-views/recovery.ejs`,
 				name: 'recovery.ejs',
@@ -42,7 +42,7 @@ export class FileSeeder {
 			}, {
 				id: FILE_VIEW_REGISTRATION_ID,
 				userId: USER_DEFAULT_ID,
-				systemId: SYSTEM_DEFAULT_ID,
+				systemId: SYSTEM_EMAIL_VIEWS_ID,
 				parentId: FOLDER_CV_EMAIL_VIEWS_ID,
 				path: `/email-views/registry.ejs`,
 				name: 'registry.ejs',
