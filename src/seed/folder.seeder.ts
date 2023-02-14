@@ -6,6 +6,7 @@ import {
 } from 'typeorm';
 import { Promise as Bluebird } from 'bluebird';
 import { v4 as uuidv4 } from 'uuid';
+import { addSeconds } from 'date-fns';
 import { Folder } from '../api/folder/folder.entity';
 import {
 	FOLDER_ROOT_ID,
@@ -27,6 +28,7 @@ export class FolderSeeder {
 
 	async send() {
 		const queryRunner = await this.connection.createQueryRunner(); 
+		let createdAt = new Date();
 
 		try {
 			// new transaction
@@ -39,6 +41,7 @@ export class FolderSeeder {
 				name: 'root',
 				description: 'Root folder.',
 				isNotDelete: true,
+				createdAt: createdAt,
 			}, {
 				id: FOLDER_CV_ID,
 				userId: USER_DEFAULT_ID,
@@ -48,6 +51,7 @@ export class FolderSeeder {
 				name: 'cv',
 				description: 'CV storage.',
 				isNotDelete: true,
+				createdAt: (createdAt = addSeconds(createdAt, 30)),
 			}, {
 				id: FOLDER_CV_LENSA_ID,
 				userId: USER_DEFAULT_ID,
@@ -57,6 +61,7 @@ export class FolderSeeder {
 				name: 'cv-lensa',
 				description: 'Storage CV from Lensa API.',
 				isNotDelete: true,
+				createdAt: (createdAt = addSeconds(createdAt, 30)),
 			}, {
 				id: FOLDER_CV_PAGE_VIEWS_ID,
 				userId: USER_DEFAULT_ID,
@@ -66,6 +71,7 @@ export class FolderSeeder {
 				name: 'page-views',
 				description: 'Page views storage.',
 				isNotDelete: true,
+				createdAt: (createdAt = addSeconds(createdAt, 30)),
 			}, {
 				id: FOLDER_CV_EMAIL_VIEWS_ID,
 				userId: USER_DEFAULT_ID,
@@ -75,6 +81,7 @@ export class FolderSeeder {
 				name: 'email-views',
 				description: 'Email views storage.',
 				isNotDelete: true,
+				createdAt: (createdAt = addSeconds(createdAt, 30)),
 			}, {
 				id: FOLDER_CV_AVATARS_ID,
 				userId: USER_DEFAULT_ID,
@@ -84,6 +91,7 @@ export class FolderSeeder {
 				name: 'avatars',
 				description: 'User avatars storage.',
 				isNotDelete: true,
+				createdAt: (createdAt = addSeconds(createdAt, 30)),
 			}], async (data) => {
 				try {
 					await this.folderRepository.insert(data);
