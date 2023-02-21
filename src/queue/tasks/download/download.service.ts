@@ -82,9 +82,13 @@ export class DownloadService extends QueueTaskService {
 				systemSystemOptionId: true,
 				content: true,
 			},
-			where: {
+			where:{
 				systemId: data['systemId'],
-				systemSystemOptionId: 'files-system-option-root',
+				systemSystemOption: {
+					systemOption: {
+						id: 'files-system-option-root',
+					},
+				},
 			},
 		});
 
