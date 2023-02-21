@@ -10,7 +10,10 @@ import {
 	QueueModule,
 	QueueService, 
 } from '@nest-datum/queue';
-import { DownloadTask } from './download.task';
+import { 
+	DownloadModule,
+	DownloadService, 
+} from './tasks/download';
 
 process.on('exit', onExit);
 process.on('warning', onWarning);
@@ -22,7 +25,7 @@ async function bootstrap() {
 		const queueService = queue.get(QueueService);
 
 		queueService
-			.setTask(DownloadTask)
+			.setTask(DownloadModule, DownloadService)
 			.start();
 	}
 	catch (err) {
