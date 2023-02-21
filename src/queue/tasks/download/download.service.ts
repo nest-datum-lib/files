@@ -135,14 +135,15 @@ export class DownloadService extends QueueTaskService {
 					extension = await utilsFilesExtension(destinationPath);
 				}
 				catch (err) {
-					console.log('ERROR: ', err.message);
+					console.log(err.message, `/${path}/${srcData[i]['name']}`);
 					i++;
 					continue;
-				}
-				
+				}	
 				if (utilsCheckStrFilled(data['convertTo'])) {				
 					if (!utilsCheckStrFilled(extension)) {
-						throw new Error(`Extension error for file "/${path}/${srcData[i]['name']}".`);
+						console.log(`Extension error for file "/${path}/${srcData[i]['name']}".`);
+						i++;
+						continue;
 					}
 					if (extension !== data['convertTo']) {
 						extension = await utilsFilesConverTo(destinationPath, data['convertTo']);
@@ -194,7 +195,7 @@ export class DownloadService extends QueueTaskService {
 			parentId: parentFolder['id'],
 			parentPath: parentFolder['path'],
 			parentName: parentFolder['name'],
-			data: output,
+			files: output,
 		};
 	}
 }
