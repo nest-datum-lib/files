@@ -45,6 +45,8 @@ export class DownloadService extends QueueTaskService {
 	}
 
 	async validateInput(data) {
+		console.log('DownloadService validateInput 1');
+
 		if (!utilsCheckObj(data)) {
 			throw new Error(`Output of task process function is not valid.`);
 		}
@@ -62,6 +64,8 @@ export class DownloadService extends QueueTaskService {
 		if (!utilsCheckArr(srcData) && !utilsCheckStrUrl(srcData)) {
 			throw new Error(`Property src "${srcData}" is not valid.`);
 		}
+		console.log('DownloadService validateInput 2');
+
 		return data;
 	}
 
@@ -84,6 +88,8 @@ export class DownloadService extends QueueTaskService {
 			},
 		});
 
+		console.log('DownloadService process systemOptionContentPath', systemOptionContentPath);
+
 		if (!systemOptionContentPath) {
 			throw new Error(`System with id "${data['systemId']}" is not defined or folder path is not configured.`);
 		}
@@ -97,6 +103,8 @@ export class DownloadService extends QueueTaskService {
 			},
 		});
 
+		console.log('DownloadService process parentFolder', parentFolder);
+
 		if (!parentFolder) {
 			throw new Error(`Parent folder with path "${systemOptionContentPath['content']}" is not defined.`);
 		}
@@ -105,8 +113,12 @@ export class DownloadService extends QueueTaskService {
 			: systemOptionContentPath['content'];
 		const queryRunner = await this.connection.createQueryRunner();
 
+		console.log('DownloadService process path', path);
+
 		try {
 			await queryRunner.startTransaction();
+
+			console.log('DownloadService process srcData', srcData.length);
 
 			while (i < srcData.length) {
 				const destinationPath = await utilsFilesDownload(srcData[i]['url'], `${process.env.PATH_ROOT}/${path}/${srcData[i]['name']}`, true);
@@ -152,11 +164,15 @@ export class DownloadService extends QueueTaskService {
 		catch (err) {
 			await queryRunner.rollbackTransaction();
 
+			console.log('DownloadService process await queryRunner.rollbackTransaction()', err);
+
 			throw err;
 		}
 		finally {
 			await queryRunner.release();
 		}
+		console.log('DownloadService process output', output.length);
+
 		return {
 			systemId: data['systemId'],
 			parentId: parentFolder['id'],
