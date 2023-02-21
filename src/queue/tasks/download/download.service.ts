@@ -136,6 +136,7 @@ export class DownloadService extends QueueTaskService {
 				}
 				catch (err) {
 					console.log('ERROR: ', err.message);
+					i++;
 					continue;
 				}
 				
