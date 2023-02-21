@@ -4,7 +4,7 @@ import { TaskService } from './task.service';
 @Injectable()
 export class CronTaskService extends TaskService {
 	private _taskModule;
-	private __setClose = false;
+	private _setClose = false;
 	protected type = 'cron';
 
 	setModule(taskModule) {
