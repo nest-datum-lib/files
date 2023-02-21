@@ -126,11 +126,18 @@ export class DownloadService extends QueueTaskService {
 
 			while (i < srcData.length) {
 				const destinationPath = await utilsFilesDownload(srcData[i]['url'], `${process.env.PATH_ROOT}/${path}/${srcData[i]['name']}`, true);
+				let extension;
 				console.log('*******************************')
 				console.log('destinationPath', destinationPath);
 				console.log('*******************************')
 
-				let extension = await utilsFilesExtension(destinationPath);
+				try {
+					extension = await utilsFilesExtension(destinationPath);
+				}
+				catch (err) {
+					console.log('ERROR: ', err.message);
+					continue;
+				}
 				
 				if (utilsCheckStrFilled(data['convertTo'])) {				
 					if (!utilsCheckStrFilled(extension)) {
