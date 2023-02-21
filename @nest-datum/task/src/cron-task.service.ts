@@ -3,7 +3,14 @@ import { TaskService } from './task.service';
 
 @Injectable()
 export class CronTaskService extends TaskService {
+	private _taskModule;
 	protected type = 'cron';
+
+	setModule(taskModule) {
+		this._taskModule = taskModule;
+
+		return this;
+	}
 
 	protected async takeOver(name: string, data): Promise<any> {
 		(async () => {
@@ -16,5 +23,15 @@ export class CronTaskService extends TaskService {
 		})();
 		
 		return this;
+	}
+
+	protected closeTask() {
+		this._taskModule.close();
+	}
+
+	protected async onNextWrapper(timestamp: Date, options: object, output: any): Promise<any> {
+		setTimeout(this.closeTask.bind(this), 1000);
+
+		return await super.onNextWrapper(timestamp, options, output);
 	}
 }
