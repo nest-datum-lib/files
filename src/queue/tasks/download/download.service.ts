@@ -70,6 +70,9 @@ export class DownloadService extends QueueTaskService {
 	}
 
 	async process(timestamp: Date, data: any): Promise<any> {
+		console.log('***************************************')
+		console.log('DownloadService process start');
+
 		const srcData = utilsCheckArr(data['src'])
 			? data['src']
 			: [ data['src'] ];
@@ -95,6 +98,8 @@ export class DownloadService extends QueueTaskService {
 		if (!systemOptionContentPath) {
 			throw new Error(`System with id "${data['systemId']}" is not defined or folder path is not configured.`);
 		}
+		console.log('DownloadService get systemOptionContentPath TRUR');
+
 		const parentFolder = await this.folderRepository.findOne({
 			select: {
 				id: true,
@@ -108,6 +113,8 @@ export class DownloadService extends QueueTaskService {
 		if (!parentFolder) {
 			throw new Error(`Parent folder with path "${systemOptionContentPath['content']}" is not defined.`);
 		}
+		console.log('DownloadService get parentFolder TRUR');
+
 		const path = (systemOptionContentPath['content'][0] === '/')
 			? systemOptionContentPath['content'].slice(1)
 			: systemOptionContentPath['content'];
@@ -175,6 +182,8 @@ export class DownloadService extends QueueTaskService {
 		finally {
 			await queryRunner.release();
 		}
+		console.log('DownloadService get parentFolder SUCCESS!');
+
 		return {
 			systemId: data['systemId'],
 			parentId: parentFolder['id'],
