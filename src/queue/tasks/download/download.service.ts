@@ -40,12 +40,34 @@ export class DownloadService extends QueueTaskService {
 		protected loopService: LoopService,
 		protected connection: Connection,
 		protected cacheService: CacheService,
+		protected queueTaskService: QueueTaskService,
 	) {
 		super(redisService, replicaService, loopService);
 	}
 
 	async onError(err, timestamp: Date, data: any): Promise<any> {
 		console.log('DownloadService err', err);
+	}
+
+	async onErrorItem(err, timestamp: Date, data: object): Promise<any> {
+		this.queueTaskService.start({
+			name: 'LensaReportSaveService',
+			payload: {
+				reportId: data['lensaReportId'],
+				reportStatusId: 'lensa-report-status-failure',
+			},
+		});
+	}
+
+	async onNextItem(err, data: object): Promise<any> {
+		this.queueTaskService.start({
+			name: 'LensaReportSaveService',
+			payload: {
+				reportId: data['lensaReportId'],
+				reportStatusId: 'lensa-report-status-success',
+				fileId: data['fileId'],
+			},
+		});
 	}
 
 	async validateInput(data) {
@@ -78,46 +100,11 @@ export class DownloadService extends QueueTaskService {
 			: [ data['src'] ];
 		let i = 0,
 			output = [];
-		const systemOptionContentPath = await this.systemSystemSystemOptionRepository.findOne({
-			select: {
-				id: true,
-				systemId: true,
-				systemSystemOptionId: true,
-				content: true,
-			},
-			where:{
-				systemId: data['systemId'],
-				systemSystemOption: {
-					systemOption: {
-						id: 'files-system-option-root',
-					},
-				},
-			},
-		});
-
-		if (!systemOptionContentPath) {
-			throw new Error(`System with id "${data['systemId']}" is not defined or folder path is not configured.`);
-		}
-		console.log('DownloadService process: systemOptionContentPath model successfully got!');
-
-		const parentFolder = await this.folderRepository.findOne({
-			select: {
-				id: true,
-				path: true,
-			},
-			where: {
-				path: systemOptionContentPath['content'],
-			},
-		});
-
-		if (!parentFolder) {
-			throw new Error(`Parent folder with path "${systemOptionContentPath['content']}" is not defined.`);
-		}
-		console.log('DownloadService process: parentFolder model successfully got!');
-
-		const path = (systemOptionContentPath['content'][0] === '/')
-			? systemOptionContentPath['content'].slice(1)
-			: systemOptionContentPath['content'];
+		const systemOptionContentPath = await this.getSystemPath(data['systemId']);
+		const parentFolder = await this.getParentFolder(systemOptionContentPath);
+		const path = (systemOptionContentPath[0] === '/')
+			? systemOptionContentPath.slice(1)
+			: systemOptionContentPath;
 		const queryRunner = await this.connection.createQueryRunner();
 
 		try {
@@ -132,17 +119,30 @@ export class DownloadService extends QueueTaskService {
 				}
 				catch (err) {
 					console.log(err.message, `/${path}/${srcData[i]['name']}`);
+
+					await this.onErrorItem(err, new Date(), srcData[i]);
 					i++;
 					continue;
 				}	
 				if (utilsCheckStrFilled(data['convertTo'])) {				
 					if (!utilsCheckStrFilled(extension)) {
 						console.log(`Extension error for file "/${path}/${srcData[i]['name']}".`);
+						await this.onErrorItem(err, new Date(), srcData[i]);
 						i++;
 						continue;
 					}
 					if (extension !== data['convertTo']) {
-						extension = await utilsFilesConverTo(destinationPath, data['convertTo']);
+						try {
+							extension = await utilsFilesConverTo(destinationPath, data['convertTo']);
+						}
+						catch (err) {
+							console.log(`Convertor error. File: "/${path}/${srcData[i]['name']}".`);
+
+							await (new Promise((resolve, reject) => setTimeout(() => resolve(true), 10000)));
+							await this.onErrorItem(err, new Date(), srcData[i]);
+							i++;
+							continue;
+						}
 					}
 				}
 				const stats = fs.statSync(destinationPath);
@@ -165,6 +165,9 @@ export class DownloadService extends QueueTaskService {
 					type: file['type'],
 					size: file['size'],
 				});
+
+				await this.onNextItem(new Date(), { ...srcData[i], fileId: file['id'] });
+				await (new Promise((resolve, reject) => setTimeout(() => resolve(true), 1000)));
 
 				console.log(`DownloadService process: File "${srcData[i]['name']} downloaded successfully!"`);
 				i++;
@@ -193,5 +196,50 @@ export class DownloadService extends QueueTaskService {
 			parentName: parentFolder['name'],
 			files: output,
 		};
+	}
+
+	async getParentFolder(path: string): Promise<any> {
+		const parentFolder = await this.folderRepository.findOne({
+			select: {
+				id: true,
+				path: true,
+			},
+			where: {
+				path,
+			},
+		});
+
+		if (!parentFolder) {
+			throw new Error(`Parent folder with path "${path}" is not defined.`);
+		}
+		console.log('DownloadService process: parentFolder model successfully got!');
+
+		return parentFolder;
+	}
+
+	async getSystemPath(systemId: string): Promise<any> {
+		const systemOptionContent = await this.systemSystemSystemOptionRepository.findOne({
+			select: {
+				id: true,
+				systemId: true,
+				systemSystemOptionId: true,
+				content: true,
+			},
+			where:{
+				systemId,
+				systemSystemOption: {
+					systemOption: {
+						id: 'files-system-option-root',
+					},
+				},
+			},
+		});
+
+		if (!systemOptionContent) {
+			throw new Error(`System with id "${systemId}" is not defined or folder path is not configured.`);
+		}
+		console.log('DownloadService getSystemPath: systemOptionContent model successfully got!');
+
+		return systemOptionContent['content'];
 	}
 }

@@ -22,6 +22,10 @@ import {
 	CacheService, 
 } from '@nest-datum/cache';
 import { LoopService } from '@nest-datum/queue';
+import { 
+	QueueTaskModule,
+	QueueTaskService, 
+} from '@nest-datum/task';
 import { ProviderStatus } from '../../../api/provider-status/provider-status.entity';
 import { ProviderOption } from '../../../api/provider-option/provider-option.entity';
 import { ProviderProviderOption } from '../../../api/provider-provider-option/provider-provider-option.entity';
@@ -59,6 +63,7 @@ import { DownloadService } from './download.service';
 		]),
 		ReplicaModule,
 		RedisModule,
+		QueueTaskModule,
 		TransportModule,
 		CacheModule,
 	],
@@ -66,6 +71,7 @@ import { DownloadService } from './download.service';
 		ReplicaService,
 		RedisService,
 		LoopService,
+		QueueTaskService,
 		TransportService,
 		CacheService,
 		DownloadService,
