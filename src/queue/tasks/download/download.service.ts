@@ -127,7 +127,7 @@ export class DownloadService extends QueueTaskService {
 				if (utilsCheckStrFilled(data['convertTo'])) {				
 					if (!utilsCheckStrFilled(extension)) {
 						console.log(`Extension error for file "/${path}/${srcData[i]['name']}".`);
-						await this.onErrorItem(err, new Date(), srcData[i]);
+						await this.onErrorItem(new Error(`Extension error for file "/${path}/${srcData[i]['name']}".`), new Date(), srcData[i]);
 						i++;
 						continue;
 					}
