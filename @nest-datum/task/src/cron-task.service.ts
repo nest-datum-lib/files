@@ -15,6 +15,8 @@ export class CronTaskService extends TaskService {
 
 	setClose(flag: boolean = true) {
 		this._setClose = flag;
+
+		return this;
 	}
 
 	protected async takeOver(name: string, data): Promise<any> {
