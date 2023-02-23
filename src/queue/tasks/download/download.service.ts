@@ -64,7 +64,6 @@ export class DownloadService extends QueueTaskService {
 			name: 'LensaReportSaveService',
 			payload: {
 				reportId: data['lensaReportId'],
-				reportStatusId: 'lensa-report-status-success',
 				fileId: data['fileId'],
 			},
 		});
