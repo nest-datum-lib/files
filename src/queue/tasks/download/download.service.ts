@@ -111,9 +111,20 @@ export class DownloadService extends QueueTaskService {
 			await queryRunner.startTransaction();
 
 			while (i < srcData.length) {
-				const destinationPath = await utilsFilesDownload(srcData[i]['url'], `${process.env.PATH_ROOT}/${path}/${srcData[i]['name']}`, true);
-				let extension;
-				
+				let destinationPath,
+					extension,
+					stats;
+
+				try {
+					destinationPath = await utilsFilesDownload(srcData[i]['url'], `${process.env.PATH_ROOT}/${path}/${srcData[i]['name']}`, true);
+				}
+				catch (err) {
+					console.log(err.message, srcData[i]['url']);
+
+					await this.onErrorItem(err, new Date(), srcData[i]);
+					i++;
+					continue;
+				}
 				try {
 					extension = await utilsFilesExtension(destinationPath);
 				}
@@ -145,7 +156,17 @@ export class DownloadService extends QueueTaskService {
 						}
 					}
 				}
-				const stats = fs.statSync(destinationPath);
+				try {
+					stats = fs.statSync(destinationPath);
+				}
+				catch (err) {
+					console.log(`Can't get statSync. File: "/${path}/${srcData[i]['name']}".`);
+
+					await (new Promise((resolve, reject) => setTimeout(() => resolve(true), 10000)));
+					await this.onErrorItem(err, new Date(), srcData[i]);
+					i++;
+					continue;
+				}
 				const file = await queryRunner.manager.save(Object.assign(new File, {
 					userId: process.env.USER_ID,
 					systemId: data['systemId'],
@@ -157,6 +178,12 @@ export class DownloadService extends QueueTaskService {
 					size: stats.size,
 				}));
 
+				if (!file) {
+					console.log(`Can't create new file: "/${path}/${srcData[i]['name']}".`);
+
+					i++;
+					continue;
+				}
 				output.push({ 
 					id: file['id'], 
 					path: file['path'],

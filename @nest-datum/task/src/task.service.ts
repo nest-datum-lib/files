@@ -5,18 +5,30 @@ import {
 	objFilled as utilsCheckObjFilled,
 	strId as utilsCheckStrId,
 	strName as utilsCheckStrName,
+	func as utilsCheckFunc,
 } from '@nest-datum-utils/check';
 
 @Injectable()
 export class TaskService {
 	private _onNextList = {};
 	private _onErrorList = {};
+	private _taskModule;
 	protected type = 'task';
 	protected replicaService;
 	protected id;
 	protected name;
 	protected createdAt;
 	protected payload;
+
+	setModule(taskModule) {
+		this._taskModule = taskModule;
+
+		return this;
+	}
+
+	getModule() {
+		return this._taskModule;
+	}
 
 	setOptions(options: object, inLoop = false) {
 		this.id = options['id'] || uuidv4();

@@ -3,44 +3,28 @@ import { TaskService } from './task.service';
 
 @Injectable()
 export class CronTaskService extends TaskService {
-	private _taskModule;
-	private _setClose = false;
+	private _notClose = false;
 	protected type = 'cron';
 
-	setModule(taskModule) {
-		this._taskModule = taskModule;
-
-		return this;
-	}
-
-	setClose(flag: boolean = true) {
-		this._setClose = flag;
+	setNotClose(flag: boolean = true) {
+		this._notClose = flag;
 
 		return this;
 	}
 
 	protected async takeOver(name: string, data): Promise<any> {
-		(async () => {
-			try {
-				await this.processWrapper(new Date());
-			}
-			catch (err) {
-				console.log(`Cron task "${this.constructor.name} error. [${err.message}]"`);
-			}
-		})();
-		
-		return this;
-	}
-
-	protected closeTask() {
-		if (this._setClose) {
-			this._taskModule.close();
+		try {
+			return await this.processWrapper(new Date());
+		}
+		catch (err) {
+			console.log(`Cron task "${this.constructor.name} error. [${err.message}]"`);
 		}
 	}
 
 	protected async onNextWrapper(timestamp: Date, options: object, output: any): Promise<any> {
-		setTimeout(this.closeTask.bind(this), 1000);
-
+		if (!this._notClose) {
+			setTimeout(this.getModule().close, Number(process.env.CRON_CLOSE_TASK_TIMEOUT || 1000));
+		}
 		return await super.onNextWrapper(timestamp, options, output);
 	}
 }
