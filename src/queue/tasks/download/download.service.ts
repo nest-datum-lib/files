@@ -148,7 +148,7 @@ export class DownloadService extends QueueTaskService {
 						catch (err) {
 							console.log(`Convertor error. File: "/${path}/${srcData[i]['name']}".`);
 
-							await (new Promise((resolve, reject) => setTimeout(() => resolve(true), 10000)));
+							await (new Promise((resolve, reject) => setTimeout(() => resolve(true), 1000)));
 							await this.onErrorItem(err, new Date(), srcData[i]);
 							i++;
 							continue;
@@ -161,19 +161,25 @@ export class DownloadService extends QueueTaskService {
 				catch (err) {
 					console.log(`Can't get statSync. File: "/${path}/${srcData[i]['name']}".`);
 
-					await (new Promise((resolve, reject) => setTimeout(() => resolve(true), 10000)));
+					await (new Promise((resolve, reject) => setTimeout(() => resolve(true), 1000)));
 					await this.onErrorItem(err, new Date(), srcData[i]);
 					i++;
 					continue;
 				}
+				if (!stats || !(stats.size >= 0)) {
+					await this.onErrorItem(new Error('stats is undefined.'), new Date(), srcData[i]);
+					i++;
+					continue;
+				}
+
 				const file = await queryRunner.manager.save(Object.assign(new File, {
 					userId: process.env.USER_ID,
-					systemId: data['systemId'],
-					parentId: parentFolder['id'],
-					path: `${path}/${srcData[i]['name']}`,
-					name: srcData[i]['name'],
-					description: srcData[i]['description'] || '',
-					type: extension,
+					systemId: data['systemId'].slice(0, 254),
+					parentId: parentFolder['id'].slice(0, 254),
+					path: `${path}/${srcData[i]['name']}`.slice(0, 254),
+					name: srcData[i]['name'].slice(0, 254),
+					description: (srcData[i]['description'] || '').slice(0, 254),
+					type: (extension || '').slice(0, 254),
 					size: stats.size,
 				}));
 
