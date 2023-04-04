@@ -14,6 +14,7 @@ export class ProviderService extends OptionEntityService {
 	protected entityName = 'provider';
 	protected entityConstructor = Provider;
 	protected entityOptionConstructor = ProviderProviderOption;
+	protected entityOptionId = 'providerOptionId';
 	protected entityId = 'providerId';
 
 	constructor(

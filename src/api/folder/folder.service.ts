@@ -194,10 +194,7 @@ export class FolderService extends StorageService {
 				
 		const newPath = folderPathSplit.join('/');
 
-		await super.updateProcess({
-			id: payload['id'],
-			path: newPath,
-		});
+		await super.updateProcess(payload['id'], { path: newPath });
 		while (i < folderChildItems.length) {
 			(utilsCheckObjQueryRunner(this.queryRunner) 
 				&& this.enableTransactions === true)
