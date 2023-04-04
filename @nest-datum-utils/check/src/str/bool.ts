@@ -1,7 +1,5 @@
+import str from './index';
 
-const bool = (value = '') => value === '1' 
-	|| value === '0' 
-	|| value.toLowerCase() === 'true'
-	|| value.toLowerCase() === 'false';
+const bool = (value) => str(value) && (value === '1' || value === '0');
 
 export default bool;

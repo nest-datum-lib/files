@@ -2,25 +2,25 @@ require('dotenv').config();
 
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions } from '@nestjs/microservices';
-import { 
-	onExit,
-	onWarning,
-	onUncaughtException, 
-} from '@nest-datum-common/process';
-import { CustomServerTCP } from '@nest-datum-common/strategies';
+// import { 
+// 	onExit,
+// 	onWarning,
+// 	onUncaughtException, 
+// } from '@nest-datum-common/process';
+import { TcpStrategy } from '@nest-datum-common/strategies';
 import { 
 	TransportModule,
 	TransportService, 
 } from '@nest-datum/transport';
 import { AppModule } from './app.module';
 
-process.on('exit', onExit);
-process.on('warning', onWarning);
-process.on('uncaughtException', onUncaughtException);
+// process.on('exit', onExit);
+// process.on('warning', onWarning);
+// process.on('uncaughtException', onUncaughtException);
 
 async function bootstrap() {
 	const appTcp = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-		strategy: new CustomServerTCP({
+		strategy: new TcpStrategy({
 			host: process.env.APP_HOST,
 			port: Number(process.env.APP_PORT),
 		}),

@@ -3,21 +3,61 @@ import {
 	Patch,
 	Body,
 	Param,
+	MethodNotAllowedException,
 } from '@nestjs/common';
-import { Controller } from '@nestjs/common';
-import { HttpController as NestDatumHttpController } from '../../controller/src';
+import { HttpController } from '@nest-datum-common/controllers';
 import { AccessToken } from '@nest-datum-common/decorators';
-import { strName as utilsCheckStrName } from '@nest-datum-utils/check';
+import { 
+	exists as utilsCheckExists,
+	strId as utilsCheckStrId,
+	strName as utilsCheckStrName,
+	strDescription as utilsCheckStrDescription, 
+	strEnvKey as utilsCheckStrEnvKey,
+} from '@nest-datum-utils/check';
 
-@Controller()
-export class StatusHttpController extends NestDatumHttpController {
-	protected entityService;
+export class StatusHttpController extends HttpController {
+	protected readonly service;
 	
 	async validateCreate(options) {
 		if (!utilsCheckStrName(options['name'])) {
-			throw new this.exceptionConstructor(`Property "name" is not valid.`);
+			throw new MethodNotAllowedException(`Property "name" is not valid.`);
 		}
 		return await this.validateUpdate(options);
+	}
+
+	async validateUpdate(options) {
+		const output = {
+			description: '',
+		};
+
+		if (utilsCheckExists(options['userId'])) {
+			if (!utilsCheckStrId(options['userId'])) {
+				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
+			}
+			output['userId'] = options['userId'];
+		}
+		if (utilsCheckExists(options['envKey'])) {
+			if (!utilsCheckStrEnvKey(options['envKey'])) {
+				throw new MethodNotAllowedException(`Property "envKey" is not valid.`);
+			}
+			output['envKey'] = options['envKey'];
+		}
+		if (utilsCheckExists(options['name'])) {
+			if (!utilsCheckStrName(options['name'])) {
+				throw new MethodNotAllowedException(`Property "name" is not valid.`);
+			}
+			output['name'] = options['name'];
+		}
+		if (utilsCheckExists(options['description'])) {
+			if (!utilsCheckStrDescription(options['description'])) {
+				throw new MethodNotAllowedException(`Property "description" is not valid.`);
+			}
+			output['description'] = options['description'];
+		}
+		return {
+			...await super.validateUpdate(options),
+			...output,
+		};
 	}
 
 	@Post()
@@ -30,7 +70,7 @@ export class StatusHttpController extends NestDatumHttpController {
 		@Body('description') description: string,
 		@Body('isNotDelete') isNotDelete: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.entityService.create(await this.validateCreate({
+		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
 			accessToken,
 			id,
 			userId,
@@ -52,7 +92,7 @@ export class StatusHttpController extends NestDatumHttpController {
 		@Body('isNotDelete') isNotDelete: boolean,
 		@Body('isDeleted') isDeleted: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.entityService.update(await this.validateUpdate({
+		return await this.serviceHandlerWrapper(async () => await this.service.update(await this.validateUpdate({
 			accessToken,
 			id,
 			newId,

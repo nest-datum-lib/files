@@ -4,22 +4,20 @@ import {
 	Repository,
 	Connection, 
 } from 'typeorm';
-import { OptionOptionService } from '@nest-datum/option';
+import { BindService } from '@nest-datum/bind';
 import { CacheService } from '@nest-datum/cache';
 import { ProviderProviderOption } from './provider-provider-option.entity';
 
-@Injectable()
-export class ProviderProviderOptionService extends OptionOptionService {
-	protected entityName = 'providerProviderOption';
-	protected entityConstructor = ProviderProviderOption;
-	protected entityOptionId = 'providerOptionId';
-	protected entityId = 'providerId';
-	protected entityOptionName = 'providerOption';
 
+export class ProviderProviderOptionService extends BindService {
+	protected readonly mainRelationColumnName: string = 'providerId';
+	protected readonly optionRelationColumnName: string = 'providerOptionId';
+	protected repositoryConstructor = ProviderProviderOption;
+	
 	constructor(
-		@InjectRepository(ProviderProviderOption) protected entityRepository: Repository<ProviderProviderOption>,
+		@InjectRepository(ProviderProviderOption) protected repository: Repository<ProviderProviderOption>,
 		protected connection: Connection,
-		protected cacheService: CacheService,
+		protected repositoryCache: CacheService,
 	) {
 		super();
 	}

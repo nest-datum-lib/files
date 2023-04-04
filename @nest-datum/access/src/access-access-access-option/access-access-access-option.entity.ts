@@ -1,4 +1,4 @@
-import { OptionOptionOption } from '@nest-datum/option';
+import { ContentMany } from '@nest-datum/many';
 
-export class AccessAccessAccessOption extends OptionOptionOption {
+export class AccessAccessAccessOption extends ContentMany {
 }

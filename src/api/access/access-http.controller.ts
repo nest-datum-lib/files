@@ -1,13 +1,11 @@
 import { Controller } from '@nestjs/common';
-import { TransportService } from '@nest-datum/transport';
-import { AccessHttpController as AccessHttpControllerBase } from '@nest-datum/access';
+import { AccessHttpTcpController as AccessHttpTcpControllerBase } from '@nest-datum/access';
 import { AccessService } from './access.service';
 
-@Controller(`access`)
-export class AccessHttpController extends AccessHttpControllerBase {
+@Controller(`${process.env.SERVICE_FILES}/access`)
+export class AccessHttpTcpController extends AccessHttpTcpControllerBase {
 	constructor(
-		protected transportService: TransportService,
-		protected entityService: AccessService,
+		protected service: AccessService,
 	) {
 		super();
 	}

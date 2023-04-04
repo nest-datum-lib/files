@@ -5,23 +5,11 @@ import {
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { 
-	ReplicaModule,
-	ReplicaService, 
-} from '@nest-datum/replica';
-import { 
-	TransportModule,
-	TransportService, 
-} from '@nest-datum/transport';
-import {
-	CacheModule, 
+	CacheModule,
 	CacheService, 
 } from '@nest-datum/cache';
-import { 
-	SqlModule,
-	SqlService, 
-} from '@nest-datum/sql';
 import { AccessService } from './access.service';
-import { AccessHttpController } from './access-http.controller';
+import { AccessTcpController } from './access-tcp.controller';
 import { RoleAccess } from '../role-access/role-access.entity';
 import { AccessAccessAccessOption } from '../access-access-access-option/access-access-access-option.entity';
 import { AccessOption } from '../access-option/access-option.entity';
@@ -29,7 +17,7 @@ import { AccessAccessOption } from '../access-access-option/access-access-option
 import { Access } from './access.entity';
 
 @Module({
-	controllers: [ AccessHttpController ],
+	controllers: [ AccessTcpController ],
 	imports: [
 		TypeOrmModule.forFeature([ 
 			AccessOption,
@@ -38,16 +26,10 @@ import { Access } from './access.entity';
 			AccessAccessAccessOption, 
 			RoleAccess,
 		]),
-		ReplicaModule,
-		TransportModule,
 		CacheModule,
-		SqlModule,
 	],
 	providers: [
-		ReplicaService,
-		TransportService,
 		CacheService,
-		SqlService,
 		AccessService, 
 	],
 })

@@ -10,23 +10,16 @@ import { SystemSystemSystemOption } from '../system-system-system-option/system-
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
 import { SystemOption } from './system-option.entity';
 
-@Injectable()
 export class SystemOptionService extends OptionService {
-	protected entityName = 'systemOption';
-	protected entityServicedName = 'system';
-	protected entityId = 'systemId';
-	protected entityOptionId = 'systemOptionId';
-	protected entityOptionRelationId = 'systemSystemOptionId';
-	protected entityConstructor = SystemOption;
-	protected entityOptionConstructor = SystemSystemOption;
-	protected entityOptionRelationConstructor = SystemSystemSystemOption;
+	protected readonly mainRelationColumnName: string = 'systemId';
+	protected readonly optionRelationColumnName: string = 'systemOptionId';
 
 	constructor(
-		@InjectRepository(SystemOption) protected entityRepository: Repository<SystemOption>,
-		@InjectRepository(SystemSystemOption) protected entityOptionRepository: Repository<SystemSystemOption>,
-		@InjectRepository(SystemSystemSystemOption) protected entityOptionRelationRepository: Repository<SystemSystemSystemOption>,
-		protected connection: Connection,
-		protected cacheService: CacheService,
+		@InjectRepository(SystemOption) protected readonly repository: Repository<SystemOption>,
+		@InjectRepository(SystemSystemOption) protected readonly repositoryOption: Repository<SystemSystemOption>,
+		@InjectRepository(SystemSystemSystemOption) public readonly contentManyService: Repository<SystemSystemSystemOption>,
+		protected readonly connection: Connection,
+		protected readonly repositoryCache: CacheService,
 	) {
 		super();
 	}

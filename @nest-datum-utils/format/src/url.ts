@@ -1,4 +1,4 @@
-import { generateAccessToken } from '@nest-datum/jwt';
+import { generateAccessToken } from '@nest-datum-common/jwt';
 import {
 	strUrl as utilsCheckStrUrl,
 	strPath as utilsCheckStrPath,

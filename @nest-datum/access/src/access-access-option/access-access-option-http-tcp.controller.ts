@@ -1,5 +1,5 @@
-import { HttpTcpController } from '@nest-datum/controller';
+import { BindHttpTcpController } from '@nest-datum/bind';
 
-export class AccessAccessOptionHttpTcpController extends HttpTcpController {
-	protected entityName = 'accessOptionRelation';
+export class AccessAccessOptionHttpTcpController extends BindHttpTcpController {
+	protected readonly entityName: string = 'accessOptionRelation';
 }

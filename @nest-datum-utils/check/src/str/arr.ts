@@ -1,5 +1,6 @@
+import str from './index';
 
-const arr = (value) => typeof value === 'string'
+const arr = (value) => str(value)
 	&& value[0] === '['
 	&& value[value.length - 1] === ']';
 

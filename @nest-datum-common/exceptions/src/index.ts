@@ -1,15 +1,19 @@
 import { Exception } from './exception';
-import { ErrorException } from './error.exception';
-import { NotificationException } from './notification.exception';
-import { TrafficException } from './traffic.exception';
-import { WarningException } from './warning.exception';
+import { FailureException } from './failure.exception';
+import { ForbidenException } from './forbiden.exception';
+import { MethodNotAllowedException } from './method-not-allowed.exception';
 import { NotFoundException } from './not-found.exception';
+import { NotificationException } from './notification.exception';
+import { UnauthorizedException } from './unauthorized.exception';
+import { WarningException } from './warning.exception';
 
 export {
 	Exception,
-	ErrorException,
-	NotificationException,
-	TrafficException,
-	WarningException,
+	FailureException,
+	ForbidenException,
+	MethodNotAllowedException,
 	NotFoundException,
+	NotificationException,
+	UnauthorizedException,
+	WarningException,
 };

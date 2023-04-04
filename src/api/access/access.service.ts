@@ -11,14 +11,15 @@ import { Access } from './access.entity';
 
 @Injectable()
 export class AccessService extends BaseAccessService {
-	protected entityConstructor = Access;
-	protected entityOptionConstructor = AccessAccessOption;
+	protected readonly enableTransactions: boolean = true;
+	protected readonly repositoryConstructor = Access;
+	protected readonly repositoryBindOptionConstructor = AccessAccessOption;
 
 	constructor(
-		@InjectRepository(Access) protected entityRepository: Repository<Access>,
-		@InjectRepository(AccessAccessOption) protected entityOptionRepository: Repository<AccessAccessOption>,
-		protected connection: Connection,
-		protected cacheService: CacheService,
+		@InjectRepository(Access) protected readonly repository: Repository<Access>,
+		@InjectRepository(AccessAccessOption) protected repositoryBindOption: Repository<AccessAccessOption>,
+		protected readonly connection: Connection,
+		protected readonly repositoryCache: CacheService,
 	) {
 		super();
 	}

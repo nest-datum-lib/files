@@ -1,5 +1,5 @@
-import obj from './index';
+import objFilled from './filled';
 
-const fileList = (value) => obj(value) && value.constructor.name === 'FileList';
+const fileList = (value) => objFilled(value) && value.constructor.name === 'FileList';
 
 export default fileList;

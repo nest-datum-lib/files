@@ -3,15 +3,12 @@ import {
 	EventPattern, 
 } from '@nestjs/microservices';
 import { Controller } from '@nestjs/common';
-import { TransportService } from '@nest-datum/transport';
 import { StatusTcpController } from '@nest-datum/status';
 import { SystemStatusService } from './system-status.service';
 
-@Controller()
 export class SystemStatusTcpController extends StatusTcpController {
 	constructor(
-		protected transportService: TransportService,
-		protected entityService: SystemStatusService,
+		protected service: SystemStatusService,
 	) {
 		super();
 	}

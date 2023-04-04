@@ -10,23 +10,16 @@ import { ProviderProviderProviderOption } from '../provider-provider-provider-op
 import { ProviderProviderOption } from '../provider-provider-option/provider-provider-option.entity';
 import { ProviderOption } from './provider-option.entity';
 
-@Injectable()
 export class ProviderOptionService extends OptionService {
-	protected entityName = 'providerOption';
-	protected entityServicedName = 'provider';
-	protected entityId = 'providerId';
-	protected entityOptionId = 'providerOptionId';
-	protected entityOptionRelationId = 'providerProviderOptionId';
-	protected entityConstructor = ProviderOption;
-	protected entityOptionConstructor = ProviderProviderOption;
-	protected entityOptionRelationConstructor = ProviderProviderProviderOption;
+	protected readonly mainRelationColumnName: string = 'providerId';
+	protected readonly optionRelationColumnName: string = 'providerOptionId';
 
 	constructor(
-		@InjectRepository(ProviderOption) protected entityRepository: Repository<ProviderOption>,
-		@InjectRepository(ProviderProviderOption) protected entityOptionRepository: Repository<ProviderProviderOption>,
-		@InjectRepository(ProviderProviderProviderOption) protected entityOptionRelationRepository: Repository<ProviderProviderProviderOption>,
-		protected connection: Connection,
-		protected cacheService: CacheService,
+		@InjectRepository(ProviderOption) protected readonly repository: Repository<ProviderOption>,
+		@InjectRepository(ProviderProviderOption) protected readonly repositoryOption: Repository<ProviderProviderOption>,
+		@InjectRepository(ProviderProviderProviderOption) public readonly contentManyService: Repository<ProviderProviderProviderOption>,
+		protected readonly connection: Connection,
+		protected readonly repositoryCache: CacheService,
 	) {
 		super();
 	}

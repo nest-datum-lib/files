@@ -12,16 +12,12 @@ import { AccessOption } from './access-option.entity';
 
 @Injectable()
 export class AccessOptionService extends AccessOptionServiceBase {
-	protected entityConstructor = AccessOption;
-	protected entityOptionConstructor = AccessAccessOption;
-	protected entityOptionRelationConstructor = AccessAccessAccessOption;
-
 	constructor(
-		@InjectRepository(AccessOption) protected entityRepository: Repository<AccessOption>,
-		@InjectRepository(AccessAccessOption) protected entityOptionRepository: Repository<AccessAccessOption>,
-		@InjectRepository(AccessAccessAccessOption) protected entityOptionRelationRepository: Repository<AccessAccessAccessOption>,
-		protected connection: Connection,
-		protected cacheService: CacheService,
+		@InjectRepository(AccessOption) protected readonly repository: Repository<AccessOption>,
+		@InjectRepository(AccessAccessOption) protected readonly repositoryOption: Repository<AccessAccessOption>,
+		@InjectRepository(AccessAccessAccessOption) public readonly contentManyService: Repository<AccessAccessAccessOption>,
+		protected readonly connection: Connection,
+		protected readonly repositoryCache: CacheService,
 	) {
 		super();
 	}

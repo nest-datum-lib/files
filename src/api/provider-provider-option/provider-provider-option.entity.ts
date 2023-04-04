@@ -4,13 +4,13 @@ import {
 	ManyToOne,
 	OneToMany,
 } from 'typeorm';
-import { OptionOption as NestDatumOptionOption } from '@nest-datum/option';
+import { Bind } from '@nest-datum/bind';
 import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
 import { ProviderOption } from '../provider-option/provider-option.entity';
 import { Provider } from '../provider/provider.entity';
 
 @Entity()
-export class ProviderProviderOption extends NestDatumOptionOption {
+export class ProviderProviderOption extends Bind {
 	@Column()
 	public providerOptionId: string;
 

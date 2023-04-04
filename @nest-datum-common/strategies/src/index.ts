@@ -1,3 +1,3 @@
-import { CustomServerTCP } from './custom-server-tcp.strategy';
+import { TcpStrategy } from './tcp.strategy';
 
-export { CustomServerTCP };
+export { TcpStrategy };

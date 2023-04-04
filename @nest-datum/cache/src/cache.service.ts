@@ -1,36 +1,37 @@
 import Redis from 'ioredis';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { Injectable } from '@nestjs/common';
-import { ErrorException } from '@nest-datum-common/exceptions';
-import { RedisService } from '@nest-datum/redis';
-import { ReplicaService } from '@nest-datum/replica';
-import { 
-	obj as utlisCheckObj,
-	strExists as utilsCheckStrExists, 
+import {
+	arrFilled as utilsCheckArrFilled,
+	objFilled as utlisCheckObjFilled,
+	strFilled as utilsCheckStrFilled,
+	numeric as utilsCheckNumeric,
 } from '@nest-datum-utils/check';
-
-const timeouts = {};
-const tmp = {};
+import { 
+	MethodNotAllowedException,
+	FailureException, 
+} from '@nest-datum-common/exceptions';
+import { RedisService } from '@nest-datum/redis';
 
 @Injectable()
 export class CacheService extends RedisService {
 	constructor(
-		@InjectRedis(process['REDIS_CACHE']) public redisService: Redis,
-		private readonly replicaService: ReplicaService,
+		@InjectRedis('Cache') protected readonly repository: Redis,
 	) {
 		super();
 	}
 
-	getKey(query: Array<any>): string {
+	protected async oneProperties(payload: object): Promise<object> {
+		if (!utilsCheckArrFilled(payload['key'])) {
+			throw new MethodNotAllowedException(`Property "payload" is not array.`);
+		}
+		const processedPayload = payload['key'];
 		let key = '',
 			i = 0;
 
-		while (i < query.length) {
-			if (!query[i]) {
-				throw new ErrorException(`Cache query item is undefined.`);
-			}
-			if (utlisCheckObj(query[i])) {
-				const processedItem = { ...query[i] };
+		while (i < processedPayload.length) {
+			if (utlisCheckObjFilled(processedPayload[i])) {
+				const processedItem = { ...processedPayload[i] };
 
 				delete processedItem['accessToken'];
 				delete processedItem['refreshToken'];
@@ -38,56 +39,51 @@ export class CacheService extends RedisService {
 
 				key += JSON.stringify(processedItem);
 			}
-			else {
-				key += String(query[i]);
+			else if (utilsCheckStrFilled(processedPayload[i]) || utilsCheckNumeric(processedPayload[i])) {
+				key += String(processedPayload[i]);
 			}
-
-			if (i < (query.length - 1)) {
+			else {
+				throw new FailureException(`Query item is undefined.`);
+			}
+			if (i < (processedPayload.length - 1)) {
 				key += '|';
 			}
 			i++;
 		}
-		return this.replicaService.prefix(`${this.replicaService.setting('app_id')}|${key}`);
+		return { key: this.prefix(key) };
 	}
 
-	async get(query: Array<any>): Promise<any> {
-		const key = this.getKey(query);
-		const output = tmp[key]
-			? undefined
-			: await this.redisService.get(key);
+	protected async manyProperties(payload): Promise<object> {
+		return await this.oneProperties(payload);
+	}
 
-		if (utilsCheckStrExists(output)) {
-			try {
-				return JSON.parse(output);
-			}
-			catch (err) {
-			}
+	protected async createProperties(payload: object): Promise<object> {
+		if (!utilsCheckStrFilled(payload['key'])) {
+			throw new MethodNotAllowedException(`Property "key" is not valid.`);
 		}
-		return output;
+		return await super.createProperties({ ...payload, key: await this.oneProperties(payload) });
 	}
 
-	async set(query: Array<any>, payload?: any): Promise<any> {
-		return await this.redisService.set(this.getKey(query), utlisCheckObj(payload)
-			? JSON.stringify(payload)
-			: String(payload));
+	protected async updateProperties(payload: object): Promise<object> {
+		return await this.createProperties(payload);
 	}
 
-	async clear(query: Array<any>): Promise<any> {
-		const key = this.getKey(query);
-		const cacheDataByKey = Number(await this.redisService.exists(key));
+	protected async dropProperties(payload): Promise<object> {
+		return await this.oneProperties(payload);
+	}
 
-		tmp[key] = true;
+	protected async manyProcess(processedPayload: object, payload: object): Promise<Array<Array<any> | number>> {
+		return await this.oneProcess(processedPayload, payload);
+	}
 
-		(cacheDataByKey) 
-			? await this.redisService.del(key)
-			: await this.keysScan(key, async (redisKey) => await this.redisService.del(redisKey));
-		clearTimeout(timeouts[key]);
+	protected async oneOutput(payload: object, data: any): Promise<any> {
+		if (utlisCheckObjFilled(data) && data['output']) {
+			return data['output'];
+		}
+		return data;
+	}
 
-		timeouts[key] = setTimeout(() => {
-			delete timeouts[key];
-			delete tmp[key];
-		}, 1000);
-
-		return true;
+	protected async manyOutput(payload: object, data: any): Promise<Array<any>> {
+		return await this.oneOutput(payload, data);
 	}
 }

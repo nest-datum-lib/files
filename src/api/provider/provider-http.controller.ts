@@ -4,46 +4,69 @@ import {
 	Patch,
 	Body,
 	Param,
-	ForbiddenException,
+	MethodNotAllowedException,
 } from '@nestjs/common';
-import { 
-	strId as utilsCheckStrId,
-	strName as utilsCheckStrName,
-} from '@nest-datum-utils/check';
-import { HttpOptionController } from '@nest-datum/controller';
-import { TransportService } from '@nest-datum/transport';
+import { checkToken } from '@nest-datum-common/jwt';
 import { AccessToken } from '@nest-datum-common/decorators';
+import { HttpController } from '@nest-datum-common/controllers';
+import { 
+	exists as utilsCheckExists,
+	strId as utilsCheckStrId,
+	strName as utilsCheckStrName, 
+	strDescription as utilsCheckStrDescription,
+} from '@nest-datum-utils/check';
 import { ProviderService } from './provider.service';
-import { ProviderProviderOptionService } from '../provider-provider-option/provider-provider-option.service';
-import { ProviderOptionService } from '../provider-option/provider-option.service';
 
-@Controller(`provider`)
-export class ProviderHttpController extends HttpOptionController {
+@Controller(`${process.env.SERVICE_FILES}/provider`)
+export class ProviderHttpController extends HttpController {
 	constructor(
-		protected transportService: TransportService,
-		protected entityService: ProviderService,
-		protected entityOptionService: ProviderOptionService,
-		protected entityOptionContentService: ProviderProviderOptionService,
+		protected service: ProviderService,
 	) {
 		super();
 	}
 
 	async validateCreate(options) {
 		if (!utilsCheckStrName(options['name'])) {
-			throw new ForbiddenException(`Property "name" is not valid.`);
+			throw new MethodNotAllowedException(`Property "name" is not valid.`);
 		}
 		if (!utilsCheckStrId(options['providerStatusId'])) {
-			throw new ForbiddenException(`Property "providerStatusId" is not valid.`);
+			throw new MethodNotAllowedException(`Property "providerStatusId" is not valid.`);
 		}
 		return await this.validateUpdate(options);
 	}
 
 	async validateUpdate(options) {
+		const output = {
+			description: '',
+		};
+
+		if (utilsCheckExists(options['userId'])) {
+			if (!utilsCheckStrId(options['userId'])) {
+				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
+			}
+			output['userId'] = options['userId'];
+		}
+		if (utilsCheckExists(options['providerStatusId'])) {
+			if (!utilsCheckStrId(options['providerStatusId'])) {
+				throw new MethodNotAllowedException(`Property "providerStatusId" is not valid.`);
+			}
+			output['providerStatusId'] = options['providerStatusId'];
+		}
+		if (utilsCheckExists(options['name'])) {
+			if (!utilsCheckStrName(options['name'])) {
+				throw new MethodNotAllowedException(`Property "name" is not valid.`);
+			}
+			output['name'] = options['name'];
+		}
+		if (utilsCheckExists(options['description'])) {
+			if (!utilsCheckStrDescription(options['description'])) {
+				throw new MethodNotAllowedException(`Property "description" is not valid.`);
+			}
+			output['description'] = options['description'];
+		}
 		return {
 			...await super.validateUpdate(options),
-			...(options['providerStatusId'] && utilsCheckStrId(options['providerStatusId'])) 
-				? { providerStatusId: options['providerStatusId'] } 
-				: {},
+			...output,
 		};
 	}
 
@@ -57,7 +80,7 @@ export class ProviderHttpController extends HttpOptionController {
 		@Body('description') description: string,
 		@Body('isNotDelete') isNotDelete: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.entityService.create(await this.validateCreate({
+		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
 			accessToken,
 			id,
 			userId,
@@ -80,7 +103,7 @@ export class ProviderHttpController extends HttpOptionController {
 		@Body('isNotDelete') isNotDelete: boolean,
 		@Body('isDeleted') isDeleted: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.entityService.update(await this.validateUpdate({
+		return await this.serviceHandlerWrapper(async () => await this.service.update(await this.validateUpdate({
 			accessToken,
 			id,
 			newId,

@@ -2,47 +2,74 @@ import {
 	MessagePattern,
 	EventPattern, 
 } from '@nestjs/microservices';
-import { Controller } from '@nestjs/common';
-import { WarningException } from '@nest-datum-common/exceptions';
-import { TransportService } from '@nest-datum/transport';
-import { TcpController } from '@nest-datum/controller';
+import { MethodNotAllowedException } from '@nest-datum-common/exceptions';
+import { TcpController } from '@nest-datum-common/controllers';
 import { 
+	exists as utilsCheckExists,
 	strId as utilsCheckStrId,
 	strName as utilsCheckStrName, 
+	strDescription as utilsCheckStrDescription,
 } from '@nest-datum-utils/check';
 import { SystemService } from './system.service';
 
-@Controller()
 export class SystemTcpController extends TcpController {
 	constructor(
-		protected transportService: TransportService,
-		protected entityService: SystemService,
+		protected service: SystemService,
 	) {
 		super();
 	}
 
 	async validateCreate(options) {
 		if (!utilsCheckStrName(options['name'])) {
-			throw new WarningException(`Property "name" is not valid.`);
-		}
-		if (!utilsCheckStrId(options['providerId'])) {
-			throw new WarningException(`Property "providerId" is not valid.`);
+			throw new MethodNotAllowedException(`Property "name" is not valid.`);
 		}
 		if (!utilsCheckStrId(options['systemStatusId'])) {
-			throw new WarningException(`Property "systemStatusId" is not valid.`);
+			throw new MethodNotAllowedException(`Property "systemStatusId" is not valid.`);
+		}
+		if (!utilsCheckStrId(options['providerId'])) {
+			throw new MethodNotAllowedException(`Property "providerId" is not valid.`);
 		}
 		return await this.validateUpdate(options);
 	}
 
 	async validateUpdate(options) {
+		const output = {
+			description: '',
+		};
+
+		if (utilsCheckExists(options['userId'])) {
+			if (!utilsCheckStrId(options['userId'])) {
+				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
+			}
+			output['userId'] = options['userId'];
+		}
+		if (utilsCheckExists(options['systemStatusId'])) {
+			if (!utilsCheckStrId(options['systemStatusId'])) {
+				throw new MethodNotAllowedException(`Property "systemStatusId" is not valid.`);
+			}
+			output['systemStatusId'] = options['systemStatusId'];
+		}
+		if (utilsCheckExists(options['providerId'])) {
+			if (!utilsCheckStrId(options['providerId'])) {
+				throw new MethodNotAllowedException(`Property "providerId" is not valid.`);
+			}
+			output['providerId'] = options['providerId'];
+		}
+		if (utilsCheckExists(options['name'])) {
+			if (!utilsCheckStrName(options['name'])) {
+				throw new MethodNotAllowedException(`Property "name" is not valid.`);
+			}
+			output['name'] = options['name'];
+		}
+		if (utilsCheckExists(options['description'])) {
+			if (!utilsCheckStrDescription(options['description'])) {
+				throw new MethodNotAllowedException(`Property "description" is not valid.`);
+			}
+			output['description'] = options['description'];
+		}
 		return {
 			...await super.validateUpdate(options),
-			...(options['providerId'] && utilsCheckStrId(options['providerId'])) 
-				? { providerId: options['providerId'] } 
-				: {},
-			...(options['systemStatusId'] && utilsCheckStrId(options['systemStatusId'])) 
-				? { systemStatusId: options['systemStatusId'] } 
-				: {},
+			...output,
 		};
 	}
 
@@ -72,7 +99,7 @@ export class SystemTcpController extends TcpController {
 	}
 
 	@EventPattern('system.update')
-	async update(payload) {
+	async update(payload: object = {}) {
 		return await super.update(payload);
 	}
 }

@@ -1,6 +1,6 @@
 import str from './index';
 
-const image = (value = '') => {
+const image = (value) => {
 	if (!str(value)) {
 		return false;
 	}

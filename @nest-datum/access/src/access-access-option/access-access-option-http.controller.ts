@@ -1,6 +1,4 @@
-import { OptionOptionHttpController } from '@nest-datum/option';
+import { BindHttpController } from '@nest-datum/bind';
 
-export class AccessAccessOptionHttpController extends OptionOptionHttpController {
-	protected entityId = 'accessId';
-	protected entityOptionId = 'accessOptionId';
+export class AccessAccessOptionHttpController extends BindHttpController {
 }

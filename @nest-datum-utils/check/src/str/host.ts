@@ -1,5 +1,9 @@
+import str from './index';
 
-const host = (value = '') => {
+const host = (value) => {
+	if (!str(value)) {
+		return false;
+	}
 	const splitByPort = String(value).split(':');
 
 	if (!(/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/.test(splitByPort[0]))

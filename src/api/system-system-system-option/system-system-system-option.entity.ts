@@ -3,12 +3,12 @@ import {
 	Column, 
 	ManyToOne,
 } from 'typeorm';
-import { OptionOptionOption as NestDatumOptionOptionOption } from '@nest-datum/option';
+import { ContentMany } from '@nest-datum/many';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
 import { System } from '../system/system.entity';
 
 @Entity()
-export class SystemSystemSystemOption extends NestDatumOptionOptionOption {
+export class SystemSystemSystemOption extends ContentMany {
 	@Column()
 	public systemSystemOptionId: string;
 

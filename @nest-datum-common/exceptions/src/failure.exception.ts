@@ -1,0 +1,5 @@
+import { Exception } from './exception';
+
+export class FailureException extends Exception {
+	public readonly cmd: string = 'fauilure.create';
+}

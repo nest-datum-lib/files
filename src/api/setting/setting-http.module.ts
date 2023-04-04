@@ -5,21 +5,9 @@ import {
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { 
-	ReplicaModule,
-	ReplicaService, 
-} from '@nest-datum/replica';
-import { 
-	TransportModule,
-	TransportService, 
-} from '@nest-datum/transport';
-import {
-	CacheModule, 
+	CacheModule,
 	CacheService, 
 } from '@nest-datum/cache';
-import { 
-	SqlModule,
-	SqlService, 
-} from '@nest-datum/sql';
 import { SettingService } from './setting.service';
 import { SettingHttpController } from './setting-http.controller';
 import { Setting } from './setting.entity';
@@ -28,16 +16,10 @@ import { Setting } from './setting.entity';
 	controllers: [ SettingHttpController ],
 	imports: [
 		TypeOrmModule.forFeature([ Setting ]),
-		ReplicaModule,
-		TransportModule,
 		CacheModule,
-		SqlModule,
 	],
 	providers: [
-		ReplicaService,
-		TransportService,
 		CacheService,
-		SqlService,
 		SettingService, 
 	],
 })

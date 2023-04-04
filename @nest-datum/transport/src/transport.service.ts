@@ -8,41 +8,45 @@ import {
 	ClientProxyFactory,
 	Transport, 
 } from '@nestjs/microservices';
+import { RedisService } from '@nest-datum/redis';
 import { 
-	NotFoundException,
-	WarningException,
-	ErrorException, 
-	NotificationException,
 	Exception,
+	FailureException,
+	WarningException, 
+	NotificationException,
+	NotFoundException,
+	UnauthorizedException,
 } from '@nest-datum-common/exceptions';
 import {
 	exists as utilsCheckExists,
 	obj as utilsCheckObj,
 	strId as utilsCheckStrId,
 	strHost as utilsCheckStrHost,
-	strName as utilsCheckStrName,
 	strQueue as utilsCheckStrQueue,
+	strFilled as utilsCheckStrFilled,
 	numericInt as utilsCheckNumericInt,
 } from '@nest-datum-utils/check';
-import { ReplicaService } from '@nest-datum/replica';
-import { RedisService } from '@nest-datum/redis';
-
-const SEND_NOT_FOUND_BALANCER = '[1]';
-const SEND_NOT_FOUND_DATA = '[2]';
-const SEND_NOT_FOUND_CONN = '[3]';
 
 const _savedInstance = {};
 
 @Injectable()
 export class TransportService extends RedisService {
+	private startCacheEntities: Array<any> = [];
+	
 	constructor(
-		@InjectRedis(process['REDIS_TRANSPORT']) public redisService: Redis,
-		private readonly replicaService: ReplicaService,
+		@InjectRedis('Transport') public repository: Redis,
 	) {
 		super();
 	}
 
-	connection({ id, host, port }: { id: string; host?: string; port?: string }): any {
+	setStartCacheEntities(entites: Array<any> = []): Array<any> {
+		return (this.startCacheEntities = entites);
+	};
+
+	connection(replicaData?: object): any {
+		const id = replicaData['id'];
+		const host = replicaData['host'];
+		const port = replicaData['port'];
 		let connectionInstance = _savedInstance[id];
 
 		if (!connectionInstance
@@ -51,8 +55,8 @@ export class TransportService extends RedisService {
 			connectionInstance = ClientProxyFactory.create({
 				transport: Transport.TCP,
 				options: {
-					host: host || this.replicaService.setting('app_host'),
-					port: Number(port || this.replicaService.setting('app_port')),
+					host: host || process.env.APP_HOST,
+					port: Number(port || process.env.APP_PORT),
 				},
 			});
 			_savedInstance[id] = connectionInstance;
@@ -76,13 +80,13 @@ export class TransportService extends RedisService {
 							resolve(true);
 							return;
 						}
-						else if (index >= Number(this.replicaService.setting('transport_connect_attempts') || 3)) {
+						else if (index >= Number(process.env.SETTING_TRANSPORT_CONNECT_ATTEMPTS || 3)) {
 							clearInterval(interval);
 							reject(new Error(`Service "${id}" is unavailable.`));
 							return;
 						}
 						index += 1;
-					}, Number(this.replicaService.setting('transport_connect_attempts_timeout') || 200));
+					}, Number(process.env.SETTING_TRANSPORT_CONNECT_ATTEMPTS_TIMEOUT || 200));
 				}));
 			}
 			return true;
@@ -93,11 +97,11 @@ export class TransportService extends RedisService {
 		return false;
 	}
 
-	async lessLoadedConnection(appName: string): Promise<any> {
-		const redisValue = await this.redisService.lindex(this.replicaService.prefix(`${appName}|balancer`), 0);
+	async lessLoadedConnection(appName: string): Promise<object> {
+		const redisValue = await this.repository.lindex(this.prefix(appName), 0);
 
 		if (!utilsCheckStrQueue(redisValue)) {
-			throw new NotFoundException(`Replica ${appName} is undefined.`, SEND_NOT_FOUND_BALANCER);
+			throw new NotFoundException(`Replica ${appName} is undefined.`);
 		}
 		const redisValueSplit = redisValue.split('|');
 
@@ -109,78 +113,102 @@ export class TransportService extends RedisService {
 		};
 	}
 
-	async balance(): Promise<any> {
-		const appName = this.replicaService.setting('app_name');
-		const appId = this.replicaService.setting('app_id');
-		const appHost = this.replicaService.setting('app_host');
-		const appPort = this.replicaService.setting('app_port');
+	async balance(payload?: object): Promise<string> {
+		const host = payload['app_host'] ?? process.env.APP_HOST;
+		const port = payload['app_port'] ?? process.env.APP_PORT;
+		const name = payload['app_name'] ?? process.env.APP_NAME;
+		const id = payload['app_id'] ?? process.env.APP_ID;
 
 		try {
-			await this.redisService.lrem(this.replicaService.prefix(`${appName}|balancer`), 0, `${appId}|${appHost}|${appPort}`);
+			await this.repository.lrem(this.prefix(name), 0, `${id}|${host}|${port}`);
 		}
 		catch (err) {
 		}
-		await this.redisService.rpush(this.replicaService.prefix(`${appName}|balancer`), `${appId}|${appHost}|${appPort}`);
+		await this.repository.rpush(this.prefix(name), `${id}|${host}|${port}`);
 
-		return appId;
+		return id;
 	}
 
-	async get(appId: string): Promise<any> {
+	protected async oneProcess(processedPayload: object, payload: object): Promise<any> {
 		return {
-			id: appId,
-			name: await this.redisService.get(this.replicaService.prefix(`${appId}|app_name`)),
-			host: await this.redisService.get(this.replicaService.prefix(`${appId}|app_host`)),
-			port: await this.redisService.get(this.replicaService.prefix(`${appId}|app_port`)),
+			id: processedPayload['key'],
+			name: await this.repository.get(this.prefix(`${processedPayload['key']}|app_name`)),
+			host: await this.repository.get(this.prefix(`${processedPayload['key']}|app_host`)),
+			port: await this.repository.get(this.prefix(`${processedPayload['key']}|app_port`)),
 		};
 	}
 
-	async create(): Promise<boolean> {
-		const appId = this.replicaService.setting('app_id');
-		const appHost = this.replicaService.setting('app_host')
-		const appPort = this.replicaService.setting('app_port');
+	protected async createProperties(payload: object): Promise<object> {
+		payload['app_host'] = payload['app_host'] ?? process.env.APP_HOST;
+		payload['app_port'] = payload['app_port'] ?? process.env.APP_PORT;
+		payload['app_name'] = payload['app_name'] ?? process.env.APP_NAME;
+		payload['user_id'] = payload['user_id'] ?? process.env.USER_ID;
+		payload['user_login'] = payload['user_login'] ?? process.env.USER_LOGIN;
+		payload['user_admin_role'] = payload['user_admin_role'] ?? process.env.USER_ADMIN_ROLE;
 
-		if (!utilsCheckStrHost(appHost)) {
-			throw new Error('Replica host is undefiined.');
+		if (!utilsCheckStrHost(payload['app_host'])) {
+			throw new Error('Replica "app_host" is undefiined.');
 		}
-		if (!utilsCheckNumericInt(appPort)) {
-			throw new Error('Replica port is undefiined.');
+		if (!utilsCheckNumericInt(payload['app_port'])) {
+			throw new Error('Replica "app_port" is undefiined.');
 		}
-		await this.createSettingsInRedis();
-		await this.balance();
-		await this.sendLog(new NotificationException(`Replica "${appId} - ${appHost}:${appPort}" successfully created!`));
-
-		return true;
+		if (!utilsCheckStrId(payload['user_id'])) {
+			throw new Error('Replica "user_id" is undefiined.');
+		}
+		if (!utilsCheckStrFilled(payload['user_id'])) {
+			throw new Error('Replica "user_id" is undefiined.');
+		}
+		if (!utilsCheckStrId(payload['user_admin_role'])) {
+			throw new Error('Replica "user_admin_role" is undefiined.');
+		}
+		return payload;
 	}
 
-	async createSettingsInRedis(): Promise<any> {
-		const settings = this.replicaService.settings();
-		const appId = settings['app_id'];
-		const appName = settings['app_name'];
-		
-		await this.redisService.set(this.replicaService.prefix(`${appName}|${appId}|app_id`), appId);
-		await this.redisService.set(this.replicaService.prefix(`${appId}|app_name`), appName);
-		await this.redisService.set(this.replicaService.prefix(`${appId}|app_host`), settings['app_host']);
-		await this.redisService.set(this.replicaService.prefix(`${appId}|app_port`), settings['app_port']);
-		await this.redisService.set(this.replicaService.prefix(`${appId}|user_id`), settings['user_id']);
-		await this.redisService.set(this.replicaService.prefix(`${appId}|user_login`), settings['user_login']);
-		await this.redisService.set(this.replicaService.prefix(`${appId}|user_email`), settings['user_email']);
+	protected async createProcess(processedPayload: object, payload: object): Promise<object> {
+		const host = payload['app_host'] ?? process.env.APP_HOST;
+		const port = payload['app_port'] ?? process.env.APP_PORT;
+		const name = payload['app_name'] ?? process.env.APP_NAME;
+		const id = payload['app_id'] ?? process.env.APP_ID;
+		const userId = payload['user_id'] ?? process.env.USER_ID;
+		const userLogin = payload['user_login'] ?? process.env.USER_LOGIN;
 
-		return settings;
+		await this.repository.set(this.prefix(`${name}|${id}|app_id`), id);
+		await this.repository.set(this.prefix(`${id}|app_name`), name);
+		await this.repository.set(this.prefix(`${id}|app_host`), host);
+		await this.repository.set(this.prefix(`${id}|app_port`), port);
+		await this.repository.set(this.prefix(`${id}|user_id`), userId);
+		await this.repository.set(this.prefix(`${id}|user_login`), userLogin);
+
+		await this.balance(processedPayload);
+		await this.startCache();
+		await this.sendLog(new NotificationException(`Started replica "${processedPayload['host']}:${processedPayload['port']}".`));
+
+		return processedPayload;
+	}
+
+	async startCache(): Promise<Array<any>> {
+		let i = 0;
+
+		while (i < this.startCacheEntities.length) {
+			await this.startCacheEntities[i].startCache(i, this.startCacheEntities);
+			i++;
+		}
+		return this.startCacheEntities;
 	}
 
 	async send({ name, id, cmd }: { name?: string, id?: string; cmd: string }, payload: any): Promise<any> {
 		const replicaData = utilsCheckStrId(id)
-			? await this.get(id)
+			? await this.one({ key: id })
 			: await this.lessLoadedConnection(name);
 
 		if (!replicaData) {
-			throw new NotFoundException(`Replica "${id || name}" not found.`, SEND_NOT_FOUND_DATA);
+			throw new NotFoundException(`Replica "${id || name}" not found.`);
 		}
 		const connectionInstance = this.connection(replicaData);
 
 		if (!connectionInstance
 			|| !(await this.isConnected(connectionInstance, replicaData['id']))) {
-			throw new NotFoundException(`Replica "${id || name}" not found.`, SEND_NOT_FOUND_CONN);
+			throw new NotFoundException(`Replica "${id || name}" not found.`);
 		}
 		const cmdIsPostAction = cmd.includes('.create') 
 			|| cmd.includes('.send')
@@ -212,8 +240,10 @@ export class TransportService extends RedisService {
 						throw new NotFoundException(connectionInstanceResponse['message']);
 					case 403:
 						throw new WarningException(connectionInstanceResponse['message']);
+					case 401:
+						throw new UnauthorizedException(connectionInstanceResponse['message']);
 					default:
-						throw new ErrorException(connectionInstanceResponse['message']);
+						throw new FailureException(connectionInstanceResponse['message']);
 				}
 			}
 			return connectionInstanceResponse;
@@ -230,19 +260,9 @@ export class TransportService extends RedisService {
 			await this.send({ 
 				name: process.env.SERVICE_LOGS,
 				cmd: exception.getCmd(), 
-			}, exception.options());
+			}, exception.data());
 		}
 		catch (err) {
-			if (utilsCheckObj(err)
-				&& utilsCheckStrName(err['cmd'])) {
-				if (err['errorCode'] !== 404) {
-					throw new ErrorException(err.message);
-				}
-				console.log('sendLog', err.message, exception.options());
-			}
-			else {
-				throw new err;
-			}
 		}
 	}
 }

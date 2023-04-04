@@ -1,6 +1,6 @@
 import str from './index';
 
-const exists = (value = '') => {
+const exists = (value) => {
 	return str(value) && value;
 };
 

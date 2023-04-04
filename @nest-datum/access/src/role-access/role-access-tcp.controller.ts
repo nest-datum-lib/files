@@ -2,17 +2,17 @@ import {
 	MessagePattern,
 	EventPattern, 
 } from '@nestjs/microservices';
-import { WarningException } from '@nest-datum-common/exceptions';
-import { TcpController } from '@nest-datum/controller';
+import { MethodNotAllowedException } from '@nest-datum-common/exceptions';
+import { TcpController } from '@nest-datum-common/controllers';
 import { strId as utilsCheckStrId } from '@nest-datum-utils/check';
 
 export class RoleAccessTcpController extends TcpController {
 	async validateCreate(options) {
 		if (!utilsCheckStrId(options['roleId'])) {
-			throw new WarningException(`Property "roleId" is not valid.`);
+			throw new MethodNotAllowedException(`Property "roleId" is not valid.`);
 		}
 		if (!utilsCheckStrId(options['accessId'])) {
-			throw new WarningException(`Property "accessId" is not valid.`);
+			throw new MethodNotAllowedException(`Property "accessId" is not valid.`);
 		}
 		return await this.validateUpdate(options);
 	}

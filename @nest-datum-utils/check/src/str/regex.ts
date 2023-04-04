@@ -1,4 +1,5 @@
+import strFilled from './filled';
 
-const regex = (value: any) => ((new RegExp(value)) instanceof RegExp);
+const regex = (value) => strFilled(value) && ((new RegExp(value)) instanceof RegExp);
 
 export default regex;

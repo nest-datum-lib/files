@@ -10,12 +10,12 @@ import { RoleAccess } from './role-access.entity';
 
 @Injectable()
 export class RoleAccessService extends RoleAccessServiceBase {
-	protected entityConstructor = RoleAccess;
+	protected repositoryConstructor = RoleAccess;
 
 	constructor(
-		@InjectRepository(RoleAccess) protected entityRepository: Repository<RoleAccess>,
+		@InjectRepository(RoleAccess) protected repository: Repository<RoleAccess>,
 		protected connection: Connection,
-		protected cacheService: CacheService,
+		protected repositoryCache: CacheService,
 	) {
 		super();
 	}

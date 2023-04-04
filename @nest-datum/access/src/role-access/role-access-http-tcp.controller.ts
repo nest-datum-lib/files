@@ -1,5 +1,5 @@
-import { HttpTcpController } from '@nest-datum/controller';
+import { HttpTcpController } from '@nest-datum-common/controllers';
 
 export class RoleAccessHttpTcpController extends HttpTcpController {
-	protected entityName = 'roleAccess';
+	protected readonly entityName: string = 'roleAccess';
 }

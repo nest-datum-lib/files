@@ -3,48 +3,84 @@ import {
 	Patch,
 	Body,
 	Param,
-	ForbiddenException,
+	UnauthorizedException,
+	MethodNotAllowedException,
 } from '@nestjs/common';
-import { checkToken } from '@nest-datum/jwt';
+import { checkToken } from '@nest-datum-common/jwt';
 import { AccessToken } from '@nest-datum-common/decorators';
-import { HttpController } from '@nest-datum/controller';
+import { HttpController } from '@nest-datum-common/controllers';
 import { 
+	exists as utilsCheckExists,
 	strId as utilsCheckStrId,
 	strName as utilsCheckStrName, 
+	strDescription as utilsCheckStrDescription,
+	strEnvKey as utilsCheckStrEnvKey,
 } from '@nest-datum-utils/check';
 
 export class AccessHttpController extends HttpController {
-	protected entityService;
-	protected entityRoleAccessService;
+	protected readonly service;
+	protected readonly serviceRoleAccess;
 
 	async validateCreate(options) {
 		if (!utilsCheckStrName(options['name'])) {
-			throw new ForbiddenException(`Property "name" is not valid.`);
+			throw new MethodNotAllowedException(`Property "name" is not valid.`);
 		}
 		if (!utilsCheckStrId(options['accessStatusId'])) {
-			throw new ForbiddenException(`Property "accessStatusId" is not valid.`);
+			throw new MethodNotAllowedException(`Property "accessStatusId" is not valid.`);
 		}
 		return await this.validateUpdate(options);
 	}
 
 	async validateUpdate(options) {
+		const output = {
+			description: '',
+		};
+
+		if (utilsCheckExists(options['userId'])) {
+			if (!utilsCheckStrId(options['userId'])) {
+				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
+			}
+			output['userId'] = options['userId'];
+		}
+		if (utilsCheckExists(options['accessStatusId'])) {
+			if (!utilsCheckStrId(options['accessStatusId'])) {
+				throw new MethodNotAllowedException(`Property "accessStatusId" is not valid.`);
+			}
+			output['accessStatusId'] = options['accessStatusId'];
+		}
+		if (utilsCheckExists(options['envKey'])) {
+			if (!utilsCheckStrEnvKey(options['envKey'])) {
+				throw new MethodNotAllowedException(`Property "envKey" is not valid.`);
+			}
+			output['envKey'] = options['envKey'];
+		}
+		if (utilsCheckExists(options['name'])) {
+			if (!utilsCheckStrName(options['name'])) {
+				throw new MethodNotAllowedException(`Property "name" is not valid.`);
+			}
+			output['name'] = options['name'];
+		}
+		if (utilsCheckExists(options['description'])) {
+			if (!utilsCheckStrDescription(options['description'])) {
+				throw new MethodNotAllowedException(`Property "description" is not valid.`);
+			}
+			output['description'] = options['description'];
+		}
 		return {
 			...await super.validateUpdate(options),
-			...(options['accessStatusId'] && utilsCheckStrId(options['accessStatusId'])) 
-				? { accessStatusId: options['accessStatusId'] } 
-				: {},
+			...output,
 		};
 	}
 
 	async validateRoleAccess(options) {
 		if (!checkToken(options['accessToken'], process.env.JWT_SECRET_ACCESS_KEY)) {
-			throw new this.exceptionConstructor(`User is undefined or token is not valid.`);
+			throw new UnauthorizedException(`User is undefined or token is not valid.`);
 		}
 		if (!utilsCheckStrId(options['accessId'])) {
-			throw new ForbiddenException(`Property "accessId" is not valid.`);
+			throw new MethodNotAllowedException(`Property "accessId" is not valid.`);
 		}
 		if (!utilsCheckStrId(options['roleId'])) {
-			throw new ForbiddenException(`Property "roleId" is not valid.`);
+			throw new MethodNotAllowedException(`Property "roleId" is not valid.`);
 		}
 		return {
 			accessToken: options['accessToken'],
@@ -64,7 +100,7 @@ export class AccessHttpController extends HttpController {
 		@Body('description') description: string,
 		@Body('isNotDelete') isNotDelete: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.entityService.create(await this.validateCreate({
+		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
 			accessToken,
 			id,
 			userId,
@@ -89,7 +125,7 @@ export class AccessHttpController extends HttpController {
 		@Body('isNotDelete') isNotDelete: boolean,
 		@Body('isDeleted') isDeleted: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.entityService.update(await this.validateUpdate({
+		return await this.serviceHandlerWrapper(async () => await this.service.update(await this.validateUpdate({
 			accessToken,
 			id,
 			newId,
@@ -109,7 +145,7 @@ export class AccessHttpController extends HttpController {
 		@Param('id') accessId: string,
 		@Body('roleId') roleId: string,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.entityRoleAccessService.create(await this.validateRoleAccess({
+		return await this.serviceHandlerWrapper(async () => await this.serviceRoleAccess.create(await this.validateRoleAccess({
 			accessToken,
 			accessId,
 			roleId,

@@ -8,15 +8,13 @@ import { StatusService } from '@nest-datum/status';
 import { CacheService } from '@nest-datum/cache';
 import { SystemStatus } from './system-status.entity';
 
-@Injectable()
 export class SystemStatusService extends StatusService {
-	protected entityName = 'systemStatus';
-	protected entityConstructor = SystemStatus;
+	protected readonly repositoryConstructor = SystemStatus;
 
 	constructor(
-		@InjectRepository(SystemStatus) protected entityRepository: Repository<SystemStatus>,
+		@InjectRepository(SystemStatus) protected repository: Repository<SystemStatus>,
 		protected connection: Connection,
-		protected cacheService: CacheService,
+		protected repositoryCache: CacheService,
 	) {
 		super();
 	}

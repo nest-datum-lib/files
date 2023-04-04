@@ -1,15 +1,22 @@
-import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { Module } from '@nestjs/common';
-import { redis } from '@nest-datum-common/config';
-import { ReplicaService } from '@nest-datum/replica';
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { TransportService } from './transport.service';
 
 @Module({
-	imports: [ RedisModule.forRoot(redis) ],
+	imports: [
+		RedisModule.forRoot({
+			config: {
+				namespace: 'Transport',
+				host: process.env.REDIS_TRANSPORT_HOST,
+				port: Number(process.env.REDIS_TRANSPORT_PORT),
+				password: process.env.REDIS_TRANSPORT_PASSWORD,
+				db: Number(process.env.REDIS_TRANSPORT_DB),
+			},
+		}),
+	],
 	controllers: [],
 	providers: [ 
-		ReplicaService,
-		TransportService,
+		TransportService, 
 	],
 })
 export class TransportModule {

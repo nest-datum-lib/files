@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { OptionEntityService } from '@nest-datum/option';
-import { CacheService } from '@nest-datum/cache';
+import { MainService } from '@nest-datum/main';
 
-export class AccessService extends OptionEntityService {
-	protected withEnvKey = true;
-	protected entityName = 'access';
-	protected entityOptionId = 'accessOptionId';
-	protected entityId = 'accessId';
-	protected entityConstructor;
-	protected entityOptionConstructor;
+@Injectable()
+export class AccessService extends MainService {
+	protected readonly withEnvKey: boolean = true;
+	protected readonly withTwoStepRemoval: boolean = true;
+	protected readonly mainRelationColumnName: string = 'accessId';
+	protected readonly optionRelationColumnName: string = 'accessOptionId';
 
 	protected manyGetColumns(customColumns: object = {}) {
 		return ({
@@ -17,14 +15,11 @@ export class AccessService extends OptionEntityService {
 			accessStatusId: true,
 			name: true,
 			description: true,
-			isDeleted: true,
-			isNotDelete: true,
 		});
 	}
 
 	protected manyGetQueryColumns(customColumns: object = {}) {
 		return ({
-		...super.manyGetQueryColumns(customColumns),
 			name: true,
 			description: true,
 		});

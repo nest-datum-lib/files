@@ -1,65 +1,40 @@
 import { 
 	Module,
 	NestModule,
-	MiddlewareConsumer, 
+	MiddlewareConsumer,
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { 
-	ReplicaModule,
-	ReplicaService, 
-} from '@nest-datum/replica';
-import { 
-	TransportModule,
-	TransportService, 
-} from '@nest-datum/transport';
-import {
-	CacheModule, 
+	CacheModule,
 	CacheService, 
 } from '@nest-datum/cache';
-import { 
-	SqlModule,
-	SqlService, 
-} from '@nest-datum/sql';
-import { SystemHttpController } from './system-http.controller';
 import { SystemService } from './system.service';
-import { System } from './system.entity';
-import { Provider } from '../provider/provider.entity';
-import { Folder } from '../folder/folder.entity';
-import { File } from '../file/file.entity';
+import { SystemHttpController } from './system-http.controller';
 import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
 import { SystemOption } from '../system-option/system-option.entity';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
-import { SystemSystemOptionModule } from '../system-system-option/system-system-option.module';
-import { SystemSystemOptionService } from '../system-system-option/system-system-option.service';
-import { SystemOptionModule } from '../system-option/system-option.module';
-import { SystemOptionService } from '../system-option/system-option.service';
+import { Provider } from '../provider/provider.entity';
+import { Folder } from '../folder/folder.entity';
+import { File } from '../file/file.entity';
+import { System } from './system.entity';
+
 
 @Module({
 	controllers: [ SystemHttpController ],
 	imports: [
 		TypeOrmModule.forFeature([ 
+			SystemOption,
+			SystemSystemOption,
 			Provider,
 			Folder,
 			File,
-			SystemOption,
-			SystemSystemOption,
 			System,
 			SystemSystemSystemOption, 
 		]),
-		ReplicaModule,
-		TransportModule,
 		CacheModule,
-		SqlModule,
-		SystemOptionModule,
-		SystemSystemOptionModule,
 	],
-	providers: [
-		ReplicaService,
-		TransportService,
+	providers: [ 
 		CacheService,
-		SqlService,
-		SystemSystemOptionService,
-		SystemOptionService, 
 		SystemService,
 	],
 })

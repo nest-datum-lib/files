@@ -1,13 +1,11 @@
 import { Controller } from '@nestjs/common';
 import { RoleAccessHttpController as RoleAccessHttpControllerBase } from '@nest-datum/access';
-import { TransportService } from '@nest-datum/transport';
-import { RoleAccess } from './role-access.entity';
+import { RoleAccessService } from './role-access.service';
 
-@Controller(`role/access`)
+@Controller(`${process.env.SERVICE_FILES}/role/access`)
 export class RoleAccessHttpController extends RoleAccessHttpControllerBase {
 	constructor(
-		protected transportService: TransportService,
-		protected entityService: RoleAccess,
+		protected service: RoleAccessService,
 	) {
 		super();
 	}

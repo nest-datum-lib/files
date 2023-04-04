@@ -1,29 +1,13 @@
-import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { Module } from '@nestjs/common';
-import { 
-	ReplicaModule,
-	ReplicaService, 
-} from '@nest-datum/replica';
-import { 
-	redis,
-	sql, 
-} from '@nest-datum-common/config';
-import { 
-	CacheModule,
-	CacheService, 
-} from '@nest-datum/cache';
+import { ModelService } from '@nest-datum/model';
 import { SqlService } from './sql.service';
 
 @Module({
-	imports: [ 
-		ReplicaModule,
-		CacheModule, 
-	],
+	imports: [],
 	controllers: [],
 	providers: [ 
-		ReplicaService,
-		CacheService,
-		SqlService,
+		ModelService,
+		SqlService, 
 	],
 })
 export class SqlModule {

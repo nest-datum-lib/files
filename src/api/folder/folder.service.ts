@@ -1,7 +1,3 @@
-const fs = require('fs-extra');
-const { chmod } = require('node:fs/promises');
-
-import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { 
@@ -9,30 +5,42 @@ import {
 	Connection, 
 	Like,
 } from 'typeorm';
-import { CacheService } from '@nest-datum/cache';
 import { 
-	str as utilsCheckStr,
+	objQueryRunner as utilsCheckObjQueryRunner,
+	strFileName as utilsCheckStrFileName, 
+	strFilled as utilsCheckStrFilled,
 	strId as utilsCheckStrId,
-	objQueryRunner as utilsCheckObjQueryRunner, 
 } from '@nest-datum-utils/check';
-import { StorageService } from '../storage/storage.service';
-import { File } from '../file/file.entity';
-import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
+import { 
+	FailureException,
+	NotFoundException, 
+	MethodNotAllowedException,
+} from '@nest-datum-common/exceptions';
+import { FuseService } from '@nest-datum/fuse';
+import { CacheService } from '@nest-datum/cache';
+import { FolderService as DiskFolderService } from '@nest-datum/disk';
 import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
+import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
+import { File } from '../file/file.entity';
 import { Folder } from './folder.entity';
 
 @Injectable()
-export class FolderService extends StorageService {
-	protected entityName = 'folder';
-	protected entityConstructor = Folder;
+export class FolderService extends FuseService {
+	protected queryRunner;
+	protected readonly withEnvKey: boolean = true;
+	protected readonly withTwoStepRemoval: boolean = true;
+	protected readonly enableTransactions: boolean = true;
+	protected readonly repositoryConstructor = Folder;
+	protected readonly repositoryFileConstructor = File;
 
 	constructor(
-		@InjectRepository(Folder) protected entityRepository: Repository<Folder>,
-		@InjectRepository(File) protected fileRepository: Repository<File>,
-		@InjectRepository(SystemSystemSystemOption) protected systemSystemSystemOptionRepository: Repository<SystemSystemSystemOption>,
-		@InjectRepository(ProviderProviderProviderOption) protected providerProviderProviderOptionRepository: Repository<ProviderProviderProviderOption>,
-		protected connection: Connection,
-		protected cacheService: CacheService,
+		@InjectRepository(Folder) protected readonly repository: Repository<Folder>,
+		@InjectRepository(File) protected readonly repositoryFile: Repository<File>,
+		@InjectRepository(SystemSystemSystemOption) protected readonly repositorySystemOptionContent: Repository<SystemSystemSystemOption>,
+		@InjectRepository(ProviderProviderProviderOption) protected readonly repositoryProviderOptionContent: Repository<ProviderProviderProviderOption>,
+		protected readonly connection: Connection,
+		protected readonly repositoryCache: CacheService,
+		protected readonly repositoryDiskFolder: DiskFolderService,
 	) {
 		super();
 	}
@@ -46,297 +54,195 @@ export class FolderService extends StorageService {
 			name: true,
 			description: true,
 			systemId: true,
-			isNotDelete: true,
-			isDeleted: true,
-		});
-	}
-
-	protected oneGetColumns(customColumns: object = {}) {
-		return ({
-			...this.manyGetColumns(customColumns),
 		});
 	}
 
 	protected manyGetQueryColumns(customColumns: object = {}) {
 		return ({
-			...super.manyGetQueryColumns(customColumns),
 			path: true,
 			name: true,
 			description: true,
 		});
 	}
 
-	protected async createProperties(payload: object): Promise<any> {
-		const processedPayload = await super.createProperties({
-			...payload,
-			path: !payload['path']
-				? await this.getPathBySystemId(payload['systemId'])
-				: payload['path'],
-		});
-		const parentFolder = await this.getByPath({
-			parentId: processedPayload['parentId'],
-			path: processedPayload['path'],
-		});
-
-		return {
-			...processedPayload,
-			parentId: parentFolder['id'],
-			path: (processedPayload['path'] === '/')
-				? `/${processedPayload['name']}`
-				: `${processedPayload['path']}/${processedPayload['name']}`,
-		};
+	protected async createProperties(payload: object): Promise<object> {
+		return await super.createProperties(await this.repositoryDiskFolder.createProperties(payload));
 	}
 
 	protected async createAfter(initialPayload: object, processedPayload: object, data: any): Promise<any> {
-		const destinationPath = `${process.env.PATH_ROOT}${data['path']}`;
-
-		await (new Promise(async (resolve, reject) => {
-			fs.exists(destinationPath, async (existsFlag) => {
-				if (existsFlag) {
-					return reject(new Error('Folder already exists.'));
+		if (!processedPayload['path']) {
+			if (!utilsCheckStrId(processedPayload['systemId'])) {
+				if (!utilsCheckStrId(processedPayload['parentId'])) {
+					throw new MethodNotAllowedException(`Property "parentId" is not valid.`);
 				}
-				fs.mkdir(destinationPath, { recursive: true }, async (err) => {
-					if (err) {
-						return reject(new Error(err.message));
-					}
-					try {
-						await chmod(destinationPath, 0o777);
-					}
-					catch (err) {
-						return reject(new Error(err.message));
-					}
-					return resolve(true);
+				processedPayload['parent'] = await this.repository.findOne({
+					select: {
+						id: true,
+						path: true,
+					},
+					where: {
+						id: processedPayload['parentId'],
+					},
 				});
-			});
-		}));
-		return await super.after(initialPayload, processedPayload, data);
+			}
+			else {
+				processedPayload['path'] = await this.pathBySystem(processedPayload['systemId']);
+			}
+		}
+		const path = `${processedPayload['path']}${processedPayload['name'] ? ('/'+ processedPayload['name']) : ''}`;
+
+		return await this.after(initialPayload, processedPayload, {
+			...await this.repositoryDiskFolder.create({ path }),
+			...data, 
+		});
 	}
 
 	protected async updateAfter(initialPayload: object, processedPayload: object, data: any): Promise<any> {
-		const currentFolder = await this.entityRepository.findOne({ 
+		const folder = this.repository.findOne({
 			select: {
 				id: true,
 				name: true,
 				path: true,
 			},
 			where: { 
-				id: initialPayload['id'],
+				id: processedPayload['id'],
 			},
 		});
 
-		if (utilsCheckStr(initialPayload['path'])
-			&& initialPayload['path'] !== currentFolder['path']) {
-			await this.renameByPath(currentFolder, initialPayload);
+		if (!folder) {
+			throw new NotFoundException(`Folder "${processedPayload['id']}" is undefined.`);
 		}
-		if (initialPayload['name']
-			&& (initialPayload['path'] === currentFolder['path']
-				|| typeof initialPayload['path'] !== 'string')) {
-			await this.renameByNameDb(currentFolder, initialPayload);
-
-			if (utilsCheckStr(initialPayload['path'])) {
-				await this.renameByNameStorage(currentFolder, initialPayload);
-			}
+		if (utilsCheckStrFilled(initialPayload['path']) && initialPayload['path'] !== folder['path']) {
+			await this.repositoryDiskFolder.update({ path: folder['path'], name: this.repositoryDiskFolder.nameByPath(initialPayload['path']) });
+		}
+		else if (utilsCheckStrFileName(initialPayload['name'])) {
+			await this.syncChildsPath(folder['path'], this.repositoryDiskFolder.path(folder['path'], initialPayload['name']));
+			await this.repositoryDiskFolder.update({ path: folder['path'], name: initialPayload['name'] });
 		}
 		return await this.after(initialPayload, processedPayload, data);
 	}
 
-	protected async renameByNameStorage(folder, payload: object): Promise<any> {
-		await (new Promise((resolve, reject) => {
-			const sourcePath = `${process.env.PATH_ROOT}${folder['path']}`;
-
-			fs.rename(sourcePath, this.editPathStr(sourcePath, folder['path'], payload['name'], true), async (err) => {
-				if (err) {
-					return reject(new Error(err.message));
-				}
-				return resolve(true);
-			});
-		}));
-	}
-
-	protected editPathStr(currentPath: string, folderPath: string, newPath: string, defineNewPath = false): string {
-		if (defineNewPath) {
-			const folderPathSplit = folderPath.split('/');
-
-			folderPathSplit[folderPathSplit.length - 1] = newPath;
-			newPath = folderPathSplit.join('/');
-		}
-		const currentPathSplit = currentPath.split('/');
-		const newPathSplit = newPath.split('/');
-
-		currentPathSplit[currentPathSplit.length - 1] = newPathSplit[newPathSplit.length - 1];
-
-		return currentPathSplit.join('/');
-	}
-
-	protected async renameByNameDb(folder, payload: object): Promise<any> {
-		const folderPathSplit = folder['path'].split('/');
-		const folderChildItems = await this.entityRepository.find({
+	protected async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
+		const folder = await super.dropProcess(processedPayload, payload);
+		const folderIds = (await this.repository.find({
 			select: {
 				id: true,
 				path: true,
 			},
 			where: {
 				path: Like(`${folder['path']}/%`),
+			},
+		})).map((item) => item.id);
+		const fileIds = (await this.repositoryFile.find({
+			select: {
+				id: true,
+				path: true,
+			},
+			where: {
+				path: Like(`${folder['path']}/%`),
+			},
+		})).map((item) => item.id);
+
+		(utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
+			? await this.queryRunner.manager.delete(this.repositoryFileConstructor, fileIds)
+			: await this.repositoryFile.delete(fileIds);
+		await this.dropManyProcess(folderIds, { ids: folderIds });
+	}
+
+	protected async pathBySystem(systemId: string, properties: object = {}): Promise<string> {
+		const systemOptionId = properties['systemOptionId'] ?? 'files-system-option-root';
+		const providerOptionId = properties['providerOptionId'] ?? 'files-provider-option-root-path';
+		const systemOptionContent = await this.repositorySystemOptionContent.findOne({
+			select: {
+				id: true,
+				systemId: true,
+				content: true,
+			},
+			where:{
+				systemId,
+				systemSystemOption: {
+					systemOption: {
+						id: systemOptionId,
+					},
+				},
+			},
+			relations: {
+				system: true,
 			},
 		});
-		const fileChildItems = await this.fileRepository.find({
+
+		if (!systemOptionContent || !systemOptionContent['system']) {
+			throw new FailureException('File system is undefined.');
+		}
+		const provider = await this.repositoryProviderOptionContent.findOne({
 			select: {
 				id: true,
-				path: true,
+				providerId: true,
+				content: true,
 			},
-			where: {
-				path: Like(`${folder['path']}/%`),
+			where:{
+				providerId: systemOptionContent['system']['providerId'],
+				providerProviderOption: {
+					providerOption: {
+						id: providerOptionId,
+					},
+				},
 			},
 		});
-		let i = 0;
 
-		folderPathSplit[folderPathSplit.length - 1] = payload['name'];
-				
-		const newPath = folderPathSplit.join('/');
-
-		await super.updateProcess(payload['id'], { path: newPath });
-		while (i < folderChildItems.length) {
-			(utilsCheckObjQueryRunner(this.queryRunner) 
-				&& this.enableTransactions === true)
-				? await this.queryRunner.manager.update(this.entityConstructor, folderChildItems[i]['id'], {
-					path: this.editPathStr(folderChildItems[i]['path'], folder['path'], newPath),
-				})
-				: await this.entityRepository.update({ id: folderChildItems[i]['id'] }, {
-					path: this.editPathStr(folderChildItems[i]['path'], folder['path'], newPath),
-				});
-			i++;
+		if (!provider) {
+			throw new FailureException('Provider is undefined.');
 		}
-		i = 0;
-
-		while (i < fileChildItems.length) {
-			(utilsCheckObjQueryRunner(this.queryRunner) 
-				&& this.enableTransactions === true)
-				? await this.queryRunner.manager.update(File, fileChildItems[i]['id'], {
-					path: fileChildItems[i]['path'].replace(`${folder['path']}/`, `${newPath}/`),
-				})
-				: await this.fileRepository.update({ id: fileChildItems[i]['id'] }, {
-					path: fileChildItems[i]['path'].replace(`${folder['path']}/`, `${newPath}/`),
-				});
-			i++;
-		}
+		return ((provider['content'] === '/') ? '' : (provider['content']) + systemOptionContent['content']);
 	}
 
-	protected async renameByPath(folder, payload: object): Promise<any> {
-		await this.renameByPathDb(folder, payload);
-		await this.renameByPathStorage(folder, payload);
-	}
-
-	protected async renameByPathStorage(folder, payload): Promise<any> {
-		await (new Promise((resolve, reject) => {
-			fs.exists(`${process.env.PATH_ROOT}/${payload['path']}`, async (existsFlag) => {
-				if (!existsFlag) {
-					return reject(new Error('Parent directory not found.'));
-				}
-				let folderName = payload['name'] || folder['name'];
-
-				fs.exists(`${process.env.PATH_ROOT}/${payload['path']}/${folderName}`, async (existsFlag) => {
-					if (existsFlag) {
-						folderName = `(copy ${uuidv4()}) - ${folderName}`;
-					}
-					fs.cp(`${process.env.PATH_ROOT}/${payload['path']}/${folder['name']}`, `${process.env.PATH_ROOT}/${payload['path']}/${folderName}`, { recursive: true }, async (err) => {
-						if (err) {
-							return reject(new Error(err.message));
-						}
-						fs.rm(`${process.env.PATH_ROOT}/${payload['path']}/${folder['name']}`, { recursive: true }, async (err) => {
-							if (err) {
-								return reject(new Error(err.message));
-							}
-							return resolve(true);
-						});
-					});
-				});
-			});
-		}));
-	}
-
-	protected async renameByPathDb(folder, payload: object): Promise<any> {
-		const folderChildren = await this.entityRepository.find({
+	protected async syncChildsPath(currentPath: string, newPath: string): Promise<any> {
+		const folders = await this.repository.find({
 			select: {
 				id: true,
 				path: true,
 			},
 			where: {
-				path: Like(`${folder['path']}/%`),
-			},
-		});
-		const fileChildren = await this.fileRepository.find({
-			select: {
-				id: true,
-				path: true,
-			},
-			where: {
-				path: Like(`${folder['path']}/%`),
+				path: Like(`${currentPath}/%`),
 			},
 		});
 		let i = 0;
 
-		while (i < folderChildren.length) {
-			(utilsCheckObjQueryRunner(this.queryRunner) 
-				&& this.enableTransactions === true)
-				?  await this.queryRunner.manager.update(Folder, folderChildren[i]['id'], {
-					path: folderChildren[i]['path'].replace(`${folder['path']}/`, `${payload['path']}/`),
+		while (i < folders.length) {
+			(utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
+				?  await this.queryRunner.manager.update(this.repositoryConstructor, folders[i]['id'], {
+					path: folders[i]['path'].replace(`${currentPath}/`, `${newPath}/`),
 				})
-				: await this.entityRepository.update({ id: folderChildren[i]['id'] }, {
-					path: folderChildren[i]['path'].replace(`${folder['path']}/`, `${payload['path']}/`),
+				: await this.repository.update({ id: folders[i]['id'] }, {
+					path: folders[i]['path'].replace(`${currentPath}/`, `${newPath}/`),
 				});
 			i++;
 		}
+		const files = await this.repositoryFile.find({
+			select: {
+				id: true,
+				path: true,
+			},
+			where: {
+				path: Like(`${currentPath}/%`),
+			},
+		});
+
 		i = 0;
 
-		while (i < fileChildren.length) {
-			(utilsCheckObjQueryRunner(this.queryRunner) 
-				&& this.enableTransactions === true)
-				? await this.queryRunner.manager.update(File, fileChildren[i]['id'], {
-					path: fileChildren[i]['path'].replace(`${folder['path']}/`, `${payload['path']}/`),
+		while (i < files.length) {
+			(utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
+				? await this.queryRunner.manager.update(this.repositoryFileConstructor, files[i]['id'], {
+					path: files[i]['path'].replace(`${currentPath}/`, `${newPath}/`),
 				})
-				: await this.entityRepository.update({ id: fileChildren[i]['id'] }, {
-					path: fileChildren[i]['path'].replace(`${folder['path']}/`, `${payload['path']}/`),
+				: await this.repositoryFile.update({ id: files[i]['id'] }, {
+					path: files[i]['path'].replace(`${currentPath}/`, `${newPath}/`),
 				});
 			i++;
 		}
 		return {
-			folderChildren,
-			fileChildren,
+			folders,
+			files,
 		};
-	}
-
-	protected async dropByPath(path: string): Promise<any> {
-		await (new Promise((resolve, reject) => {
-			fs.rm(`${process.env.PATH_ROOT}${path}`, { recursive: true }, async (err) => {
-				if (err) {
-					return reject(new Error(err.message));
-				}
-				return resolve(true);
-			});
-		}));
-	}
-
-	protected async dropProcess(entityOrId): Promise<any> {
-		const folder = await super.dropProcess(entityOrId);
-		const folderChildren = await this.entityRepository.find({
-			select: {
-				id: true,
-				path: true,
-			},
-			where: {
-				path: Like(`${folder['path']}/%`),
-			},
-		});
-
-		if (folderChildren.length > 0) {
-			(utilsCheckObjQueryRunner(this.queryRunner) 
-				&& this.enableTransactions === true)
-				? await this.queryRunner.manager.delete(Folder, folderChildren.map(({ id }) => id))
-				: await this.entityRepository.delete(folderChildren.map(({ id }) => id));
-		}
-		if (folder.isDeleted) {
-			await this.dropByPath(folder['path']);
-		}
-		return folder;
 	}
 }

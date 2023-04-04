@@ -1,6 +1,6 @@
 import str from './index';
 
-const ejs = (value = '') => {
+const ejs = (value) => {
 	if (!str(value)) {
 		return false;
 	}

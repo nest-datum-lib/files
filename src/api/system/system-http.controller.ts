@@ -4,52 +4,78 @@ import {
 	Patch,
 	Body,
 	Param,
-	ForbiddenException,
+	MethodNotAllowedException,
 } from '@nestjs/common';
-import { 
-	strId as utilsCheckStrId,
-	strName as utilsCheckStrName,
-} from '@nest-datum-utils/check';
-import { HttpOptionController } from '@nest-datum/controller';
-import { TransportService } from '@nest-datum/transport';
+import { checkToken } from '@nest-datum-common/jwt';
 import { AccessToken } from '@nest-datum-common/decorators';
+import { HttpController } from '@nest-datum-common/controllers';
+import { 
+	exists as utilsCheckExists,
+	strId as utilsCheckStrId,
+	strName as utilsCheckStrName, 
+	strDescription as utilsCheckStrDescription,
+} from '@nest-datum-utils/check';
 import { SystemService } from './system.service';
-import { SystemSystemOptionService } from '../system-system-option/system-system-option.service';
-import { SystemOptionService } from '../system-option/system-option.service';
 
-@Controller(`system`)
-export class SystemHttpController extends HttpOptionController {
+@Controller(`${process.env.SERVICE_FILES}/system`)
+export class SystemHttpController extends HttpController {
 	constructor(
-		protected transportService: TransportService,
-		protected entityService: SystemService,
-		protected entityOptionService: SystemOptionService,
-		protected entityOptionContentService: SystemSystemOptionService,
+		protected service: SystemService,
 	) {
 		super();
 	}
 
 	async validateCreate(options) {
 		if (!utilsCheckStrName(options['name'])) {
-			throw new ForbiddenException(`Property "name" is not valid.`);
-		}
-		if (!utilsCheckStrId(options['providerId'])) {
-			throw new ForbiddenException(`Property "providerId" is not valid.`);
+			throw new MethodNotAllowedException(`Property "name" is not valid.`);
 		}
 		if (!utilsCheckStrId(options['systemStatusId'])) {
-			throw new ForbiddenException(`Property "systemStatusId" is not valid.`);
+			throw new MethodNotAllowedException(`Property "systemStatusId" is not valid.`);
+		}
+		if (!utilsCheckStrId(options['providerId'])) {
+			throw new MethodNotAllowedException(`Property "providerId" is not valid.`);
 		}
 		return await this.validateUpdate(options);
 	}
 
 	async validateUpdate(options) {
+		const output = {
+			description: '',
+		};
+
+		if (utilsCheckExists(options['userId'])) {
+			if (!utilsCheckStrId(options['userId'])) {
+				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
+			}
+			output['userId'] = options['userId'];
+		}
+		if (utilsCheckExists(options['systemStatusId'])) {
+			if (!utilsCheckStrId(options['systemStatusId'])) {
+				throw new MethodNotAllowedException(`Property "systemStatusId" is not valid.`);
+			}
+			output['systemStatusId'] = options['systemStatusId'];
+		}
+		if (utilsCheckExists(options['providerId'])) {
+			if (!utilsCheckStrId(options['providerId'])) {
+				throw new MethodNotAllowedException(`Property "providerId" is not valid.`);
+			}
+			output['providerId'] = options['providerId'];
+		}
+		if (utilsCheckExists(options['name'])) {
+			if (!utilsCheckStrName(options['name'])) {
+				throw new MethodNotAllowedException(`Property "name" is not valid.`);
+			}
+			output['name'] = options['name'];
+		}
+		if (utilsCheckExists(options['description'])) {
+			if (!utilsCheckStrDescription(options['description'])) {
+				throw new MethodNotAllowedException(`Property "description" is not valid.`);
+			}
+			output['description'] = options['description'];
+		}
 		return {
 			...await super.validateUpdate(options),
-			...(options['providerId'] && utilsCheckStrId(options['providerId'])) 
-				? { providerId: options['providerId'] } 
-				: {},
-			...(options['systemStatusId'] && utilsCheckStrId(options['systemStatusId'])) 
-				? { systemStatusId: options['systemStatusId'] } 
-				: {},
+			...output,
 		};
 	}
 
@@ -58,18 +84,18 @@ export class SystemHttpController extends HttpOptionController {
 		@AccessToken() accessToken: string,
 		@Body('id') id: string,
 		@Body('userId') userId: string,
-		@Body('providerId') providerId: string,
 		@Body('systemStatusId') systemStatusId: string,
+		@Body('providerId') providerId: string,
 		@Body('name') name: string,
 		@Body('description') description: string,
 		@Body('isNotDelete') isNotDelete: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.entityService.create(await this.validateCreate({
+		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
 			accessToken,
 			id,
 			userId,
-			providerId,
 			systemStatusId,
+			providerId,
 			name,
 			description,
 			isNotDelete,
@@ -82,20 +108,20 @@ export class SystemHttpController extends HttpOptionController {
 		@Param('id') id: string,
 		@Body('id') newId: string,
 		@Body('userId') userId: string,
-		@Body('providerId') providerId: string,
 		@Body('systemStatusId') systemStatusId: string,
+		@Body('providerId') providerId: string,
 		@Body('name') name: string,
 		@Body('description') description: string,
 		@Body('isNotDelete') isNotDelete: boolean,
 		@Body('isDeleted') isDeleted: boolean,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.entityService.update(await this.validateUpdate({
+		return await this.serviceHandlerWrapper(async () => await this.service.update(await this.validateUpdate({
 			accessToken,
 			id,
 			newId,
 			userId,
-			providerId,
 			systemStatusId,
+			providerId,
 			name,
 			description,
 			isNotDelete,

@@ -4,24 +4,26 @@ import {
 	Repository,
 	Connection, 
 } from 'typeorm';
-import { OptionEntityService } from '@nest-datum/option';
+import { MainService } from '@nest-datum/main';
 import { CacheService } from '@nest-datum/cache';
 import { ProviderProviderOption } from '../provider-provider-option/provider-provider-option.entity';
 import { Provider } from './provider.entity';
 
 @Injectable()
-export class ProviderService extends OptionEntityService {
-	protected entityName = 'provider';
-	protected entityConstructor = Provider;
-	protected entityOptionConstructor = ProviderProviderOption;
-	protected entityOptionId = 'providerOptionId';
-	protected entityId = 'providerId';
+export class ProviderService extends MainService {
+	protected readonly withEnvKey: boolean = true;
+	protected readonly withTwoStepRemoval: boolean = true;
+	protected readonly enableTransactions: boolean = true;
+	protected readonly repositoryConstructor = Provider;
+	protected readonly repositoryBindOptionConstructor = ProviderProviderOption;
+	protected readonly mainRelationColumnName: string = 'providerId';
+	protected readonly optionRelationColumnName: string = 'providerOptionId';
 
 	constructor(
-		@InjectRepository(Provider) protected entityRepository: Repository<Provider>,
-		@InjectRepository(ProviderProviderOption) protected entityOptionRepository: Repository<ProviderProviderOption>,
-		protected connection: Connection,
-		protected cacheService: CacheService,
+		@InjectRepository(Provider) protected readonly repository: Repository<Provider>,
+		@InjectRepository(ProviderProviderOption) protected repositoryBindOption: Repository<ProviderProviderOption>,
+		protected readonly connection: Connection,
+		protected readonly repositoryCache: CacheService,
 	) {
 		super();
 	}
@@ -33,14 +35,11 @@ export class ProviderService extends OptionEntityService {
 			providerStatusId: true,
 			name: true,
 			description: true,
-			isDeleted: true,
-			isNotDelete: true,
 		});
 	}
 
 	protected manyGetQueryColumns(customColumns: object = {}) {
 		return ({
-			...super.manyGetQueryColumns(customColumns),
 			name: true,
 			description: true,
 		});

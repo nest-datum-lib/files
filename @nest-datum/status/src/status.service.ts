@@ -1,25 +1,17 @@
-import { Repository } from 'typeorm';
-import { SqlService } from '@nest-datum/sql';
+import { Injectable } from '@nestjs/common';
+import { FuseService } from '@nest-datum/fuse';
 
-export class StatusService extends SqlService {
-	protected withEnvKey = true;
-	protected entityWithTwoStepRemoval = true;
+@Injectable()
+export class StatusService extends FuseService {
+	protected readonly withTwoStepRemoval: boolean = false;
 
-	protected manyGetColumns(customColumns: object = {}) {
-		return ({
+	protected manyGetColumns(customColumns: object = {}): object {
+		return {
 			...super.manyGetColumns(customColumns),
 			userId: true,
 			name: true,
 			description: true,
-			isNotDelete: true,
-			isDeleted: true,
-		});
-	}
-
-	protected oneGetColumns(customColumns: object = {}) {
-		return ({
-			...this.manyGetColumns(customColumns),
-		});
+		};
 	}
 
 	protected manyGetQueryColumns(customColumns: object = {}) {

@@ -4,23 +4,26 @@ import {
 	Repository,
 	Connection, 
 } from 'typeorm';
-import { OptionEntityService } from '@nest-datum/option';
+import { MainService } from '@nest-datum/main';
 import { CacheService } from '@nest-datum/cache';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
 import { System } from './system.entity';
 
 @Injectable()
-export class SystemService extends OptionEntityService {
-	protected entityName = 'system';
-	protected entityConstructor = System;
-	protected entityOptionConstructor = SystemSystemOption;
-	protected entityId = 'systemId';
+export class SystemService extends MainService {
+	protected readonly withEnvKey: boolean = true;
+	protected readonly withTwoStepRemoval: boolean = true;
+	protected readonly enableTransactions: boolean = true;
+	protected readonly repositoryConstructor = System;
+	protected readonly repositoryBindOptionConstructor = SystemSystemOption;
+	protected readonly mainRelationColumnName: string = 'systemId';
+	protected readonly optionRelationColumnName: string = 'systemOptionId';
 
 	constructor(
-		@InjectRepository(System) protected entityRepository: Repository<System>,
-		@InjectRepository(SystemSystemOption) protected entityOptionRepository: Repository<SystemSystemOption>,
-		protected connection: Connection,
-		protected cacheService: CacheService,
+		@InjectRepository(System) protected readonly repository: Repository<System>,
+		@InjectRepository(SystemSystemOption) protected repositoryBindOption: Repository<SystemSystemOption>,
+		protected readonly connection: Connection,
+		protected readonly repositoryCache: CacheService,
 	) {
 		super();
 	}
@@ -33,17 +36,13 @@ export class SystemService extends OptionEntityService {
 			providerId: true,
 			name: true,
 			description: true,
-			isDeleted: true,
-			isNotDelete: true,
 		});
 	}
 
 	protected manyGetQueryColumns(customColumns: object = {}) {
 		return ({
-			...super.manyGetQueryColumns(customColumns),
 			name: true,
 			description: true,
-			providerId: true,
 		});
 	}
 }

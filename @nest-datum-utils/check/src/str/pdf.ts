@@ -1,6 +1,6 @@
 import str from './index';
 
-const pdf = (value = '') => {
+const pdf = (value) => {
 	if (!str(value)) {
 		return false;
 	}

@@ -3,23 +3,63 @@ import {
 	Patch,
 	Body,
 	Param,
+	MethodNotAllowedException,
 } from '@nestjs/common';
-import { Controller } from '@nestjs/common';
 import { AccessToken } from '@nest-datum-common/decorators';
-import { HttpTcpController } from '../../controller/src';
-import { strName as utilsCheckStrName } from '@nest-datum-utils/check';
+import { HttpTcpController } from '@nest-datum-common/controllers';
+import { 
+	exists as utilsCheckExists,
+	strId as utilsCheckStrId,
+	strName as utilsCheckStrName,
+	strDescription as utilsCheckStrDescription, 
+	strEnvKey as utilsCheckStrEnvKey,
+} from '@nest-datum-utils/check';
 
-@Controller()
 export class StatusHttpTcpController extends HttpTcpController {
-	protected transportService;
-	protected serviceName;
-	protected entityName;
+	protected readonly transport;
+	protected readonly serviceName: string;
+	protected readonly entityName: string = 'status';
 	
 	async validateCreate(options) {
 		if (!utilsCheckStrName(options['name'])) {
-			throw new this.exceptionConstructor(`Property "name" is not valid.`);
+			throw new MethodNotAllowedException(`Property "name" is not valid.`);
 		}
 		return await this.validateUpdate(options);
+	}
+
+	async validateUpdate(options) {
+		const output = {
+			description: '',
+		};
+
+		if (utilsCheckExists(options['userId'])) {
+			if (!utilsCheckStrId(options['userId'])) {
+				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
+			}
+			output['userId'] = options['userId'];
+		}
+		if (utilsCheckExists(options['envKey'])) {
+			if (!utilsCheckStrEnvKey(options['envKey'])) {
+				throw new MethodNotAllowedException(`Property "envKey" is not valid.`);
+			}
+			output['envKey'] = options['envKey'];
+		}
+		if (utilsCheckExists(options['name'])) {
+			if (!utilsCheckStrName(options['name'])) {
+				throw new MethodNotAllowedException(`Property "name" is not valid.`);
+			}
+			output['name'] = options['name'];
+		}
+		if (utilsCheckExists(options['description'])) {
+			if (!utilsCheckStrDescription(options['description'])) {
+				throw new MethodNotAllowedException(`Property "description" is not valid.`);
+			}
+			output['description'] = options['description'];
+		}
+		return {
+			...await super.validateUpdate(options),
+			...output,
+		};
 	}
 
 	@Post()
@@ -32,8 +72,7 @@ export class StatusHttpTcpController extends HttpTcpController {
 		@Body('description') description: string,
 		@Body('isNotDelete') isNotDelete: boolean,
 	) {
-		return await this.serviceHandlerWrapper(
-			async () => await this.transportService.send({
+		return await this.serviceHandlerWrapper(async () => await this.transport.send({
 			name: this.serviceName, 
 			cmd: `${this.entityName}.create`,
 		}, await this.validateCreate({
@@ -58,8 +97,7 @@ export class StatusHttpTcpController extends HttpTcpController {
 		@Body('isNotDelete') isNotDelete: boolean,
 		@Body('isDeleted') isDeleted: boolean,
 	) {
-		return await this.serviceHandlerWrapper(
-			async () => await this.transportService.send({
+		return await this.serviceHandlerWrapper(async () => await this.transport.send({
 			name: this.serviceName, 
 			cmd: `${this.entityName}.update`,
 		}, await this.validateUpdate({

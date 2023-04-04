@@ -2,12 +2,9 @@ import {
 	MessagePattern,
 	EventPattern, 
 } from '@nestjs/microservices';
-import { OptionOptionTcpController } from '@nest-datum/option';
+import { BindTcpController } from '@nest-datum/bind';
 
-export class AccessAccessOptionTcpController extends OptionOptionTcpController {
-	protected entityId = 'accessId';
-	protected entityOptionId = 'accessOptionId';
-
+export class AccessAccessOptionTcpController extends BindTcpController {
 	@MessagePattern({ cmd: 'accessOptionRelation.many' })
 	async many(payload) {
 		return await super.many(payload);

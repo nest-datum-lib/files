@@ -1,7 +1,7 @@
 import fileName from './fileName';
 import str from './index';
 
-const path = (value: any) => {
+const path = (value) => {
 	if (!str(value)) {
 		return false;
 	}

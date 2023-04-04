@@ -1,6 +1,5 @@
-import { Exception } from './exception';
+import { NotificationException } from './notification.exception';
 
-export class WarningException extends Exception {
+export class WarningException extends NotificationException {
 	public readonly cmd: string = 'warning.create';
-	public readonly errorCode: number = 403;
 }

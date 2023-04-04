@@ -1,7 +1,7 @@
-import image from './image';
+import strImage from './image';
 
-const media = (value = '') => {
-	return image(value);
+const media = (value) => {
+	return strImage(value);
 };
 
 export default media;

@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { OptionOptionService } from '@nest-datum/option';
+import { BindService } from '@nest-datum/bind';
 
-export class AccessAccessOptionService extends OptionOptionService {
-	protected entityName = 'accessAccessOption';
-	protected entityOptionId = 'accessOptionId';
-	protected entityId = 'accessId';
+export class AccessAccessOptionService extends BindService {
+	protected readonly mainRelationColumnName: string = 'accessId';
+	protected readonly optionRelationColumnName: string = 'accessOptionId';
 }

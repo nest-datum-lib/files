@@ -3,15 +3,12 @@ import {
 	EventPattern, 
 } from '@nestjs/microservices';
 import { Controller } from '@nestjs/common';
-import { TransportService } from '@nest-datum/transport';
 import { OptionTcpController } from '@nest-datum/option';
 import { ProviderOptionService } from './provider-option.service';
 
-@Controller()
 export class ProviderOptionTcpController extends OptionTcpController {
 	constructor(
-		protected transportService: TransportService,
-		protected entityService: ProviderOptionService,
+		protected service: ProviderOptionService,
 	) {
 		super();
 	}

@@ -3,18 +3,12 @@ import {
 	EventPattern, 
 } from '@nestjs/microservices';
 import { Controller } from '@nestjs/common';
-import { TransportService } from '@nest-datum/transport';
-import { OptionOptionTcpController } from '@nest-datum/option';
+import { BindTcpController } from '@nest-datum/bind';
 import { SystemSystemOptionService } from './system-system-option.service';
 
-@Controller()
-export class SystemSystemOptionTcpController extends OptionOptionTcpController {
-	protected entityId = 'systemId';
-	protected entityOptionId = 'systemOptionId';
-
+export class SystemSystemOptionTcpController extends BindTcpController {
 	constructor(
-		protected transportService: TransportService,
-		protected entityService: SystemSystemOptionService,
+		protected service: SystemSystemOptionService,
 	) {
 		super();
 	}

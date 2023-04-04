@@ -1,65 +1,55 @@
 import { Injectable } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { TaskService } from '@nest-datum/task';
+import { FailureException } from '@nest-datum-common/exceptions';
+import { 
+	callerFunc as utilsFormatCallerFunc,
+	strToObj as utilsFormatStrToObj, 
+} from '@nest-datum-utils/format';
+import { objFilled as utilsCheckObjFilled } from '@nest-datum-utils/check';
 
 @Injectable()
-export class QueueService {
-	protected tasklist = {};
-	private maxWatch = 50;
-	private times = 0;
-	private taskIndex = 0;
-	private taskLength = 0;
+export class QueueService extends TaskService {
+	protected name: string;
 
-	getTaskList() {
-		return this.tasklist;
+	protected readonly delay: number = 0;
+	protected readonly serviceLoop;
+	protected readonly repository;
+
+	public listen() {
+		this.serviceLoop.create({ name: this.name, delay: this.delay, callback: this.execution.bind(this) });
+
+		return this;
 	}
 
-	getTaskListArr() {
-		return Object.values(this.getTaskList());
+	protected async createProcess(processedPayload: object, payload: object): Promise<object> {
+		const data = await super.createProcess(processedPayload, payload);
+
+		await this.repository.rpush(this.name, JSON.stringify(data));
+
+		return data;
 	}
 
-	getTask(taskName: string) {
-		return this.tasklist[taskName];
-	}
+	public async execution(): Promise<object> {
+		try {
+			const taskDataStr = await this.repository.lindex(this.name, 0);
 
-	setTask(taskModule, taskService) {
-		const taskName = String(taskModule.name ?? taskModule.constructor.name);
+			await this.repository.lrem(this.name, 1, taskDataStr);
+			await this.executionBefore(this.data);
 
-		this.taskLength += 1;
+			const taskData = utilsFormatStrToObj(taskDataStr);
 
-		(async () => {
-			const task = await NestFactory.create(taskModule);
+			if (!utilsCheckObjFilled(taskData)) {
+				throw new FailureException(`Task signature of "${this.name}" is not valid.`);
+			}		
+			const processedPayload = await this.executionProperties(taskData);
+			const output = await this.executionProcess(processedPayload);
+
+			return await this.executionOutput(processedPayload, await this.executionAfter(processedPayload, output));
+		}
+		catch (err) {
+			this.errorAt = new Date();
 			
-			this.tasklist[taskName] = task.get(taskService);
-			this.taskIndex += 1;
-		})();
-
-		return this;
-	}
-
-	start() {
-		(async () => {
-			if (this.taskLength === this.taskIndex) {
-				const tasklistProcessed = await this.getTaskListArr();
-
-				if (tasklistProcessed.length === 0) {
-					throw new Error(`Task list is empty.`);
-				}
-				let i = 0;
-
-				while (i < tasklistProcessed.length) {
-					tasklistProcessed[i]['listen']();
-					i++;
-				}
-				return;
-			}
-			else if (this.maxWatch > this.times) {
-				await (new Promise((resolve, reject) => setTimeout(() => resolve(true), 200)));
-
-				this.times += 1;
-				this.start();
-			}
-		})();
-
-		return this;
+			await this.onError(err, this.data);
+		}
 	}
 }

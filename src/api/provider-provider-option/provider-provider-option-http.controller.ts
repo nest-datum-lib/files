@@ -1,16 +1,11 @@
 import { Controller } from '@nestjs/common';
-import { TransportService } from '@nest-datum/transport';
-import { OptionOptionHttpController } from '@nest-datum/option';
+import { BindHttpController } from '@nest-datum/bind';
 import { ProviderProviderOptionService } from './provider-provider-option.service';
 
-@Controller(`provider/option`)
-export class ProviderProviderOptionHttpController extends OptionOptionHttpController {
-	protected entityId = 'providerId';
-	protected entityOptionId = 'providerOptionId';
-
+@Controller(`${process.env.SERVICE_FILES}/provider/option`)
+export class ProviderProviderOptionHttpController extends BindHttpController {
 	constructor(
-		protected transportService: TransportService,
-		protected entityService: ProviderProviderOptionService,
+		protected service: ProviderProviderOptionService,
 	) {
 		super();
 	}

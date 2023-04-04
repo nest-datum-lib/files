@@ -1,16 +1,16 @@
-import numeric from '../numeric';
 import str from './index';
+import numeric from '../numeric';
 
-const date = (value = '') => {
+const date = (value) => {
 	if (!value) {
 		return false;
 	}
-	let processedValue;
+	let processedValue = value;
 
 	if (str(value) || numeric(value)) {
 		processedValue = new Date(value);
 	}
-	return ((processedValue || value) instanceof Date && !Number.isNaN(processedValue || value));
+	return (processedValue instanceof Date && !Number.isNaN(processedValue));
 };
 
 export default date;
