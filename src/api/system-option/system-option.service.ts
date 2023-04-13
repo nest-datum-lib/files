@@ -6,18 +6,19 @@ import {
 } from 'typeorm';
 import { OptionService } from '@nest-datum/option';
 import { CacheService } from '@nest-datum/cache';
-import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
 import { SystemOption } from './system-option.entity';
 
+@Injectable()
 export class SystemOptionService extends OptionService {
 	protected readonly mainRelationColumnName: string = 'systemId';
 	protected readonly optionRelationColumnName: string = 'systemOptionId';
+	protected readonly repositoryConstructor = SystemOption;
+	protected readonly repositoryOptionConstructor = SystemSystemOption;
 
 	constructor(
 		@InjectRepository(SystemOption) protected readonly repository: Repository<SystemOption>,
-		@InjectRepository(SystemSystemOption) protected readonly repositoryOption: Repository<SystemSystemOption>,
-		@InjectRepository(SystemSystemSystemOption) public readonly contentManyService: Repository<SystemSystemSystemOption>,
+		@InjectRepository(SystemSystemOption) public readonly repositoryOption: Repository<SystemSystemOption>,
 		protected readonly connection: Connection,
 		protected readonly repositoryCache: CacheService,
 	) {

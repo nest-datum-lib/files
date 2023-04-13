@@ -13,6 +13,7 @@ import {
 	strName as utilsCheckStrName,
 	strDescription as utilsCheckStrDescription, 
 	strEnvKey as utilsCheckStrEnvKey,
+	strFilled as utilsCheckStrFilled,
 } from '@nest-datum-utils/check';
 
 export class StatusHttpTcpController extends HttpTcpController {
@@ -28,17 +29,9 @@ export class StatusHttpTcpController extends HttpTcpController {
 	}
 
 	async validateUpdate(options) {
-		const output = {
-			description: '',
-		};
+		const output = {};
 
-		if (utilsCheckExists(options['userId'])) {
-			if (!utilsCheckStrId(options['userId'])) {
-				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
-			}
-			output['userId'] = options['userId'];
-		}
-		if (utilsCheckExists(options['envKey'])) {
+		if (utilsCheckStrFilled(options['envKey'])) {
 			if (!utilsCheckStrEnvKey(options['envKey'])) {
 				throw new MethodNotAllowedException(`Property "envKey" is not valid.`);
 			}

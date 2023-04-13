@@ -4,7 +4,11 @@ export class TcpController extends Controller {
 	protected readonly service;
 
 	async many(payload) {
-		return await this.serviceHandlerWrapper(async () => await this.service.many(await this.validateMany(payload)));
+		return await this.serviceHandlerWrapper(async () => {
+			const output = await this.service.many(await this.validateMany(payload));
+
+			return { rows: output[0], total: output[1] };
+		});
 	}
 
 	async one(payload) {

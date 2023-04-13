@@ -8,18 +8,21 @@ import {
 } from '@nestjs/common';
 import { checkToken } from '@nest-datum-common/jwt';
 import { AccessToken } from '@nest-datum-common/decorators';
-import { HttpController } from '@nest-datum-common/controllers';
+import { MainHttpController } from '@nest-datum/main';
 import { 
 	exists as utilsCheckExists,
 	strId as utilsCheckStrId,
 	strName as utilsCheckStrName, 
 	strDescription as utilsCheckStrDescription,
 	strEnvKey as utilsCheckStrEnvKey,
+	strFilled as utilsCheckStrFilled,
 } from '@nest-datum-utils/check';
 
-export class AccessHttpController extends HttpController {
-	protected readonly service;
+export class AccessHttpController extends MainHttpController {
+	protected readonly serviceOption;
 	protected readonly serviceRoleAccess;
+	protected readonly mainRelationColumnName: string = 'accessId';
+	protected readonly optionRelationColumnName: string = 'accessOptionId';
 
 	async validateCreate(options) {
 		if (!utilsCheckStrName(options['name'])) {
@@ -32,23 +35,15 @@ export class AccessHttpController extends HttpController {
 	}
 
 	async validateUpdate(options) {
-		const output = {
-			description: '',
-		};
+		const output = {};
 
-		if (utilsCheckExists(options['userId'])) {
-			if (!utilsCheckStrId(options['userId'])) {
-				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
-			}
-			output['userId'] = options['userId'];
-		}
 		if (utilsCheckExists(options['accessStatusId'])) {
 			if (!utilsCheckStrId(options['accessStatusId'])) {
 				throw new MethodNotAllowedException(`Property "accessStatusId" is not valid.`);
 			}
 			output['accessStatusId'] = options['accessStatusId'];
 		}
-		if (utilsCheckExists(options['envKey'])) {
+		if (utilsCheckStrFilled(options['envKey'])) {
 			if (!utilsCheckStrEnvKey(options['envKey'])) {
 				throw new MethodNotAllowedException(`Property "envKey" is not valid.`);
 			}

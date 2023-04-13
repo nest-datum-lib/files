@@ -22,6 +22,7 @@ import { AccessAccessOptionHttpController } from './access-access-option/access-
 import { AccessAccessOptionTcpController } from './access-access-option/access-access-option-tcp.controller';
 import { AccessAccessOptionService } from './access-access-option/access-access-option.service';
 import { AccessAccessOption } from './access-access-option/access-access-option.entity';
+import { AccessAccessAccessOptionService } from './access-access-access-option/access-access-access-option.service';
 import { AccessAccessAccessOption } from './access-access-access-option/access-access-access-option.entity';
 import { AccessStatusHttpTcpModule } from './access-status/access-status-http-tcp.module';
 import { AccessStatusHttpModule } from './access-status/access-status-http.module';
@@ -65,6 +66,7 @@ export {
 	AccessAccessOptionTcpController,
 	AccessAccessOptionService,
 	AccessAccessOption,
+	AccessAccessAccessOptionService,
 	AccessAccessAccessOption,
 	AccessStatusHttpTcpModule,
 	AccessStatusHttpModule,

@@ -6,13 +6,37 @@ export class BindService extends FuseService {
 	protected readonly mainRelationColumnName: string;
 	protected readonly optionRelationColumnName: string;
 	protected readonly repositoryCache;
+	protected readonly withEnvKey: boolean = false;
 
-	protected manyGetColumns(customColumns: object = {}) {
+	protected manyGetColumns(customColumns: object = {}): object {
+		const output = super.manyGetColumns(customColumns);
+
+		delete output['isDeleted'];
+		delete output['isNotDelete'];
+
 		return ({
-			...super.manyGetColumns(),
+			...output,
 			[this.mainRelationColumnName]: true,
 			[this.optionRelationColumnName]: true,
 		});
+	}
+
+	protected oneGetColumns(customColumns: object = {}): object {
+		const output = super.oneGetColumns(customColumns);
+
+		delete output['isDeleted'];
+		delete output['isNotDelete'];
+
+		return output;
+	}
+
+	protected manyGetQueryColumns(customColumns: object = {}): object {
+		const output = super.manyGetQueryColumns(customColumns);
+
+		delete output['isDeleted'];
+		delete output['isNotDelete'];
+
+		return output;
 	}
 
 	protected async createProperties(payload: object): Promise<any> {
@@ -31,13 +55,13 @@ export class BindService extends FuseService {
 	}
 
 	protected async createBefore(payload): Promise<any> {
-		this.repositoryCache.drop({ key: [ this.prefix(), 'many' ] });
+		this.repositoryCache.drop({ key: [ this.prefix(), 'many', '*' ] });
 
 		return await super.createBefore(payload);
 	}
 
 	protected async updateBefore(payload): Promise<any> {
-		this.repositoryCache.drop({ key: [ this.prefix(), 'many' ] });
+		this.repositoryCache.drop({ key: [ this.prefix(), 'many', '*' ] });
 
 		return await super.updateBefore(payload);
 	}

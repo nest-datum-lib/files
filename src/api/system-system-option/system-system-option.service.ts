@@ -12,7 +12,7 @@ import { SystemSystemOption } from './system-system-option.entity';
 export class SystemSystemOptionService extends BindService {
 	protected readonly mainRelationColumnName: string = 'systemId';
 	protected readonly optionRelationColumnName: string = 'systemOptionId';
-	protected repositoryConstructor = SystemSystemOption;
+	protected readonly repositoryConstructor = SystemSystemOption;
 	
 	constructor(
 		@InjectRepository(SystemSystemOption) protected repository: Repository<SystemSystemOption>,

@@ -27,7 +27,7 @@ export class MainService extends FuseService {
 			delete filter['custom'];
 
 			if (types.length > 0) {
-				filter['id'] = [ '$Not', ...types.map((item) => item[this.mainRelationColumnName]) ];
+				filter['id'] = [ '$Not', '$In', ...types.map((item) => item[this.mainRelationColumnName]) ];
 			}
 		}
 		return await super.findMany({ page, limit, query, filter, sort, relations });

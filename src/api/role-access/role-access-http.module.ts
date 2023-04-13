@@ -9,12 +9,12 @@ import {
 	CacheService, 
 } from '@nest-datum/cache';
 import { RoleAccessService } from './role-access.service';
-import { RoleAccessTcpController } from './role-access-tcp.controller';
+import { RoleAccessHttpController } from './role-access-http.controller';
 import { Access } from '../access/access.entity';
 import { RoleAccess } from './role-access.entity';
 
 @Module({
-	controllers: [ RoleAccessTcpController ],
+	controllers: [ RoleAccessHttpController ],
 	imports: [
 		TypeOrmModule.forFeature([ 
 			Access,

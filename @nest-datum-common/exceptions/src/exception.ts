@@ -1,7 +1,13 @@
+import { HttpException } from '@nestjs/common';
 
 export class Exception extends Error {
 	public readonly cmd: string = 'err.create';
 	public readonly errorCode: number = 500;
+	public readonly httpExceptionConstructor;
+
+	public getHttp() {
+		return this.httpExceptionConstructor ?? HttpException;
+	}
 
 	public getCmd(): string {
 		return this.cmd;

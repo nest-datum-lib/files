@@ -8,19 +8,26 @@ import {
 } from '@nestjs/common';
 import { checkToken } from '@nest-datum-common/jwt';
 import { AccessToken } from '@nest-datum-common/decorators';
-import { HttpController } from '@nest-datum-common/controllers';
+import { MainHttpController } from '@nest-datum/main';
 import { 
 	exists as utilsCheckExists,
 	strId as utilsCheckStrId,
 	strName as utilsCheckStrName, 
 	strDescription as utilsCheckStrDescription,
 } from '@nest-datum-utils/check';
+import { ProviderProviderOptionService } from '../provider-provider-option/provider-provider-option.service';
+import { ProviderProviderProviderOptionService } from '../provider-provider-provider-option/provider-provider-provider-option.service';
 import { ProviderService } from './provider.service';
 
 @Controller(`${process.env.SERVICE_FILES}/provider`)
-export class ProviderHttpController extends HttpController {
+export class ProviderHttpController extends MainHttpController {
+	protected readonly mainRelationColumnName: string = 'providerId';
+	protected readonly optionRelationColumnName: string = 'providerOptionId';
+
 	constructor(
 		protected service: ProviderService,
+		protected readonly serviceOptionContent: ProviderProviderProviderOptionService,
+		protected readonly serviceOptionRelation: ProviderProviderOptionService,
 	) {
 		super();
 	}
@@ -36,16 +43,8 @@ export class ProviderHttpController extends HttpController {
 	}
 
 	async validateUpdate(options) {
-		const output = {
-			description: '',
-		};
+		const output = {};
 
-		if (utilsCheckExists(options['userId'])) {
-			if (!utilsCheckStrId(options['userId'])) {
-				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
-			}
-			output['userId'] = options['userId'];
-		}
 		if (utilsCheckExists(options['providerStatusId'])) {
 			if (!utilsCheckStrId(options['providerStatusId'])) {
 				throw new MethodNotAllowedException(`Property "providerStatusId" is not valid.`);

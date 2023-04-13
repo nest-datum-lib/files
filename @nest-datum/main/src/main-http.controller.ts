@@ -22,8 +22,10 @@ import {
 } from '@nest-datum-common/jwt';
 
 export class MainHttpController extends HttpController {
-	protected readonly serviceOption;
+	protected readonly serviceOptionRelation;
 	protected readonly serviceOptionContent;
+	protected readonly mainRelationColumnName: string;
+	protected readonly optionRelationColumnName: string;
 
 	async validateOption(options) {
 		if (!checkToken(options['accessToken'], process.env.JWT_SECRET_ACCESS_KEY)) {
@@ -31,18 +33,17 @@ export class MainHttpController extends HttpController {
 		}
 		const user = getUser(options['accessToken']);
 
-		if (!utilsCheckStrId(options['entityOptionId'])) {
-			throw new MethodNotAllowedException(`Property "entityOptionId" is nt valid.`);
+		if (!utilsCheckStrId(options[this.optionRelationColumnName] ?? options['entityOptionId'])) {
+			throw new MethodNotAllowedException(`Property "${this.optionRelationColumnName}" is nt valid.`);
 		}
-		if (!utilsCheckStrId(options['entityId'])) {
-			throw new MethodNotAllowedException(`Property "entityId" is nt valid.`);
+		if (!utilsCheckStrId(options[this.mainRelationColumnName] ?? options['entityId'])) {
+			throw new MethodNotAllowedException(`Property "${this.mainRelationColumnName}" is nt valid.`);
 		}
-
 		return {
 			accessToken: options['accessToken'],
 			userId: user['id'],
-			entityId: options['entityId'],
-			entityOptionId: options['entityOptionId'],
+			[this.mainRelationColumnName]: options[this.mainRelationColumnName] ?? options['entityId'],
+			[this.optionRelationColumnName]: options[this.optionRelationColumnName] ?? options['entityOptionId'],
 		};
 	}
 
@@ -82,7 +83,7 @@ export class MainHttpController extends HttpController {
 		@Query('filter') filter: string,
 		@Query('sort') sort: string,
 	): Promise<any> {
-		return await this.serviceHandlerWrapper(async () => await this.serviceOptionContent.many(await this.validateMany({
+		return await this.serviceHandlerWrapper(async () => await this.serviceOptionRelation.many(await this.validateMany({
 			accessToken,
 			select,
 			relations,
@@ -101,7 +102,7 @@ export class MainHttpController extends HttpController {
 		@Query('relations') relations: string,
 		@Param('id') id: string,
 	): Promise<any> {
-		return await this.serviceHandlerWrapper(async () => await this.serviceOptionContent.one(await this.validateOne({
+		return await this.serviceHandlerWrapper(async () => await this.serviceOptionRelation.one(await this.validateOne({
 			accessToken,
 			select,
 			relations,
@@ -114,7 +115,7 @@ export class MainHttpController extends HttpController {
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.serviceOptionContent.drop(await this.validateDrop({
+		return await this.serviceHandlerWrapper(async () => await this.serviceOptionRelation.drop(await this.validateDrop({
 			accessToken,
 			id,
 		})));
@@ -124,15 +125,15 @@ export class MainHttpController extends HttpController {
 	async createOption(
 		@AccessToken() accessToken: string,
 		@Param('id') entityOptionId: string,
-		@Body() body,
+		@Body() data,
 	) {
-		const bodyKeys = Object.keys(body);
-		const entityId = body[bodyKeys[0]];
+		const dataKeys = Object.keys(data);
+		const entityId = data[dataKeys[0]];
 
-		return await this.serviceHandlerWrapper(async () => await this.serviceOptionContent.create(await this.validateOption({
+		return await this.serviceHandlerWrapper(async () => await this.serviceOptionRelation.create(await this.validateOption({
 			accessToken,
-			entityOptionId,
 			entityId,
+			entityOptionId,
 		})));
 	}
 
@@ -142,7 +143,7 @@ export class MainHttpController extends HttpController {
 		@Param('id') id: string,
 		@Body() data,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.serviceOption.content(await this.validateOptions({
+		return await this.serviceHandlerWrapper(async () => await this.serviceOptionContent.content(await this.validateOptions({
 			accessToken,
 			id,
 			data,

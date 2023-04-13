@@ -41,6 +41,12 @@ export class Folder {
 	@Index()
 	public description: string;
 
+	@Column({ default: 'folder' })
+	public type: string;
+
+	@Column({ default: 0 })
+	public size: number;
+
 	@Column('boolean', { default: false })
 	public isNotDelete: boolean = false;
 

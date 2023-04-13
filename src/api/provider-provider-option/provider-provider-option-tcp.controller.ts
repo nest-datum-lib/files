@@ -6,6 +6,7 @@ import { Controller } from '@nestjs/common';
 import { BindTcpController } from '@nest-datum/bind';
 import { ProviderProviderOptionService } from './provider-provider-option.service';
 
+@Controller()
 export class ProviderProviderOptionTcpController extends BindTcpController {
 	constructor(
 		protected service: ProviderProviderOptionService,

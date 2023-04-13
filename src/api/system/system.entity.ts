@@ -35,6 +35,9 @@ export class System {
 	@Column({ default: '' })
 	public systemStatusId: string;
 
+	@Column({ default: '' })
+	public envKey: string;
+
 	@Column()
 	@Index({ unique: true })
 	public name: string;

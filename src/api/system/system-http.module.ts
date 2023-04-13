@@ -10,6 +10,8 @@ import {
 } from '@nest-datum/cache';
 import { SystemService } from './system.service';
 import { SystemHttpController } from './system-http.controller';
+import { SystemSystemOptionService } from '../system-system-option/system-system-option.service';
+import { SystemSystemSystemOptionService } from '../system-system-system-option/system-system-system-option.service';
 import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
 import { SystemOption } from '../system-option/system-option.entity';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
@@ -35,6 +37,8 @@ import { System } from './system.entity';
 	],
 	providers: [ 
 		CacheService,
+		SystemSystemOptionService,
+		SystemSystemSystemOptionService,
 		SystemService,
 	],
 })

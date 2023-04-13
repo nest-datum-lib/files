@@ -26,6 +26,9 @@ export class Provider {
 	@Column({ default: '' })
 	public providerStatusId: string;
 
+	@Column({ default: '' })
+	public envKey: string;
+
 	@Column()
 	@Index({ unique: true })
 	public name: string;

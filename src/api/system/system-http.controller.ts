@@ -1,5 +1,7 @@
 import { 
 	Controller,
+	Get,
+	Query,
 	Post,
 	Patch,
 	Body,
@@ -8,21 +10,36 @@ import {
 } from '@nestjs/common';
 import { checkToken } from '@nest-datum-common/jwt';
 import { AccessToken } from '@nest-datum-common/decorators';
-import { HttpController } from '@nest-datum-common/controllers';
+import { MainHttpController } from '@nest-datum/main';
 import { 
 	exists as utilsCheckExists,
 	strId as utilsCheckStrId,
+	strIdExists as utilsCheckStrIdExists,
 	strName as utilsCheckStrName, 
 	strDescription as utilsCheckStrDescription,
 } from '@nest-datum-utils/check';
+import { SystemSystemOptionService } from '../system-system-option/system-system-option.service';
+import { SystemSystemSystemOptionService } from '../system-system-system-option/system-system-system-option.service';
 import { SystemService } from './system.service';
 
 @Controller(`${process.env.SERVICE_FILES}/system`)
-export class SystemHttpController extends HttpController {
+export class SystemHttpController extends MainHttpController {
+	protected readonly mainRelationColumnName: string = 'systemId';
+	protected readonly optionRelationColumnName: string = 'systemOptionId';
+
 	constructor(
-		protected service: SystemService,
+		protected readonly service: SystemService,
+		protected readonly serviceOptionRelation: SystemSystemOptionService,
+		protected readonly serviceOptionContent: SystemSystemSystemOptionService,
 	) {
 		super();
+	}
+
+	async validateManager(options: object = {}) {
+		if (!utilsCheckStrIdExists(options['systemId'])) {
+			throw new MethodNotAllowedException(`Property "systemId" is not valid.`);
+		}
+		return { ...await super.validateMany(options), systemId: options['systemId'] };
 	}
 
 	async validateCreate(options) {
@@ -39,16 +56,8 @@ export class SystemHttpController extends HttpController {
 	}
 
 	async validateUpdate(options) {
-		const output = {
-			description: '',
-		};
+		const output = {};
 
-		if (utilsCheckExists(options['userId'])) {
-			if (!utilsCheckStrId(options['userId'])) {
-				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
-			}
-			output['userId'] = options['userId'];
-		}
 		if (utilsCheckExists(options['systemStatusId'])) {
 			if (!utilsCheckStrId(options['systemStatusId'])) {
 				throw new MethodNotAllowedException(`Property "systemStatusId" is not valid.`);
@@ -77,6 +86,35 @@ export class SystemHttpController extends HttpController {
 			...await super.validateUpdate(options),
 			...output,
 		};
+	}
+
+	@Get(':id/manager')
+	async manager(
+		@AccessToken() accessToken: string,
+		@Param('id') systemId: string,
+		@Query('select') select: string,
+		@Query('relations') relations: string,
+		@Query('page') page: number,
+		@Query('limit') limit: number,
+		@Query('query') query: string,
+		@Query('filter') filter: string,
+		@Query('sort') sort: string,
+	): Promise<any> {
+		return await this.serviceHandlerWrapper(async () => {
+			const output = await this.service.manager(await this.validateManager({
+				accessToken,
+				systemId,
+				select,
+				relations,
+				page,
+				limit,
+				query,
+				filter,
+				sort,
+			}));
+
+			return { rows: output[0], total: output[1] };
+		});
 	}
 
 	@Post()

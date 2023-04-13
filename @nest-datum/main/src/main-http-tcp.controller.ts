@@ -26,6 +26,8 @@ export class MainHttpTcpController extends HttpTcpController {
 	protected readonly serviceName: string;
 	protected readonly entityName: string;
 	protected readonly entityManyName: string;
+	protected readonly mainRelationColumnName: string;
+	protected readonly optionRelationColumnName: string;
 
 	async validateOption(options) {
 		if (!checkToken(options['accessToken'], process.env.JWT_SECRET_ACCESS_KEY)) {
@@ -33,18 +35,17 @@ export class MainHttpTcpController extends HttpTcpController {
 		}
 		const user = getUser(options['accessToken']);
 
-		if (!utilsCheckStrId(options['entityOptionId'])) {
-			throw new MethodNotAllowedException(`Property "entityOptionId" is nt valid.`);
+		if (!utilsCheckStrId(options[this.optionRelationColumnName] ?? options['entityOptionId'])) {
+			throw new MethodNotAllowedException(`Property "${this.optionRelationColumnName}" is nt valid.`);
 		}
-		if (!utilsCheckStrId(options['entityId'])) {
-			throw new MethodNotAllowedException(`Property "entityId" is nt valid.`);
+		if (!utilsCheckStrId(options[this.mainRelationColumnName] ?? options['entityId'])) {
+			throw new MethodNotAllowedException(`Property "${this.mainRelationColumnName}" is nt valid.`);
 		}
-
 		return {
 			accessToken: options['accessToken'],
 			userId: user['id'],
-			entityId: options['entityId'],
-			entityOptionId: options['entityOptionId'],
+			[this.mainRelationColumnName]: options[this.mainRelationColumnName] ?? options['entityId'],
+			[this.optionRelationColumnName]: options[this.optionRelationColumnName] ?? options['entityOptionId'],
 		};
 	}
 

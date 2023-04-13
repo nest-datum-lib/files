@@ -6,6 +6,7 @@ import { Controller } from '@nestjs/common';
 import { BindTcpController } from '@nest-datum/bind';
 import { SystemSystemOptionService } from './system-system-option.service';
 
+@Controller()
 export class SystemSystemOptionTcpController extends BindTcpController {
 	constructor(
 		protected service: SystemSystemOptionService,

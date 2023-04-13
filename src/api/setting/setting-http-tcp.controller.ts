@@ -4,7 +4,7 @@ import { SettingHttpTcpController as SettingHttpTcpControllerBase } from '@nest-
 
 @Controller(`${process.env.SERVICE_FILES}/setting`)
 export class SettingHttpTcpController extends SettingHttpTcpControllerBase {
-	protected serviceName = process.env.SERVICE_FILES;
+	protected readonly serviceName: string = process.env.SERVICE_FILES;
 
 	constructor(
 		protected transport: TransportService,

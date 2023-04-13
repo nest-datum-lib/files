@@ -11,7 +11,6 @@ import { Setting } from './setting.entity';
 @Injectable()
 export class SettingService extends BaseSettingService {
 	protected readonly repositoryConstructor = Setting;
-	protected readonly enableTransactions: boolean = true;
 
 	constructor(
 		@InjectRepository(Setting) protected readonly repository: Repository<Setting>,

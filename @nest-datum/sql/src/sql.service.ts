@@ -1,4 +1,5 @@
-import deepmerge from 'deepmerge';
+const deepmerge = require('deepmerge');
+
 import { Injectable } from '@nestjs/common';
 import {  
 	Repository,
@@ -52,6 +53,7 @@ export class SqlService extends ModelService {
 	protected readonly connection;
 	protected readonly enableTransactions: boolean = false;
 	protected readonly withCache: boolean = false;
+	protected readonly withEnvKey: boolean = false;
 	protected readonly repositoryCache;
 	protected readonly repositoryConstructor;
 	protected readonly repository;
@@ -87,15 +89,15 @@ export class SqlService extends ModelService {
 	}
 
 	protected manyGetColumns(customColumns: object = {}): object {
-		return { id: true };
+		return { id: true, ...this.withEnvKey ? { envKey: true } : {} };
 	}
 
 	protected oneGetColumns(customColumns: object = {}): object {
-		return { id: true };
+		return { id: true, ...this.withEnvKey ? { envKey: true } : {} };
 	}
 
 	protected manyGetQueryColumns(customColumns: object = {}): object {
-		return {};
+		return { ...this.withEnvKey ? { envKey: true } : {} };
 	}
 
 	protected where(filter: object = {}, where: object = {}): object {
@@ -257,7 +259,7 @@ export class SqlService extends ModelService {
 		const output = await this.repository.findAndCount(condition);
 
 		if (this.withCache === true) {
-			await this.repositoryCache.create({ key: [ this.prefix(), 'many', payload ] }, { output });
+			await this.repositoryCache.create({ key: [ this.prefix(), 'many', processedPayload ], output });
 		}
 		return output;
 	}
@@ -266,12 +268,12 @@ export class SqlService extends ModelService {
 		if (payload['id'] && !utilsCheckStrId(payload['id'])) {
 			throw new MethodNotAllowedException(`Property "id" is not valid.`);
 		}
-		return payload;
+		return { ...payload };
 	}
 
 	protected async oneProcess(processedPayload: object, payload: object): Promise<any> {
 		if (this.withCache === true) {
-			const cachedData = await this.repositoryCache.get({ key: [ this.prefix(), 'one', processedPayload ] });
+			const cachedData = await this.repositoryCache.one({ key: [ this.prefix(), 'one', { id: processedPayload['id'] } ] });
 
 			if (cachedData) {
 				return cachedData;
@@ -280,7 +282,7 @@ export class SqlService extends ModelService {
 		const output = await this.repository.findOne(await this.findOne(processedPayload));
 
 		if (output && this.withCache === true) {
-			await this.repositoryCache.create({ key: [ this.prefix(), 'one', payload ] }, { output });
+			await this.repositoryCache.create({ key: [ this.prefix(), 'one', { id: processedPayload['id'] } ], output });
 		}
 		if (!output) {
 			return new NotFoundException('Entity is undefined.');
@@ -311,7 +313,7 @@ export class SqlService extends ModelService {
 	protected async createProperties(payload: object): Promise<object> {
 		if (this.enableTransactions === true) {
 			try {
-				return await super.createProperties(payload);
+				return await super.createProperties({ ...payload });
 			}
 			catch (err) {
 				await this.rollbackQueryRunnerManager();
@@ -322,18 +324,17 @@ export class SqlService extends ModelService {
 				await this.dropQueryRunnerManager();
 			}
 		}
-		return await super.createProperties(payload);
+		return await super.createProperties({ ...payload });
 	}
 
 	protected async createProcess(processedPayload: object, payload: object): Promise<object> {
 		try {
 			if (this.withCache === true) {
-				this.repositoryCache.drop({ key: [ this.prefix(), 'many' ] });
+				this.repositoryCache.drop({ key: [ this.prefix(), 'many', '*' ] });
 			}
-
 			return (utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
-				? await this.queryRunner.manager.save(Object.assign(new this.repositoryConstructor(), payload))
-				: await this.repository.save(payload);
+				? await this.queryRunner.manager.save(Object.assign(new this.repositoryConstructor(), processedPayload))
+				: await this.repository.save(processedPayload);
 		}
 		catch (err) {
 			await this.rollbackQueryRunnerManager();
@@ -345,12 +346,12 @@ export class SqlService extends ModelService {
 		}
 	}
 
-	protected async createAfter(initialPayload: object, processedPayload: object, data: any): Promise<any> {
+	protected async after(initialPayload: object, processedPayload: object, data: any): Promise<any> {
 		if (utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true) {
 			try {
 				await this.commitQueryRunnerManager();
 
-				return await this.after(initialPayload, processedPayload, data);
+				return await super.after(initialPayload, processedPayload, data);
 			}
 			catch (err) {
 				await this.rollbackQueryRunnerManager();
@@ -361,7 +362,7 @@ export class SqlService extends ModelService {
 				await this.dropQueryRunnerManager();
 			}
 		}
-		return await this.after(initialPayload, processedPayload, data);
+		return await super.after(initialPayload, processedPayload, data);
 	}
 
 	protected async updateBefore(payload: object): Promise<any> {
@@ -372,7 +373,7 @@ export class SqlService extends ModelService {
 		if (payload['newId'] && !utilsCheckStrId(payload['newId'])) {
 			throw new MethodNotAllowedException(`Property "newId" is not valid.`);
 		}
-		return await super.createProperties(payload);
+		return await super.updateProperties({ ...payload });
 	}
 
 	protected async updateProcess(id: string, processedPayload: object, payload: object): Promise<object> {
@@ -382,16 +383,16 @@ export class SqlService extends ModelService {
 			delete processedPayload['newId'];
 		}
 		if (this.withCache === true) {
-			this.repositoryCache.drop({ key: [ this.prefix(), 'many' ] });
-			this.repositoryCache.drop({ key: [ this.prefix(), 'one' ] });
+			this.repositoryCache.drop({ key: [ this.prefix(), 'many', '*' ] });
+			this.repositoryCache.drop({ key: [ this.prefix(), 'one', { id } ] });
 		}
 		return (utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
-			? await this.queryRunner.manager.update(this.repositoryConstructor, id, payload)
-			: await this.repository.update({ id }, payload);
+			? await this.queryRunner.manager.update(this.repositoryConstructor, id, processedPayload)
+			: await this.repository.update({ id }, processedPayload);
 	}
 
 	protected async updateAfter(initialPayload: object, processedPayload: object, data: any): Promise<any> {
-		return await this.createAfter(initialPayload, processedPayload, data);
+		return await this.after(initialPayload, processedPayload, data);
 	}
 
 	protected async dropBefore(payload: object): Promise<any> {
@@ -399,17 +400,17 @@ export class SqlService extends ModelService {
 	}
 
 	protected async dropProperties(payload): Promise<object> {
-		return await super.oneProperties(payload);
+		return await super.oneProperties({ ...payload });
 	}
 
-	protected async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
+	protected async dropProcess(processedPayload: object | string, payload: object): Promise<any> {		
 		const id = utilsCheckObj(processedPayload)
 			? String((processedPayload || {})['id'])
 			: String(processedPayload);
 
 		if (this.withCache === true) {
-			this.repositoryCache.drop({ key: [ this.prefix(), 'many' ] });
-			this.repositoryCache.drop({ key: [ this.prefix(), 'one', payload ] });
+			this.repositoryCache.drop({ key: [ this.prefix(), 'many', '*' ] });
+			this.repositoryCache.drop({ key: [ this.prefix(), 'one', { id } ] });
 		}
 		return (utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
 			? await this.queryRunner.manager.delete(this.repositoryConstructor, id)
@@ -417,7 +418,7 @@ export class SqlService extends ModelService {
 	}
 
 	protected async dropAfter(initialPayload: object, processedPayload: object, data: any): Promise<any> {
-		return await this.createAfter(initialPayload, processedPayload, data);
+		return await this.after(initialPayload, processedPayload, data);
 	}
 
 	protected async dropManyBefore(payload: object): Promise<any> {
@@ -433,8 +434,14 @@ export class SqlService extends ModelService {
 
 	protected async dropManyProcess(processedPayload: Array<string>, payload: object): Promise<any> {
 		if (this.withCache === true) {
-			this.repositoryCache.drop({ key: [ this.prefix(), 'many' ] });
-			this.repositoryCache.drop({ key: [ this.prefix(), 'one', payload ] });
+			this.repositoryCache.drop({ key: [ this.prefix(), 'many', '*' ] });
+
+			let i = 0;
+
+			while (i < processedPayload['ids'].length) {
+				this.repositoryCache.drop({ key: [ this.prefix(), 'one', { id: processedPayload['ids'][i] } ] });
+				i++;
+			}
 		}
 		return (utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
 			? await this.queryRunner.manager.delete(this.repositoryConstructor, processedPayload['ids'])
@@ -442,6 +449,6 @@ export class SqlService extends ModelService {
 	}
 
 	protected async dropManyAfter(initialPayload: object, processedPayload: object, data: any): Promise<any> {
-		return await this.createAfter(initialPayload, processedPayload, data);
+		return await this.after(initialPayload, processedPayload, data);
 	}
 }

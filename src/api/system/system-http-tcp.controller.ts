@@ -44,16 +44,8 @@ export class SystemHttpTcpController extends MainHttpTcpController {
 	}
 
 	async validateUpdate(options) {
-		const output = {
-			description: '',
-		};
+		const output = {};
 
-		if (utilsCheckExists(options['userId'])) {
-			if (!utilsCheckStrId(options['userId'])) {
-				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
-			}
-			output['userId'] = options['userId'];
-		}
 		if (utilsCheckExists(options['systemStatusId'])) {
 			if (!utilsCheckStrId(options['systemStatusId'])) {
 				throw new MethodNotAllowedException(`Property "systemStatusId" is not valid.`);

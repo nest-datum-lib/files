@@ -21,8 +21,8 @@ export class LocalService extends DiskService {
 		return pahtSplit[pahtSplit.length - 1];
 	}
 
-	public path(section: string, newName?: string): string {
-		const output = `${process.env.PATH_ROOT}/${section
+	public path(section: string, newName?: string, withoutCore: boolean = false): string {
+		const output = `${!withoutCore ? process.env.PATH_ROOT : ''}/${section
 			.replace(/[^a-zA-Zа-я 0-9-',.!?"()@$:;+=&%\\]+/, '')
 			.replace(/[^a-zA-Zа-я 0-9-',.!?"()@$:;+=&%\\]+$/, '')}`;
 
@@ -34,6 +34,16 @@ export class LocalService extends DiskService {
 			return outputSplit.join('/');
 		}
 		return output;
+	}
+
+	public async exists(path: string): Promise<boolean> {
+		try {
+			await fs.stat(path);
+			return true;
+		}
+		catch {
+		}
+		return false;
 	}
 
 	public async manyProperties(payload): Promise<object> {
@@ -103,10 +113,11 @@ export class LocalService extends DiskService {
 	}
 
 	public async oneProcess(processedPayload: object, payload: object): Promise<any> {
-		const stats = await fs.stat(processedPayload['path']);
+		const path = this.path(processedPayload['path']);
+		const stats = await fs.stat(path);
 
 		return {
-			path: `${processedPayload['path']}/${name}`,
+			path,
 			size: stats.size,
 			isDirectory: stats.isDirectory(),
 		};
@@ -115,19 +126,21 @@ export class LocalService extends DiskService {
 	public async updateProcess(id: string, processedPayload: object, payload: object): Promise<object> {
 		const destinationPath = this.path(processedPayload['path']);
 
-		if (!await fs.exists(destinationPath)) {
+		if (!await this.exists(destinationPath)) {
 			throw new MethodNotAllowedException(`Resource "${destinationPath}" is not exists.`);
 		}
 		if (processedPayload['chmod']) {
 			await fs.chmod(destinationPath, processedPayload['chmod']);
 		}
 		if (processedPayload['name']) {
-			await fs.rename(destinationPath, this.path(destinationPath, processedPayload['name']));
+			await fs.rename(destinationPath, this.path(processedPayload['path'], processedPayload['name']));
 		}
 		return processedPayload;
 	}
 
 	public async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
+		console.log('processedPayload', processedPayload);
+
 		return await fs.rm(this.path(processedPayload['path']), { recursive: true });
 	}
 

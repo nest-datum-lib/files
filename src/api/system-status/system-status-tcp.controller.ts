@@ -6,6 +6,7 @@ import { Controller } from '@nestjs/common';
 import { StatusTcpController } from '@nest-datum/status';
 import { SystemStatusService } from './system-status.service';
 
+@Controller()
 export class SystemStatusTcpController extends StatusTcpController {
 	constructor(
 		protected service: SystemStatusService,

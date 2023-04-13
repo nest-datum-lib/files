@@ -41,16 +41,8 @@ export class ProviderHttpTcpController extends MainHttpTcpController {
 	}
 
 	async validateUpdate(options) {
-		const output = {
-			description: '',
-		};
+		const output = {};
 
-		if (utilsCheckExists(options['userId'])) {
-			if (!utilsCheckStrId(options['userId'])) {
-				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
-			}
-			output['userId'] = options['userId'];
-		}
 		if (utilsCheckExists(options['providerStatusId'])) {
 			if (!utilsCheckStrId(options['providerStatusId'])) {
 				throw new MethodNotAllowedException(`Property "providerStatusId" is not valid.`);

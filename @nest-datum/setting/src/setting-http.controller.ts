@@ -15,6 +15,7 @@ import {
 	strRegex as utilsCheckStrRegex,
 	strType as utilsCheckStrType,
 	strDescription as utilsCheckStrDescription,
+	strFilled as utilsCheckStrFilled,
 } from '@nest-datum-utils/check';
 
 export class SettingHttpController extends HttpController {
@@ -28,18 +29,9 @@ export class SettingHttpController extends HttpController {
 	}
 
 	async validateUpdate(options) {
-		const output = {
-			description: '',
-			regex: '',
-		};
+		const output = {};
 
-		if (utilsCheckExists(options['userId'])) {
-			if (!utilsCheckStrId(options['userId'])) {
-				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
-			}
-			output['userId'] = options['userId'];
-		}
-		if (utilsCheckExists(options['envKey'])) {
+		if (utilsCheckStrFilled(options['envKey'])) {
 			if (!utilsCheckStrEnvKey(options['envKey'])) {
 				throw new MethodNotAllowedException(`Property "envKey" is not valid.`);
 			}
@@ -69,10 +61,12 @@ export class SettingHttpController extends HttpController {
 			}
 			output['regex'] = options['regex'];
 		}
+		if (utilsCheckExists(options['value'])) {
+			output['value'] = String(options['value'] ?? '');
+		}
 		return {
 			...await super.validateUpdate(options),
 			...output,
-			value: String(options['value'] ?? ''),
 		};
 	}
 

@@ -6,12 +6,16 @@ import {
 	UnauthorizedException,
 	MethodNotAllowedException,
 } from '@nestjs/common';
-import { checkToken } from '@nest-datum-common/jwt';
+import { 
+	checkToken,
+	getUser, 
+} from '@nest-datum-common/jwt';
 import { AccessToken } from '@nest-datum-common/decorators';
 import { MainHttpTcpController } from '@nest-datum/main';
 import { 
 	exists as utilsCheckExists,
 	strId as utilsCheckStrId,
+	strFilled as utilsCheckStrFilled,
 	strName as utilsCheckStrName, 
 	strDescription as utilsCheckStrDescription,
 	strEnvKey as utilsCheckStrEnvKey,
@@ -22,6 +26,8 @@ export class AccessHttpTcpController extends MainHttpTcpController {
 	protected readonly serviceName: string;
 	protected readonly entityName: string = 'access';
 	protected readonly entityManyName: string = 'accessOptionRelation';
+	protected readonly mainRelationColumnName: string = 'accessId';
+	protected readonly optionRelationColumnName: string = 'accessOptionId';
 
 	async validateCreate(options) {
 		if (!utilsCheckStrName(options['name'])) {
@@ -34,23 +40,15 @@ export class AccessHttpTcpController extends MainHttpTcpController {
 	}
 
 	async validateUpdate(options) {
-		const output = {
-			description: '',
-		};
+		const output = {};
 
-		if (utilsCheckExists(options['userId'])) {
-			if (!utilsCheckStrId(options['userId'])) {
-				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
-			}
-			output['userId'] = options['userId'];
-		}
 		if (utilsCheckExists(options['accessStatusId'])) {
 			if (!utilsCheckStrId(options['accessStatusId'])) {
 				throw new MethodNotAllowedException(`Property "accessStatusId" is not valid.`);
 			}
 			output['accessStatusId'] = options['accessStatusId'];
 		}
-		if (utilsCheckExists(options['envKey'])) {
+		if (utilsCheckStrFilled(options['envKey'])) {
 			if (!utilsCheckStrEnvKey(options['envKey'])) {
 				throw new MethodNotAllowedException(`Property "envKey" is not valid.`);
 			}
@@ -157,7 +155,7 @@ export class AccessHttpTcpController extends MainHttpTcpController {
 	) {
 		return await this.serviceHandlerWrapper(async () => await this.transport.send({
 			name: this.serviceName, 
-			cmd: `${this.entityManyName}.create`,
+			cmd: `roleAccess.create`,
 		}, await this.validateRoleAccess({
 			accessToken,
 			accessId,

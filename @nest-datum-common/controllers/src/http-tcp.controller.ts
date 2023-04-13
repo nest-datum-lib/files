@@ -26,19 +26,23 @@ export class HttpTcpController extends HttpController {
 		@Query('filter') filter: string,
 		@Query('sort') sort: string,
 	): Promise<any> {
-		return await this.serviceHandlerWrapper(async () => await this.transport.send({
-			name: this.serviceName, 
-			cmd: `${this.entityName}.many`,
-		}, await this.validateMany({
-			accessToken,
-			select,
-			relations,
-			page,
-			limit,
-			query,
-			filter,
-			sort,
-		})));
+		return await this.serviceHandlerWrapper(async () => {
+			const output = await this.transport.send({
+				name: this.serviceName, 
+				cmd: `${this.entityName}.many`,
+			}, await this.validateMany({
+				accessToken,
+				select,
+				relations,
+				page,
+				limit,
+				query,
+				filter,
+				sort,
+			}));
+
+			return { rows: output[0], total: output[1] };
+		});
 	}
 
 	@Get(':id')

@@ -8,6 +8,7 @@ export class ContentManyService extends ManyService {
 	protected readonly mainRelationColumnName: string;
 	protected readonly optionRelationColumnName: string;
 	protected readonly repositoryCache;
+	protected readonly connection;
 
 	public async content(payload: object): Promise<any> {
 		await this.contentBefore(payload);
@@ -27,7 +28,9 @@ export class ContentManyService extends ManyService {
 
 				while (ii < option.length) {
 					ids.add(option[ii]['id']);
-					parentIds.add(option[ii]['parentId']);
+					if (option[ii]['parentId']) {
+						parentIds.add(option[ii]['parentId']);
+					}
 					ii++;
 				}
 			}
@@ -45,7 +48,7 @@ export class ContentManyService extends ManyService {
 
 		(utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
 			? await this.queryRunner.manager.query(`DELETE FROM ${this.repository.metadata.tableName} WHERE ${condition}`)
-			: await this.repository.query(`DELETE FROM ${this.repository.metadata.tableName} WHERE ${condition}`);
+			: await this.connection.query(`DELETE FROM ${this.repository.metadata.tableName} WHERE ${condition}`);
 
 		i = 0;
 		ii = 0;

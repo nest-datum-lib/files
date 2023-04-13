@@ -21,8 +21,24 @@ export class SettingService extends FuseService {
 	protected manyGetQueryColumns(customColumns: object = {}): object {
 		return {
 			...super.manyGetQueryColumns(customColumns),
+			userId: true,
 			name: true,
 			description: true,
+			dataTypeId: true,
+			value: true,
+			regex: true,
+		};
+	}
+
+	protected oneGetColumns(customColumns: object = {}): object {
+		return {
+			...super.oneGetColumns(customColumns),
+			userId: true,
+			name: true,
+			description: true,
+			dataTypeId: true,
+			value: true,
+			regex: true,
 		};
 	}
 }

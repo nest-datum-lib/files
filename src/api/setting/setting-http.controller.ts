@@ -5,7 +5,7 @@ import { SettingService } from './setting.service';
 @Controller(`${process.env.SERVICE_FILES}/setting`)
 export class SettingHttpController extends SettingHttpControllerBase {
 	constructor(
-		protected service: SettingService,
+		protected readonly service: SettingService,
 	) {
 		super();
 	}

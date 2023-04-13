@@ -14,9 +14,8 @@ export class ManyService extends FuseService {
 	public readonly contentManyService;
 
 	protected async dropProcessForever(id): Promise<any> {
-		this.repositoryCache.drop({ key: [ this.prefix(), 'many' ] });
-		this.repositoryCache.drop({ key: [ this.prefix(), 'many' ] });
-		this.repositoryCache.drop({ key: [ this.prefix(), 'one' ] });
+		this.repositoryCache.drop({ key: [ this.prefix(), 'many', '*' ] });
+		this.repositoryCache.drop({ key: [ this.prefix(), 'one', { id } ] });
 
 		if (utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true) {
 			await this.queryRunner.manager.delete(this.repositoryOptionConstructor, { [this.optionRelationColumnName]: id });

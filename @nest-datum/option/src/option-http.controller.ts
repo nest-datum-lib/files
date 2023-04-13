@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { 
 	exists as utilsCheckExists,
+	str as utilsCheckStr,
 	strId as utilsCheckStrId,
 	strEnvKey as utilsCheckStrEnvKey,
 	strName as utilsCheckStrName,
@@ -14,6 +15,7 @@ import {
 	strRegex as utilsCheckStrRegex,
 	strType as utilsCheckStrType,
 	bool as utilsCheckBool,
+	strFilled as utilsCheckStrFilled,
 } from '@nest-datum-utils/check';
 import { AccessToken } from '@nest-datum-common/decorators';
 import { ManyHttpController } from '@nest-datum/many';
@@ -32,10 +34,7 @@ export class OptionHttpController extends ManyHttpController {
 	}
 
 	async validateUpdate(options) {
-		const output = {
-			description: '',
-			regex: '',
-		};
+		const output = {};
 
 		if (utilsCheckExists(options['userId'])) {
 			if (!utilsCheckStrId(options['userId'])) {
@@ -43,7 +42,7 @@ export class OptionHttpController extends ManyHttpController {
 			}
 			output['userId'] = options['userId'];
 		}
-		if (utilsCheckExists(options['envKey'])) {
+		if (utilsCheckStrFilled(options['envKey'])) {
 			if (!utilsCheckStrEnvKey(options['envKey'])) {
 				throw new MethodNotAllowedException(`Property "envKey" is not valid.`);
 			}
@@ -85,10 +84,15 @@ export class OptionHttpController extends ManyHttpController {
 			}
 			output['isMultiline'] = options['isMultiline'];
 		}
+		if (utilsCheckExists(options['defaultValue'])) {
+			if (!utilsCheckStr(options['defaultValue'])) {
+				throw new MethodNotAllowedException(`Property "defaultValue" is not valid.`);
+			}
+			output['defaultValue'] = options['defaultValue'];
+		}
 		return {
 			...await super.validateUpdate(options),
 			...output,
-			defaultValue: String(options['defaultValue'] ?? ''),
 		};
 	}
 

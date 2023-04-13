@@ -50,7 +50,7 @@ export class CacheService extends RedisService {
 			}
 			i++;
 		}
-		return { key: this.prefix(key) };
+		return { key };
 	}
 
 	protected async manyProperties(payload): Promise<object> {
@@ -58,10 +58,10 @@ export class CacheService extends RedisService {
 	}
 
 	protected async createProperties(payload: object): Promise<object> {
-		if (!utilsCheckStrFilled(payload['key'])) {
+		if (!utilsCheckArrFilled(payload['key'])) {
 			throw new MethodNotAllowedException(`Property "key" is not valid.`);
 		}
-		return await super.createProperties({ ...payload, key: await this.oneProperties(payload) });
+		return await super.createProperties({ ...payload, ...await this.oneProperties(payload) });
 	}
 
 	protected async updateProperties(payload: object): Promise<object> {
@@ -70,10 +70,6 @@ export class CacheService extends RedisService {
 
 	protected async dropProperties(payload): Promise<object> {
 		return await this.oneProperties(payload);
-	}
-
-	protected async manyProcess(processedPayload: object, payload: object): Promise<Array<Array<any> | number>> {
-		return await this.oneProcess(processedPayload, payload);
 	}
 
 	protected async oneOutput(payload: object, data: any): Promise<any> {

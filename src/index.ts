@@ -68,14 +68,16 @@ import {
 	SystemHttpTcpModule,
 	SystemTcpModule, 
 } from './api/system';
-// import { 
-// 	FolderHttpModule,
-// 	FolderTcpModule, 
-// } from './api/folder';
-// import { 
-// 	FileHttpModule,
-// 	FileTcpModule, 
-// } from './api/dile';
+import { 
+	FolderHttpModule,
+	FolderHttpTcpModule,
+	FolderTcpModule, 
+} from './api/folder';
+import { 
+	FileHttpModule,
+	FileHttpTcpModule,
+	FileTcpModule, 
+} from './api/file';
 
 const Http = {
 	AccessAccessOptionHttpModule,
@@ -91,8 +93,8 @@ const Http = {
 	SystemOptionHttpModule,
 	SystemStatusHttpModule,
 	SystemHttpModule,
-	// FolderHttpModule,
-	// FileHttpModule,
+	FolderHttpModule,
+	FileHttpModule,
 	SettingHttpModule,
 };
 const HttpTcp = {
@@ -109,8 +111,8 @@ const HttpTcp = {
 	SystemOptionHttpTcpModule,
 	SystemStatusHttpTcpModule,
 	SystemHttpTcpModule,
-	// FolderHttpModule,
-	// FileHttpModule,
+	FolderHttpTcpModule,
+	FileHttpTcpModule,
 	SettingHttpTcpModule,
 };
 const Tcp = {
@@ -127,8 +129,8 @@ const Tcp = {
 	SystemOptionTcpModule,
 	SystemStatusTcpModule,
 	SystemTcpModule,
-	// FolderTcpModule,
-	// FileTcpModule,
+	FolderTcpModule,
+	FileTcpModule,
 	SettingTcpModule,
 };
 
@@ -177,4 +179,10 @@ export {
 	SystemHttpModule,
 	SystemHttpTcpModule,
 	SystemTcpModule, 
+	FileHttpModule,
+	FileHttpTcpModule,
+	FileTcpModule,
+	FolderHttpModule,
+	FolderHttpTcpModule,
+	FolderTcpModule,
 };

@@ -9,7 +9,10 @@ import {
 	CacheService, 
 } from '@nest-datum/cache';
 import { AccessService } from './access.service';
-import { AccessTcpController } from './access-tcp.controller';
+import { AccessHttpController } from './access-http.controller';
+import { RoleAccessService } from '../role-access/role-access.service';
+import { AccessAccessOptionService } from '../access-access-option/access-access-option.service';
+import { AccessAccessAccessOptionService } from '../access-access-access-option/access-access-access-option.service';
 import { RoleAccess } from '../role-access/role-access.entity';
 import { AccessAccessAccessOption } from '../access-access-access-option/access-access-access-option.entity';
 import { AccessOption } from '../access-option/access-option.entity';
@@ -17,7 +20,7 @@ import { AccessAccessOption } from '../access-access-option/access-access-option
 import { Access } from './access.entity';
 
 @Module({
-	controllers: [ AccessTcpController ],
+	controllers: [ AccessHttpController ],
 	imports: [
 		TypeOrmModule.forFeature([ 
 			AccessOption,
@@ -30,6 +33,10 @@ import { Access } from './access.entity';
 	],
 	providers: [
 		CacheService,
+		RoleAccessService,
+		AccessAccessOptionService,
+		AccessAccessAccessOptionService,
+		RoleAccess,
 		AccessService, 
 	],
 })

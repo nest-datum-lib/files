@@ -1,4 +1,4 @@
-import { HttpTcpController } from '@nest-datum-common/controllers';
+import { HttpController } from '@nest-datum-common/controllers';
 
-export class ManyHttpController extends HttpTcpController {
+export class ManyHttpController extends HttpController {
 }

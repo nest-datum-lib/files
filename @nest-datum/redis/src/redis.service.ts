@@ -71,14 +71,13 @@ export class RedisService extends ModelService {
 	}
 
 	protected async oneProcess(processedPayload: object, payload: object): Promise<any> {
-		const key = this.prefix(processedPayload['key']);
 		let output;
 
 		try {
-			output = await this.repository.get(key);
+			output = await this.repository.get(processedPayload['key']);
 		}
 		catch (err) {
-			throw new NotFoundException(`Property "${key}" in not found.`);
+			throw new NotFoundException(`Property "${processedPayload['key']}" in not found.`);
 		}
 		return utilsFormatStrToObj(output) ?? output;
 	}
@@ -100,15 +99,14 @@ export class RedisService extends ModelService {
 			}
 			return output;
 		}
-		return await this.scan({ callback: async (key) => await this.oneProcess({ key }, payload), ...processedPayload });
+		return await this.scan({ callback: async (key) => key, ...processedPayload });
 	}
 
 	protected async createProcess(processedPayload: object, payload: object): Promise<object> {
 		const data = { ...processedPayload };
 
 		delete data['key'];
-
-		await this.repository.set(this.prefix(processedPayload['key']), JSON.stringify(data));
+		await this.repository.set(processedPayload['key'], JSON.stringify(data));
 
 		return processedPayload;
 	}
@@ -123,7 +121,14 @@ export class RedisService extends ModelService {
 	}
 
 	protected async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
-		await this.repository.del(this.prefix(processedPayload['key']));
+		const keys = await this.manyProcess({ match: processedPayload['key'], disableAnyPattern: true }, payload);
+		let i = 0;
+
+		while (i < keys[0]['length']) {
+			await this.repository.del(keys[0][i]);
+			i++;
+		}
+		await this.repository.del(processedPayload['key']);
 
 		return true;
 	}
@@ -144,7 +149,7 @@ export class RedisService extends ModelService {
 			count = processedPayload['count'] ?? 64,
 			callback = processedPayload['callback'] ?? (async (item, index) => item);
 
-		if (utilsCheckStrFilled(match)) {
+		if (utilsCheckStrFilled(match) && !processedPayload['disableAnyPattern']) {
 			if (match[0] !== '*') {
 				match = `*${processedPayload['match']}`;
 			}
@@ -166,8 +171,10 @@ export class RedisService extends ModelService {
 					i++;
 				}
 			})
-			.on('end', () => resolve(output))));
-			
+			.on('end', () => setTimeout(() => {
+				resolve(output);
+			}, 0))));
+
 		return [ output, output.length ];
 	}
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { 
 	objFilled as utilsCheckObjFilled,
 	objQueryRunner as utilsCheckObjQueryRunner, 
+	bool as utilsCheckBool,
 } from '@nest-datum-utils/check';
 import { loopAsync as utilsLoopAsync } from '@nest-datum-utils/loop';
 import { PrimaryService } from '@nest-datum/primary';
@@ -10,6 +11,7 @@ import { PrimaryService } from '@nest-datum/primary';
 export class FuseService extends PrimaryService {
 	protected readonly enableTransactions: boolean = false;
 	protected readonly queryRunner;
+	protected readonly connection;
 	protected readonly repository;
 	protected readonly repositoryConstructor;
 	protected readonly withCache: boolean = false;
@@ -34,17 +36,18 @@ export class FuseService extends PrimaryService {
 	}
 
 	protected async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
-		if (this.withCache === true) {
-			this.repositoryCache.drop({ key: [ this.prefix(), 'many' ] });
-			this.repositoryCache.drop({ key: [ this.prefix(), 'one', payload ] });
-		}
-		if (!this.withTwoStepRemoval) {
-			return await this.dropProcessForever(processedPayload);
-		}
 		const id = utilsCheckObjFilled(processedPayload)
 			? String((processedPayload || {})['id'])
 			: String(processedPayload);
-		const entity = utilsCheckObjFilled(processedPayload)
+
+		if (this.withCache === true) {
+			this.repositoryCache.drop({ key: [ this.prefix(), 'many', '*' ] });
+			this.repositoryCache.drop({ key: [ this.prefix(), 'one', { id } ] });
+		}
+		if (!this.withTwoStepRemoval) {
+			return await this.dropProcessForever(id);
+		}
+		const entity = (utilsCheckObjFilled(processedPayload) && utilsCheckBool(processedPayload['isDeleted']))
 			? processedPayload
 			: (await this.repository.findOne({
 				select: {
@@ -55,27 +58,27 @@ export class FuseService extends PrimaryService {
 					id,
 				},
 			}));
-
+		
 		entity.isDeleted
 			? await this.dropProcessForever(id)
 			: await this.dropProcessPrepare(id);
 
-		if (this.withCache === true) {
-			this.repositoryCache.drop({ key: [ this.prefix(), 'many' ] });
-			this.repositoryCache.drop({ key: [ this.prefix(), 'one', payload ] });
-		}
 		return entity;
 	}
 
 	protected async dropManyProcess(processedPayload: Array<string>, payload: object): Promise<any> {
-		if (this.withCache === true) {
-			this.repositoryCache.drop({ key: [ this.prefix(), 'many' ] });
-			this.repositoryCache.drop({ key: [ this.prefix(), 'one', payload ] });
-		}
 		if (!this.withTwoStepRemoval) {
+			if (this.withCache === true) {
+				this.repositoryCache.drop({ key: [ this.prefix(), 'many', '*' ] });
+				this.repositoryCache.drop({ key: [ this.prefix(), 'one', '*' ] });
+			}
 			return await this.dropManyProcessForever(processedPayload);
 		}
 		return await utilsLoopAsync(processedPayload, (async (id) => {
+			if (this.withCache === true) {
+				this.repositoryCache.drop({ key: [ this.prefix(), 'many', '*' ] });
+				this.repositoryCache.drop({ key: [ this.prefix(), 'one', { id } ] });
+			}
 			const entity = await this.repository.findOne({
 				select: {
 					id: true,
@@ -95,7 +98,7 @@ export class FuseService extends PrimaryService {
 	protected async dropProcessForever(id): Promise<any> {
 		return (utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
 			? await this.queryRunner.manager.delete(this.repositoryConstructor, id)
-			: await this.repository.delete({ id });
+			: await this.connection.query(`DELETE FROM ${this.repository.metadata.tableName} WHERE id = "${id}";`);
 	}
 
 	protected async dropProcessPrepare(id: string): Promise<any> {

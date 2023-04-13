@@ -202,7 +202,7 @@ export class Controller {
 			if (this.serviceLog) {
 				this.serviceLog.create(err);
 			}
-			throw new err;
+			throw err;
 		}
 	}
 }

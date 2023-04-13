@@ -6,21 +6,19 @@ import { LocalService } from './local.service';
 
 @Injectable()
 export class FolderService extends LocalService {
-	public async createProcess(processedPayload: object, payload: object): Promise<object> {
-		return {};
-		let destinationPath = this.path(`${processedPayload['path']}/${processedPayload['name']}`);
+	public async createProcess(processedPayload: object, payload: object): Promise<Array<any>> {
+		const destinationPath = this.path(processedPayload['path']);
 
-		if (await fs.exists(destinationPath)) {
+		if (await this.exists(destinationPath)) {
 			if (!processedPayload['force']) {
 				throw new MethodNotAllowedException(`Folder "${destinationPath}" already exists.`);
 			}
-			destinationPath = this.path(`${processedPayload['path']}/${this.uniqueName(processedPayload['name'])}`);
 		}
 		await fs.mkdir(destinationPath, { recursive: true });
 		
 		if (processedPayload['chmod']) {
 			await fs.chmod(destinationPath, processedPayload['chmod']);
 		}
-		return processedPayload;
+		return [];
 	}
 }

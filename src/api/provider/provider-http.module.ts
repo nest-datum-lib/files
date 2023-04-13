@@ -10,6 +10,8 @@ import {
 } from '@nest-datum/cache';
 import { ProviderService } from './provider.service';
 import { ProviderHttpController } from './provider-http.controller';
+import { ProviderProviderOptionService } from '../provider-provider-option/provider-provider-option.service';
+import { ProviderProviderProviderOptionService } from '../provider-provider-provider-option/provider-provider-provider-option.service';
 import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
 import { ProviderOption } from '../provider-option/provider-option.entity';
 import { ProviderProviderOption } from '../provider-provider-option/provider-provider-option.entity';
@@ -28,6 +30,8 @@ import { Provider } from './provider.entity';
 	],
 	providers: [ 
 		CacheService,
+		ProviderProviderOptionService,
+		ProviderProviderProviderOptionService,
 		ProviderService,
 	],
 })
