@@ -4,10 +4,12 @@ import {
 	Column,
 	CreateDateColumn,
 	UpdateDateColumn,
-	ManyToOne,
+	Index,
 	OneToMany,
 } from 'typeorm';
-import { ProviderStatus } from '../provider-status/provider-status.entity';
+import {
+	IsEmail,
+} from 'class-validator';
 import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
 import { ProviderProviderOption } from '../provider-provider-option/provider-provider-option.entity';
 import { System } from '../system/system.entity';
@@ -18,25 +20,28 @@ export class Provider {
 	public id: string;
 
 	@Column({ default: '' })
+	@Index()
 	public userId: string;
 
 	@Column({ default: '' })
 	public providerStatusId: string;
 
-	@ManyToOne(() => ProviderStatus, (providerStatus) => providerStatus.providers)
-	public providerStatus: ProviderStatus;
+	@Column({ default: '' })
+	public envKey: string;
 
 	@Column()
+	@Index({ unique: true })
 	public name: string;
 
 	@Column({ default: '' })
+	@Index()
 	public description: string;
 
 	@Column('boolean', { default: false })
 	public isDeleted: boolean = false;
 
 	@Column('boolean', { default: false })
-	public isNotDelete: boolean;
+	public isNotDelete: boolean = false;
 
 	@CreateDateColumn({ 
 		type: 'timestamp', 

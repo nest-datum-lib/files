@@ -4,10 +4,13 @@ import {
 	Column,
 	CreateDateColumn,
 	UpdateDateColumn,
+	Index,
 	ManyToOne,
 	OneToMany,
 } from 'typeorm';
-import { SystemStatus } from '../system-status/system-status.entity';
+import {
+	IsEmail,
+} from 'class-validator';
 import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
 import { Provider } from '../provider/provider.entity';
@@ -20,31 +23,34 @@ export class System {
 	public id: string;
 
 	@Column({ default: '' })
-	public userId: string;
-
-	@Column({ default: '' })
 	public providerId: string;
 
 	@ManyToOne(() => Provider, (provider) => provider.systems, { onDelete: 'CASCADE' })
 	public provider: Provider;
 
 	@Column({ default: '' })
+	@Index()
+	public userId: string;
+
+	@Column({ default: '' })
 	public systemStatusId: string;
 
-	@ManyToOne(() => SystemStatus, (systemStatus) => systemStatus.systems)
-	public systemStatus: SystemStatus;
+	@Column({ default: '' })
+	public envKey: string;
 
 	@Column()
+	@Index({ unique: true })
 	public name: string;
 
 	@Column({ default: '' })
+	@Index()
 	public description: string;
 
 	@Column('boolean', { default: false })
 	public isDeleted: boolean = false;
 
 	@Column('boolean', { default: false })
-	public isNotDelete: boolean;
+	public isNotDelete: boolean = false;
 
 	@CreateDateColumn({ 
 		type: 'timestamp', 

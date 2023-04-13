@@ -1,266 +1,65 @@
-import { v4 as uuidv4 } from 'uuid';
-import Redis from 'ioredis';
-import getCurrentLine from 'get-current-line';
-import { 
-	Inject,
-	Injectable, 
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { 
 	Repository,
 	Connection, 
 } from 'typeorm';
-import { SqlService } from 'nest-datum/sql/src';
-import { CacheService } from 'nest-datum/cache/src';
-import { 
-	ErrorException,
-	NotFoundException, 
-} from 'nest-datum/exceptions/src';
-import { Provider } from './provider.entity';
-import { ProviderProviderProviderOption } from '../provider-provider-provider-option/provider-provider-provider-option.entity';
+import {
+	strIdExists as utilsCheckStrIdExists,
+	objFilled as utilsCheckObjFilled,
+} from '@nest-datum-utils/check';
+import { MainService } from '@nest-datum/main';
+import { CacheService } from '@nest-datum/cache';
+import { Folder } from '../folder/folder.entity';
+import { File } from '../file/file.entity';
 import { ProviderProviderOption } from '../provider-provider-option/provider-provider-option.entity';
+import { Provider } from './provider.entity';
 
 @Injectable()
-export class ProviderService extends SqlService {
+export class ProviderService extends MainService {
+	protected readonly withEnvKey: boolean = true;
+	protected readonly withTwoStepRemoval: boolean = true;
+	protected readonly repositoryConstructor = Provider;
+	protected readonly repositoryBindOptionConstructor = ProviderProviderOption;
+	protected readonly mainRelationColumnName: string = 'providerId';
+	protected readonly optionRelationColumnName: string = 'providerOptionId';
+
 	constructor(
-		@InjectRepository(Provider) private readonly providerRepository: Repository<Provider>,
-		@InjectRepository(ProviderProviderProviderOption) private readonly providerProviderProviderOptionRepository: Repository<ProviderProviderProviderOption>,
-		@InjectRepository(ProviderProviderOption) private readonly providerProviderOptionRepository: Repository<ProviderProviderOption>,
-		private readonly connection: Connection,
-		private readonly cacheService: CacheService,
+		@InjectRepository(Provider) protected readonly repository: Repository<Provider>,
+		@InjectRepository(ProviderProviderOption) protected repositoryBindOption: Repository<ProviderProviderOption>,
+		protected readonly connection: Connection,
+		protected readonly repositoryCache: CacheService,
 	) {
 		super();
 	}
 
-	protected selectDefaultMany = {
-		id: true,
-		userId: true,
-		providerStatusId: true,
-		name: true,
-		description: true,
-		isDeleted: true,
-		isNotDelete: true,
-		createdAt: true,
-		updatedAt: true,
-	};
-
-	protected queryDefaultMany = {
-		id: true,
-		name: true,
-		description: true,
-	};
-
-	async many({ user, ...payload }): Promise<any> {
-		try {
-			const cachedData = await this.cacheService.get([ 'provider', 'many', payload ]);
-
-			if (cachedData) {
-				return cachedData;
-			}
-			const output = await this.providerRepository.findAndCount(await this.findMany(payload));
-
-			await this.cacheService.set([ 'provider', 'many', payload ], output);
-			
-			return output;
-		}
-		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-
-		return [ [], 0 ];
+	protected manyGetColumns(customColumns: object = {}) {
+		return ({
+			...super.manyGetColumns(customColumns),
+			userId: true,
+			envKey: true,
+			providerStatusId: true,
+			name: true,
+			description: true,
+		});
 	}
 
-	async one({ user, ...payload }): Promise<any> {
-		try {
-			const cachedData = await this.cacheService.get([ 'provider', 'one', payload ]);
-
-			if (cachedData) {
-				return cachedData;
-			}
-			const output = await this.providerRepository.findOne(await this.findOne(payload));
-		
-			if (output) {
-				await this.cacheService.set([ 'provider', 'one', payload ], output);
-			}
-			if (!output) {
-				return new NotFoundException('Entity is undefined', getCurrentLine(), { user, ...payload });
-			}
-			return output;
-		}
-		catch (err) {
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
+	protected oneGetColumns(customColumns: object = {}): object {
+		return ({
+			...super.oneGetColumns(customColumns),
+			userId: true,
+			envKey: true,
+			providerStatusId: true,
+			name: true,
+			description: true,
+		});
 	}
 
-	async drop({ user, ...payload }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ 'provider', 'many' ]);
-			this.cacheService.clear([ 'provider', 'one', payload ]);
-
-			await this.dropByIsDeleted(this.providerRepository, payload['id'], async (entity) => {
-				await this.providerProviderProviderOptionRepository.delete({ providerId: entity['id'] });
-				await this.providerProviderOptionRepository.delete({ providerId: entity['id'] });
-			});
-
-			await queryRunner.commitTransaction();
-
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
-	async dropMany({ user, ...payload }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ 'provider', 'many' ]);
-			this.cacheService.clear([ 'provider', 'one', payload ]);
-
-			let i = 0;
-
-			while (i < payload['ids'].length) {
-				await this.dropByIsDeleted(this.providerRepository, payload['ids'][i], async (entity) => {
-					await this.providerProviderProviderOptionRepository.delete({ providerId: entity['id'] });
-					await this.providerProviderOptionRepository.delete({ providerId: entity['id'] });
-				});
-				i++;
-			}
-			await queryRunner.commitTransaction();
-
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
-	async create({ user, ...payload }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ 'provider', 'many' ]);
-
-			const output = await this.providerRepository.save({
-				...payload,
-				userId: payload['userId'] || user['id'] || '',
-			});
-
-			await queryRunner.commitTransaction();
-
-			return output;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
-	async createOptions({ user, id, data }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner();
-
-		try {
-			await queryRunner.startTransaction();
-
-			this.cacheService.clear([ 'provider', 'option', 'many' ]);
-			this.cacheService.clear([ 'provider', 'many' ]);
-			this.cacheService.clear([ 'provider', 'one' ]);
-
-			await this.providerProviderProviderOptionRepository.delete({
-				providerId: id,
-			});
-
-			let i = 0,
-				ii = 0;
-
-			while (i < data.length) {
-				ii = 0;
-
-				const option = data[i];
-
-				while (ii < option.length) {
-					const {
-						entityOptionId,
-						entityId,
-						id: itemId,
-						...optionData
-					} = option[ii];
-
-					const output = await this.providerProviderProviderOptionRepository.save({
-						...optionData,
-						providerId: id,
-						providerProviderOptionId: entityOptionId,
-					});
-
-					ii++;
-				}
-				i++;
-			}
-			await queryRunner.commitTransaction();
-			
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, id, data });
-		}
-		finally {
-			await queryRunner.release();
-		}
-	}
-
-	async update({ user, ...payload }): Promise<any> {
-		const queryRunner = await this.connection.createQueryRunner(); 
-
-		try {
-			await queryRunner.startTransaction();
-			
-			this.cacheService.clear([ 'provider', 'many' ]);
-			this.cacheService.clear([ 'provider', 'one' ]);
-			
-			await this.updateWithId(this.providerRepository, payload);
-			
-			await queryRunner.commitTransaction();
-			
-			return true;
-		}
-		catch (err) {
-			await queryRunner.rollbackTransaction();
-			await queryRunner.release();
-
-			throw new ErrorException(err.message, getCurrentLine(), { user, ...payload });
-		}
-		finally {
-			await queryRunner.release();
-		}
+	protected manyGetQueryColumns(customColumns: object = {}) {
+		return ({
+			envKey: true,
+			name: true,
+			description: true,
+		});
 	}
 }

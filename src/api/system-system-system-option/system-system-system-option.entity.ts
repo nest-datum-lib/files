@@ -1,22 +1,14 @@
 import { 
-	Entity, 
-	Column,
-	PrimaryGeneratedColumn,
+	Entity,
+	Column, 
 	ManyToOne,
-	CreateDateColumn,
-	UpdateDateColumn,
 } from 'typeorm';
+import { ContentMany } from '@nest-datum/many';
 import { SystemSystemOption } from '../system-system-option/system-system-option.entity';
 import { System } from '../system/system.entity';
 
 @Entity()
-export class SystemSystemSystemOption {
-	@PrimaryGeneratedColumn('uuid')
-	public id: string;
-
-	@Column({ default: '' })
-	public parentId: string;
-
+export class SystemSystemSystemOption extends ContentMany {
 	@Column()
 	public systemSystemOptionId: string;
 
@@ -30,22 +22,4 @@ export class SystemSystemSystemOption {
 
 	@ManyToOne(() => System, (system) => system.systemSystemSystemOptions)
 	public system: System;
-
-	@Column('text')
-	public content: string;
-
-	@CreateDateColumn({ 
-		type: 'timestamp', 
-		precision: null,
-		default: () => 'CURRENT_TIMESTAMP', 
-	})
-	public createdAt: Date;
-
-	@UpdateDateColumn({ 
-		type: 'timestamp', 
-		precision: null,
-		default: () => 'CURRENT_TIMESTAMP',
-		onUpdate: 'CURRENT_TIMESTAMP', 
-	})
-	public updatedAt: Date;
 }
