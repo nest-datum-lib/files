@@ -73,6 +73,7 @@ export class ProviderHttpController extends MainHttpController {
 	async create(
 		@AccessToken() accessToken: string,
 		@Body('id') id: string,
+		@Body('envKey') envKey: string,
 		@Body('userId') userId: string,
 		@Body('providerStatusId') providerStatusId: string,
 		@Body('name') name: string,
@@ -82,6 +83,7 @@ export class ProviderHttpController extends MainHttpController {
 		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
 			accessToken,
 			id,
+			envKey,
 			userId,
 			providerStatusId,
 			name,
@@ -95,6 +97,7 @@ export class ProviderHttpController extends MainHttpController {
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
 		@Body('id') newId: string,
+		@Body('envKey') envKey: string,
 		@Body('userId') userId: string,
 		@Body('providerStatusId') providerStatusId: string,
 		@Body('name') name: string,
@@ -106,6 +109,7 @@ export class ProviderHttpController extends MainHttpController {
 			accessToken,
 			id,
 			newId,
+			envKey,
 			userId,
 			providerStatusId,
 			name,

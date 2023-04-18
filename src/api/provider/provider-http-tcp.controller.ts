@@ -71,6 +71,7 @@ export class ProviderHttpTcpController extends MainHttpTcpController {
 	async create(
 		@AccessToken() accessToken: string,
 		@Body('id') id: string,
+		@Body('envKey') envKey: string,
 		@Body('userId') userId: string,
 		@Body('providerStatusId') providerStatusId: string,
 		@Body('name') name: string,
@@ -84,6 +85,7 @@ export class ProviderHttpTcpController extends MainHttpTcpController {
 		}, await this.validateCreate({
 			accessToken,
 			id,
+			envKey,
 			userId,
 			providerStatusId,
 			name,
@@ -97,6 +99,7 @@ export class ProviderHttpTcpController extends MainHttpTcpController {
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
 		@Body('id') newId: string,
+		@Body('envKey') envKey: string,
 		@Body('userId') userId: string,
 		@Body('providerStatusId') providerStatusId: string,
 		@Body('name') name: string,
@@ -112,6 +115,7 @@ export class ProviderHttpTcpController extends MainHttpTcpController {
 			accessToken,
 			id,
 			newId,
+			envKey,
 			userId,
 			providerStatusId,
 			name,

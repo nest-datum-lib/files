@@ -1,22 +1,24 @@
-import { Module } from '@nestjs/common';
 import { 
-	CacheModule,
-	CacheService, 
-} from '@nest-datum/cache';
-import { SystemService } from './system.service';
+	Module,
+	NestModule,
+	MiddlewareConsumer, 
+} from '@nestjs/common';
+import { 
+	TransportModule,
+	TransportService, 
+} from '@nest-datum/transport';
 import { SystemHttpTcpController } from './system-http-tcp.controller';
 
 @Module({
-	controllers: [
-		SystemHttpTcpController, 
-	],
+	controllers: [ SystemHttpTcpController ],
 	imports: [
-		CacheModule,
+		TransportModule,
 	],
 	providers: [ 
-		CacheService,
-		SystemService,
+		TransportService,
 	],
 })
-export class SystemHttpTcpModule {
+export class SystemHttpTcpModule implements NestModule {
+	configure(consumer: MiddlewareConsumer) {
+	}
 }

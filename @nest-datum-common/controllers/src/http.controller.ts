@@ -211,7 +211,7 @@ export class HttpController extends Controller {
 				sort,
 			}));
 
-			return { rows: output[0], total: output[1] };
+			return { rows: (output['rows'] ?? output[0]), total: (output['total'] ?? output[1]) };
 		});
 	}
 

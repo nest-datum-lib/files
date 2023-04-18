@@ -7,7 +7,7 @@ export class TcpController extends Controller {
 		return await this.serviceHandlerWrapper(async () => {
 			const output = await this.service.many(await this.validateMany(payload));
 
-			return { rows: output[0], total: output[1] };
+			return { rows: (output['rows'] ?? output[0]), total: (output['total'] ?? output[1]) };
 		});
 	}
 

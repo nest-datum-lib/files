@@ -80,6 +80,7 @@ export class SystemHttpTcpController extends MainHttpTcpController {
 	async create(
 		@AccessToken() accessToken: string,
 		@Body('id') id: string,
+		@Body('envKey') envKey: string,
 		@Body('userId') userId: string,
 		@Body('systemStatusId') systemStatusId: string,
 		@Body('providerId') providerId: string,
@@ -94,6 +95,7 @@ export class SystemHttpTcpController extends MainHttpTcpController {
 		}, await this.validateCreate({
 			accessToken,
 			id,
+			envKey,
 			userId,
 			systemStatusId,
 			providerId,
@@ -108,6 +110,7 @@ export class SystemHttpTcpController extends MainHttpTcpController {
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
 		@Body('id') newId: string,
+		@Body('envKey') envKey: string,
 		@Body('userId') userId: string,
 		@Body('systemStatusId') systemStatusId: string,
 		@Body('providerId') providerId: string,
@@ -124,6 +127,7 @@ export class SystemHttpTcpController extends MainHttpTcpController {
 			accessToken,
 			id,
 			newId,
+			envKey,
 			userId,
 			systemStatusId,
 			providerId,

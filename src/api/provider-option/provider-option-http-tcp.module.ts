@@ -4,20 +4,18 @@ import {
 	MiddlewareConsumer, 
 } from '@nestjs/common';
 import { 
-	CacheModule,
-	CacheService, 
-} from '@nest-datum/cache';
-import { ProviderOptionService } from './provider-option.service';
+	TransportModule,
+	TransportService, 
+} from '@nest-datum/transport';
 import { ProviderOptionHttpTcpController } from './provider-option-http-tcp.controller';
 
 @Module({
 	controllers: [ ProviderOptionHttpTcpController ],
 	imports: [
-		CacheModule,
+		TransportModule,
 	],
 	providers: [ 
-		CacheService,
-		ProviderOptionService,
+		TransportService,
 	],
 })
 export class ProviderOptionHttpTcpModule implements NestModule {

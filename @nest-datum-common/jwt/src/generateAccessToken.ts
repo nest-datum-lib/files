@@ -6,7 +6,6 @@ const generateAccessToken = (userData = {}, iat: number = Date.now(), exp = proc
 	const id = userData['id'] || process.env.USER_ID;
 	const email = userData['email'] || process.env.USER_EMAIL;
 	const roleId = userData['roleId'] || process.env.USER_ADMIN_ROLE;
-
 	const publicString = `${utilsJWTCreateHeader()}.${utilsJWTCreatePayload({
 		exp,
 		id,

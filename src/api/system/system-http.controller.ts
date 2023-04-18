@@ -113,7 +113,7 @@ export class SystemHttpController extends MainHttpController {
 				sort,
 			}));
 
-			return { rows: output[0], total: output[1] };
+			return { rows: (output['rows'] ?? output[0]), total: (output['total'] ?? output[1]) };
 		});
 	}
 
@@ -122,6 +122,7 @@ export class SystemHttpController extends MainHttpController {
 		@AccessToken() accessToken: string,
 		@Body('id') id: string,
 		@Body('userId') userId: string,
+		@Body('envKey') envKey: string,
 		@Body('systemStatusId') systemStatusId: string,
 		@Body('providerId') providerId: string,
 		@Body('name') name: string,
@@ -131,6 +132,7 @@ export class SystemHttpController extends MainHttpController {
 		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
 			accessToken,
 			id,
+			envKey,
 			userId,
 			systemStatusId,
 			providerId,
@@ -145,6 +147,7 @@ export class SystemHttpController extends MainHttpController {
 		@AccessToken() accessToken: string,
 		@Param('id') id: string,
 		@Body('id') newId: string,
+		@Body('envKey') envKey: string,
 		@Body('userId') userId: string,
 		@Body('systemStatusId') systemStatusId: string,
 		@Body('providerId') providerId: string,
@@ -157,6 +160,7 @@ export class SystemHttpController extends MainHttpController {
 			accessToken,
 			id,
 			newId,
+			envKey,
 			userId,
 			systemStatusId,
 			providerId,

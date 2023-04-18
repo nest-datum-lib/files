@@ -10,10 +10,10 @@ import {
 import { RoleAccessHttpTcpController } from './role-access-http-tcp.controller';
 
 @Module({
-	imports: [ 
-		TransportModule, 
-	],
 	controllers: [ RoleAccessHttpTcpController ],
+	imports: [
+		TransportModule,
+	],
 	providers: [ 
 		TransportService, 
 	],

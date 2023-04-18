@@ -66,7 +66,7 @@ export class OptionHttpController extends ManyHttpController {
 			}
 			output['dataTypeId'] = options['dataTypeId'];
 		}
-		if (utilsCheckExists(options['regex'])) {
+		if (utilsCheckStrFilled(options['regex'])) {
 			if (!utilsCheckStrRegex(options['regex'])) {
 				throw new MethodNotAllowedException(`Property "regex" is not valid.`);
 			}

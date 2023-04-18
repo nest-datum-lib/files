@@ -1,22 +1,18 @@
 import { Module } from '@nestjs/common';
 import { 
-	CacheModule,
-	CacheService, 
-} from '@nest-datum/cache';
-import { FileService as DiskFileService } from '@nest-datum/disk';
+	TransportModule,
+	TransportService, 
+} from '@nest-datum/transport';
 import { FileService } from './file.service';
 import { FileHttpTcpController } from './file-http-tcp.controller';
 
 @Module({
-	controllers: [
-		FileHttpTcpController, 
-	],
+	controllers: [ FileHttpTcpController ],
 	imports: [
-		CacheModule,
+		TransportModule,
 	],
 	providers: [ 
-		CacheService,
-		DiskFileService,
+		TransportService,
 		FileService,
 	],
 })

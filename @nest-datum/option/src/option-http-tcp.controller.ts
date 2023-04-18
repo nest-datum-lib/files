@@ -68,7 +68,7 @@ export class OptionHttpTcpController extends ManyHttpTcpController {
 			}
 			output['dataTypeId'] = options['dataTypeId'];
 		}
-		if (utilsCheckExists(options['regex'])) {
+		if (utilsCheckStrFilled(options['regex'])) {
 			if (!utilsCheckStrRegex(options['regex'])) {
 				throw new MethodNotAllowedException(`Property "regex" is not valid.`);
 			}

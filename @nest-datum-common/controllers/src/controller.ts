@@ -8,11 +8,12 @@ import { strToObj as utilsFormatStrToObj } from '@nest-datum-utils/format';
 import {
 	func as utilsCheckFunc,
 	obj as utilsCheckObj,
+	objFilled as utilsCheckObjFilled,
+	arrFilled as utilsCheckArrFilled,
 	exists as utilsCheckExists,
 	bool as utilsCheckBool,
 	strId as utilsCheckStrId,
 	strArr as utilsCheckStrArr,
-	strJson as utilsCheckStrJson,
 	strName as utilsCheckStrName,
 	strDescription as utilsCheckStrDescription,
 	strRegex as utilsCheckStrRegex,
@@ -38,25 +39,25 @@ export class Controller {
 		};
 
 		if (utilsCheckExists(options['select'])) {
-			if (!utilsCheckStrJson(options['select'])) {
+			if (!utilsCheckObjFilled(options['select']) && !utilsCheckArrFilled(options['select'])) {
 				throw new MethodNotAllowedException(`Property "select" is not valid.`);
 			}
 			output['select'] = utilsFormatStrToObj(options['select']);
 		}
 		if (utilsCheckExists(options['relations'])) {
-			if (!utilsCheckStrJson(options['relations'])) {
+			if (!utilsCheckObjFilled(options['relations']) && !utilsCheckArrFilled(options['relations'])) {
 				throw new MethodNotAllowedException(`Property "relations" is not valid.`);
 			}
 			output['relations'] = utilsFormatStrToObj(options['relations']);
 		}
 		if (utilsCheckExists(options['sort'])) {
-			if (!utilsCheckStrJson(options['sort'])) {
+			if (!utilsCheckObjFilled(options['sort']) && !utilsCheckArrFilled(options['sort'])) {
 				throw new MethodNotAllowedException(`Property "sort" is not valid.`);
 			}
 			output['sort'] = utilsFormatStrToObj(options['sort']);
 		}
 		if (utilsCheckExists(options['filter'])) {
-			if (!utilsCheckStrJson(options['filter'])) {
+			if (!utilsCheckObjFilled(options['filter']) && !utilsCheckArrFilled(options['filter'])) {
 				throw new MethodNotAllowedException(`Property "filter" is not valid.`);
 			}
 			output['filter'] = utilsFormatStrToObj(options['filter']);
@@ -94,13 +95,13 @@ export class Controller {
 		};
 
 		if (utilsCheckExists(options['select'])) {
-			if (!utilsCheckStrJson(options['select'])) {
+			if (!utilsCheckObjFilled(options['select']) && !utilsCheckArrFilled(options['select'])) {
 				throw new MethodNotAllowedException(`Property "select" is not valid.`);
 			}
 			output['select'] = utilsFormatStrToObj(options['select']);
 		}
 		if (utilsCheckExists(options['relations'])) {
-			if (!utilsCheckStrJson(options['relations'])) {
+			if (!utilsCheckObjFilled(options['relations']) && !utilsCheckArrFilled(options['relations'])) {
 				throw new MethodNotAllowedException(`Property "relations" is not valid.`);
 			}
 			output['relations'] = utilsFormatStrToObj(options['relations']);
