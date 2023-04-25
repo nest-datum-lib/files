@@ -17,6 +17,8 @@ import {
 	strIdExists as utilsCheckStrIdExists,
 	strName as utilsCheckStrName, 
 	strDescription as utilsCheckStrDescription,
+	strFilled as utilsCheckStrFilled,
+	strEnvKey as utilsCheckStrEnvKey,
 } from '@nest-datum-utils/check';
 import { SystemSystemOptionService } from '../system-system-option/system-system-option.service';
 import { SystemSystemSystemOptionService } from '../system-system-system-option/system-system-system-option.service';
@@ -58,6 +60,12 @@ export class SystemHttpController extends MainHttpController {
 	async validateUpdate(options) {
 		const output = {};
 
+		if (utilsCheckStrFilled(options['envKey'])) {
+			if (!utilsCheckStrEnvKey(options['envKey'])) {
+				throw new MethodNotAllowedException(`Property "envKey" is not valid.`);
+			}
+			output['envKey'] = options['envKey'];
+		}
 		if (utilsCheckExists(options['systemStatusId'])) {
 			if (!utilsCheckStrId(options['systemStatusId'])) {
 				throw new MethodNotAllowedException(`Property "systemStatusId" is not valid.`);

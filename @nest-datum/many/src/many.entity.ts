@@ -6,7 +6,7 @@ import {
 	Index,
 } from 'typeorm';
 
-export class ContentMany {
+export class Many {
 	@PrimaryGeneratedColumn('uuid')
 	public id: string;
 

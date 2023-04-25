@@ -226,10 +226,16 @@ export class TransportService extends RedisService {
 			connectionInstance.emit(cmd, { ...payload });
 		}
 		else {
-			const connectionInstanceResponse = await lastValueFrom(connectionInstance
-				.send({ cmd }, payload)
-				.pipe(map(response => response)));
+			let connectionInstanceResponse;
 
+			try {
+				connectionInstanceResponse = await lastValueFrom(connectionInstance
+					.send({ cmd }, payload)
+					.pipe(map(response => response)));
+			}
+			catch (err) {
+				throw new NotFoundException(err.message);
+			}
 			if (!utilsCheckExists(connectionInstanceResponse)) {
 				throw new NotFoundException(`Resource not found.`);
 			}

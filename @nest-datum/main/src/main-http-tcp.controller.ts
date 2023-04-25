@@ -44,8 +44,8 @@ export class MainHttpTcpController extends HttpTcpController {
 		return {
 			accessToken: options['accessToken'],
 			userId: user['id'],
-			[this.mainRelationColumnName]: options[this.mainRelationColumnName] ?? options['entityId'],
-			[this.optionRelationColumnName]: options[this.optionRelationColumnName] ?? options['entityOptionId'],
+			[this.mainRelationColumnName ?? 'entityId']: options[this.mainRelationColumnName] ?? options['entityId'],
+			[this.optionRelationColumnName ?? 'entityOptionId']: options[this.optionRelationColumnName] ?? options['entityOptionId'],
 		};
 	}
 
@@ -141,6 +141,16 @@ export class MainHttpTcpController extends HttpTcpController {
 	) {
 		const bodyKeys = Object.keys(body);
 		const entityId = body[bodyKeys[0]];
+
+		console.log('??????', {
+			accessToken,
+			entityOptionId,
+			entityId,
+		}, await this.validateOption({
+			accessToken,
+			entityOptionId,
+			entityId,
+		}));
 
 		return await this.serviceHandlerWrapper(async () => await this.transport.send({
 			name: this.serviceName, 

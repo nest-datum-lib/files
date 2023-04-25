@@ -1,4 +1,5 @@
 import callerFunc from './src/callerFunc';
+import strToArr from './src/strToArr';
 import strToObj from './src/strToObj';
 import strToLat from './src/strToLat';
 import strToEnv from './src/strToEnv';
@@ -13,6 +14,7 @@ import sqlConfig from './src/sqlConfig';
 
 export {
 	callerFunc,
+	strToArr,
 	strToObj,
 	strToLat,
 	strToEnv,

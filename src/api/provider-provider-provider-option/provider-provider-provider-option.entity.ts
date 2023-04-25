@@ -3,12 +3,12 @@ import {
 	Column, 
 	ManyToOne,
 } from 'typeorm';
-import { ContentMany } from '@nest-datum/many';
+import { Many } from '@nest-datum/many';
 import { ProviderProviderOption } from '../provider-provider-option/provider-provider-option.entity';
 import { Provider } from '../provider/provider.entity';
 
 @Entity()
-export class ProviderProviderProviderOption extends ContentMany {
+export class ProviderProviderProviderOption extends Many {
 	@Column()
 	public providerProviderOptionId: string;
 

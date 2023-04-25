@@ -1,6 +1,7 @@
+import { strToObj as utilsFormatStrToObj } from '@nest-datum-utils/format';
 import { 
 	exists as utilsCheckExists,
-	strFilled as utilsCheckStr,
+	str as utilsCheckStr,
 	strId as utilsCheckStrId,
 	strEnvKey as utilsCheckStrEnvKey,
 	strName as utilsCheckStrName,
@@ -9,8 +10,16 @@ import {
 	strType as utilsCheckStrType,
 	bool as utilsCheckBool,
 	strFilled as utilsCheckStrFilled,
+	arr as utilsCheckArr,
 } from '@nest-datum-utils/check';
-import { MethodNotAllowedException } from '@nest-datum-common/exceptions';
+import { 
+	checkToken,
+	getUser, 
+} from '@nest-datum-common/jwt';
+import { 
+	MethodNotAllowedException,
+	UnauthorizedException, 
+} from '@nest-datum-common/exceptions';
 import { ManyTcpController } from '@nest-datum/many';
 
 export class OptionTcpController extends ManyTcpController {

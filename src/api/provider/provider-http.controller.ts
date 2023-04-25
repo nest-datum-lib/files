@@ -14,6 +14,8 @@ import {
 	strId as utilsCheckStrId,
 	strName as utilsCheckStrName, 
 	strDescription as utilsCheckStrDescription,
+	strFilled as utilsCheckStrFilled,
+	strEnvKey as utilsCheckStrEnvKey,
 } from '@nest-datum-utils/check';
 import { ProviderProviderOptionService } from '../provider-provider-option/provider-provider-option.service';
 import { ProviderProviderProviderOptionService } from '../provider-provider-provider-option/provider-provider-provider-option.service';
@@ -45,6 +47,12 @@ export class ProviderHttpController extends MainHttpController {
 	async validateUpdate(options) {
 		const output = {};
 
+		if (utilsCheckStrFilled(options['envKey'])) {
+			if (!utilsCheckStrEnvKey(options['envKey'])) {
+				throw new MethodNotAllowedException(`Property "envKey" is not valid.`);
+			}
+			output['envKey'] = options['envKey'];
+		}
 		if (utilsCheckExists(options['providerStatusId'])) {
 			if (!utilsCheckStrId(options['providerStatusId'])) {
 				throw new MethodNotAllowedException(`Property "providerStatusId" is not valid.`);

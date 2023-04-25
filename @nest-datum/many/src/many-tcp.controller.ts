@@ -3,7 +3,7 @@ import {
 	MethodNotAllowedException,
 	UnauthorizedException, 
 } from '@nest-datum-common/exceptions';
-import { strToObj as utilsFormatStrToObj } from '@nest-datum-utils/format';
+import { strToArr as utilsFormatStrToArr } from '@nest-datum-utils/format';
 import { 
 	strId as utilsCheckStrId,
 	arr as utilsCheckArr,
@@ -25,7 +25,7 @@ export class ManyTcpController extends TcpController {
 		if (!utilsCheckStrId(options['id'])) {
 			throw new MethodNotAllowedException(`Property "id" is nt valid.`);
 		}
-		options['data'] = utilsFormatStrToObj(options['data']);
+		options['data'] = utilsFormatStrToArr(options['data']);
 
 		if (!utilsCheckArr(options['data'])) {
 			throw new MethodNotAllowedException(`Property "data" is not valid.`);
@@ -38,6 +38,6 @@ export class ManyTcpController extends TcpController {
 	}
 
 	async content(payload) {
-		return await this.serviceHandlerWrapper(async () => await this.service.contentManyService.content(await this.validateContent(payload)));
+		return await this.serviceHandlerWrapper(async () => await this.service.content(await this.validateContent(payload)));
 	}
 }

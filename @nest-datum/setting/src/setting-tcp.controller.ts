@@ -32,6 +32,12 @@ export class SettingTcpController extends TcpController {
 			}
 			output['envKey'] = options['envKey'];
 		}
+		if (utilsCheckExists(options['userId'])) {
+			if (!utilsCheckStrId(options['userId'])) {
+				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
+			}
+			output['userId'] = options['userId'];
+		}
 		if (utilsCheckExists(options['name'])) {
 			if (!utilsCheckStrName(options['name'])) {
 				throw new MethodNotAllowedException(`Property "name" is not valid.`);

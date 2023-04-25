@@ -5,11 +5,11 @@ import {
 	Connection, 
 } from 'typeorm';
 import { CacheService } from '@nest-datum/cache';
-import { ContentManyService } from '@nest-datum/many';
+import { ManyService } from '@nest-datum/many';
 import { ProviderProviderProviderOption } from './provider-provider-provider-option.entity';
 
 @Injectable()
-export class ProviderProviderProviderOptionService extends ContentManyService {
+export class ProviderProviderProviderOptionService extends ManyService {
 	protected readonly mainRelationColumnName: string = 'providerId';
 	protected readonly optionRelationColumnName: string = 'providerProviderOptionId';
 	protected readonly repositoryConstructor = ProviderProviderProviderOption;

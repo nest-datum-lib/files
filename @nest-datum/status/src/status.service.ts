@@ -20,6 +20,7 @@ export class StatusService extends FuseService {
 	protected oneGetColumns(customColumns: object = {}): object {
 		return ({
 			...super.oneGetColumns(customColumns),
+			userId: true,
 			envKey: true,
 			name: true,
 			description: true,

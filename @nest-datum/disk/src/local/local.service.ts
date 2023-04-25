@@ -139,8 +139,6 @@ export class LocalService extends DiskService {
 	}
 
 	public async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
-		console.log('processedPayload', processedPayload);
-
 		return await fs.rm(this.path(processedPayload['path']), { recursive: true });
 	}
 

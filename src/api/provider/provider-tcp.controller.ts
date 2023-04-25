@@ -10,6 +10,8 @@ import {
 	strId as utilsCheckStrId,
 	strName as utilsCheckStrName, 
 	strDescription as utilsCheckStrDescription,
+	strFilled as utilsCheckStrFilled,
+	strEnvKey as utilsCheckStrEnvKey,
 } from '@nest-datum-utils/check';
 import { ProviderService } from './provider.service';
 
@@ -34,6 +36,18 @@ export class ProviderTcpController extends TcpController {
 	async validateUpdate(options) {
 		const output = {};
 
+		if (utilsCheckStrFilled(options['envKey'])) {
+			if (!utilsCheckStrEnvKey(options['envKey'])) {
+				throw new MethodNotAllowedException(`Property "envKey" is not valid.`);
+			}
+			output['envKey'] = options['envKey'];
+		}
+		if (utilsCheckExists(options['userId'])) {
+			if (!utilsCheckStrId(options['userId'])) {
+				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
+			}
+			output['userId'] = options['userId'];
+		}
 		if (utilsCheckExists(options['providerStatusId'])) {
 			if (!utilsCheckStrId(options['providerStatusId'])) {
 				throw new MethodNotAllowedException(`Property "providerStatusId" is not valid.`);

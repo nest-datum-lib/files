@@ -15,6 +15,14 @@ export class HttpTcpController extends HttpController {
 	protected readonly serviceName;
 	protected readonly entityName;
 
+	async validateCreate(options) {
+		return await this.validateUpdate(options);
+	}
+
+	async validateUpdate(options) {
+		return { ...await super.validateUpdate(options), accessToken: options['accessToken'] };
+	}
+
 	@Get()
 	async many(
 		@AccessToken() accessToken: string,

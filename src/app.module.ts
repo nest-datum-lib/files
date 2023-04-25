@@ -4,10 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { sqlConfig as utilsFormatSqlConfig } from '@nest-datum-utils/format';
 import { AppController } from './app.controller';
-import { Http as Modules } from './index';
+import { 
+	Http as HttpModules,
+	Tcp as TcpModules, 
+} from './index';
 
 @Module({
 	imports: [
+		ServeStaticModule.forRoot({ rootPath: process.env.PATH_ROOT }),
 		TypeOrmModule.forRoot(utilsFormatSqlConfig()),
 		RedisModule.forRoot({
 			config: [{
@@ -31,7 +35,8 @@ import { Http as Modules } from './index';
 			}],
 		}),
 		
-		...Object.keys(Modules).map((key) => Modules[key]),
+		...Object.keys(HttpModules).map((key) => HttpModules[key]),
+		...Object.keys(TcpModules).map((key) => TcpModules[key]),
 	],
 	controllers: [ AppController ],
 	providers: [],

@@ -42,8 +42,8 @@ export class MainHttpController extends HttpController {
 		return {
 			accessToken: options['accessToken'],
 			userId: user['id'],
-			[this.mainRelationColumnName]: options[this.mainRelationColumnName] ?? options['entityId'],
-			[this.optionRelationColumnName]: options[this.optionRelationColumnName] ?? options['entityOptionId'],
+			[this.mainRelationColumnName ?? 'entityId']: options[this.mainRelationColumnName] ?? options['entityId'],
+			[this.optionRelationColumnName ?? 'entityOptionId']: options[this.optionRelationColumnName] ?? options['entityOptionId'],
 		};
 	}
 

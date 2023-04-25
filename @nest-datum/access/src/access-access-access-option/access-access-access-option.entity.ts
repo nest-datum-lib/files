@@ -1,4 +1,4 @@
-import { ContentMany } from '@nest-datum/many';
+import { Many } from '@nest-datum/many';
 
-export class AccessAccessAccessOption extends ContentMany {
+export class AccessAccessAccessOption extends Many {
 }

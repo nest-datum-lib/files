@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { 
-	ManyService,
-	ContentManyService, 
-} from '@nest-datum/many';
+import { ManyService } from '@nest-datum/many';
 
 @Injectable()
 export class OptionService extends ManyService {

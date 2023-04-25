@@ -5,11 +5,11 @@ import {
 	Connection, 
 } from 'typeorm';
 import { CacheService } from '@nest-datum/cache';
-import { ContentManyService } from '@nest-datum/many';
+import { ManyService } from '@nest-datum/many';
 import { SystemSystemSystemOption } from './system-system-system-option.entity';
 
 @Injectable()
-export class SystemSystemSystemOptionService extends ContentManyService {
+export class SystemSystemSystemOptionService extends ManyService {
 	protected readonly mainRelationColumnName: string = 'systemId';
 	protected readonly optionRelationColumnName: string = 'systemSystemOptionId';
 	protected readonly repositoryConstructor = SystemSystemSystemOption;

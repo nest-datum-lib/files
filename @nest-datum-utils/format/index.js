@@ -1,4 +1,5 @@
 import callerFunc from './src/callerFunc.js';
+import strToArr from './src/strToArr.js';
 import strToObj from './src/strToObj.js';
 import strToLat from './src/strToLat.js';
 import strToEnv from './src/strToEnv.js';
@@ -12,6 +13,7 @@ import objMergeRec from './src/objMergeRec.js';
 
 export {
 	callerFunc,
+	strToArr,
 	strToObj,
 	strToLat,
 	strToEnv,

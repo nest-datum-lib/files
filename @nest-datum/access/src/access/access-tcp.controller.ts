@@ -33,6 +33,12 @@ export class AccessTcpController extends TcpController {
 			}
 			output['accessStatusId'] = options['accessStatusId'];
 		}
+		if (utilsCheckExists(options['userId'])) {
+			if (!utilsCheckStrId(options['userId'])) {
+				throw new MethodNotAllowedException(`Property "userId" is not valid.`);
+			}
+			output['userId'] = options['userId'];
+		}
 		if (utilsCheckStrFilled(options['envKey'])) {
 			if (!utilsCheckStrEnvKey(options['envKey'])) {
 				throw new MethodNotAllowedException(`Property "envKey" is not valid.`);
