@@ -168,6 +168,8 @@ export class FileService extends FuseService {
 					},
 				});
 
+				console.log('model', model, files);
+
 				if (!model) {
 					output.push((utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
 						? await this.queryRunner.manager.save(Object.assign(new this.repositoryConstructor(), files[i]))
