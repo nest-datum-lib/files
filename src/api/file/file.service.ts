@@ -155,7 +155,7 @@ export class FileService extends FuseService {
 				files[i]['parentId'] = processedPayload['parentId'];
 				files[i]['userId'] = processedPayload['userId'];
 				
-				const model =await this.repositoryFolder.findOne({
+				const model =await this.repository.findOne({
 					select: {
 						id: true,
 						systemId: true,
