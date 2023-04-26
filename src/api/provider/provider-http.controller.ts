@@ -21,7 +21,7 @@ import { ProviderProviderOptionService } from '../provider-provider-option/provi
 import { ProviderProviderProviderOptionService } from '../provider-provider-provider-option/provider-provider-provider-option.service';
 import { ProviderService } from './provider.service';
 
-@Controller(`${process.env.SERVICE_FILES}/provider`)
+@Controller(`/provider`)
 export class ProviderHttpController extends MainHttpController {
 	protected readonly mainRelationColumnName: string = 'providerId';
 	protected readonly optionRelationColumnName: string = 'providerOptionId';

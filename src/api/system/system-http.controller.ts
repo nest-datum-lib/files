@@ -24,7 +24,7 @@ import { SystemSystemOptionService } from '../system-system-option/system-system
 import { SystemSystemSystemOptionService } from '../system-system-system-option/system-system-system-option.service';
 import { SystemService } from './system.service';
 
-@Controller(`${process.env.SERVICE_FILES}/system`)
+@Controller(`/system`)
 export class SystemHttpController extends MainHttpController {
 	protected readonly mainRelationColumnName: string = 'systemId';
 	protected readonly optionRelationColumnName: string = 'systemOptionId';

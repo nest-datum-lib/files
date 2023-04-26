@@ -19,7 +19,7 @@ import {
 } from '@nest-datum-utils/check';
 import { FolderService } from './folder.service';
 
-@Controller(`${process.env.SERVICE_FILES}/folder`)
+@Controller(`/folder`)
 export class FolderHttpController extends HttpController {
 	constructor(
 		protected service: FolderService,

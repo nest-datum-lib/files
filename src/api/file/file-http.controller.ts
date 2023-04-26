@@ -23,7 +23,7 @@ import {
 } from '@nest-datum-utils/check';
 import { FileService } from './file.service';
 
-@Controller(`${process.env.SERVICE_FILES}/file`)
+@Controller(`/file`)
 export class FileHttpController extends HttpController {
 	constructor(
 		protected service: FileService,
