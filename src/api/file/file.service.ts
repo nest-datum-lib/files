@@ -116,7 +116,29 @@ export class FileService extends FuseService {
 				},
 			})) || {})['id'];
 		}
+		if (output['systemId'] === 'files-system-avatars') {
+			output['forceName'] = `${payload['userId']}.jpg`;
+			output['force'] = true;
+		}
 		return await super.createProperties(output);
+	}
+
+	public async updateProperties(payload: object): Promise<object> {
+		const parentFolder = await this.repositoryFolder.findOne({
+			select: {
+				id: true,
+				systemId: true,
+			},
+			where: {
+				id: payload['id'],
+			},
+		});
+
+		if (parentFolder && parentFolder['systemId'] === 'files-system-avatars') {
+			payload['name'] = `${payload['userId']}.jpg`;
+			payload['force'] = true;
+		}
+		return await super.updateProperties(payload);
 	}
 
 	protected async createProcess(processedPayload: object, payload: object): Promise<object> {
