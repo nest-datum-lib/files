@@ -107,21 +107,15 @@ export class FileHttpController extends HttpController {
 		@Body('path') path: string,
 		@UploadedFiles() files: Array<Express.Multer.File>,
 	) {
-		return await this.serviceHandlerWrapper(async () => {
-			const aaa = await this.service.create(await this.validateCreate({
-				accessToken,
-				id,
-				userId,
-				systemId,
-				parentId,
-				path,
-				files,
-			}));
-
-			console.log('aaa', aaa);
-
-			return aaa;
-		});
+		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
+			accessToken,
+			id,
+			userId,
+			systemId,
+			parentId,
+			path,
+			files,
+		})));
 	}
 
 	@Patch(':id')

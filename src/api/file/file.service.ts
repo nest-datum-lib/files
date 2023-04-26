@@ -156,15 +156,15 @@ export class FileService extends FuseService {
 				files[i]['userId'] = processedPayload['userId'];
 				
 				const model = await this.repository.findOne({
-					select: {
-						path: true,
-					},
 					where: {
 						path: files[i]['path'],
 					},
 				});
 
-				if (!model) {
+				if (model) {
+					output.push(model);
+				}
+				else {
 					output.push((utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
 						? await this.queryRunner.manager.save(Object.assign(new this.repositoryConstructor(), files[i]))
 						: await this.repository.save(files[i]));
