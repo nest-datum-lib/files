@@ -154,6 +154,10 @@ export class FileService extends FuseService {
 				files[i]['systemId'] = processedPayload['systemId'];
 				files[i]['parentId'] = processedPayload['parentId'];
 				files[i]['userId'] = processedPayload['userId'];
+				
+				(utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
+					? await this.queryRunner.manager.delete(this.repositoryConstructor, { ...files[i] })
+					: await this.repository.delete({ ...files[i] });
 				output.push((utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
 					? await this.queryRunner.manager.save(Object.assign(new this.repositoryConstructor(), files[i]))
 					: await this.repository.save(files[i]));
