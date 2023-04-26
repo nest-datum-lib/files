@@ -155,12 +155,24 @@ export class FileService extends FuseService {
 				files[i]['parentId'] = processedPayload['parentId'];
 				files[i]['userId'] = processedPayload['userId'];
 				
-				(utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
-					? await this.queryRunner.manager.delete(this.repositoryConstructor, { ...files[i] })
-					: await this.repository.delete({ ...files[i] });
-				output.push((utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
-					? await this.queryRunner.manager.save(Object.assign(new this.repositoryConstructor(), files[i]))
-					: await this.repository.save(files[i]));
+				const model =await this.repositoryFolder.findOne({
+					select: {
+						id: true,
+						systemId: true,
+						name: true,
+					},
+					where: {
+						id: files[i]['parentId'],
+						systemId: files[i]['systemId'],
+						name: files[i]['name'],
+					},
+				});
+
+				if (!model) {
+					output.push((utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
+						? await this.queryRunner.manager.save(Object.assign(new this.repositoryConstructor(), files[i]))
+						: await this.repository.save(files[i]));
+				}
 				i++;
 			}
 		}
