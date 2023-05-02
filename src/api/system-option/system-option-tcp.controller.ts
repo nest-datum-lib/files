@@ -49,8 +49,8 @@ export class SystemOptionTcpController extends OptionTcpController {
 		return await super.content(payload);
 	}
 
-	@EventPattern('system.updateContent')
-	async updateContent(payload) {
-		return await super.updateContent(payload);
+	@EventPattern('system.contentUpdate')
+	async contentUpdate(payload) {
+		return await super.contentUpdate(payload);
 	}
 }

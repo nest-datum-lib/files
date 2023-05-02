@@ -7,6 +7,7 @@ import {
 import {
 	strIdExists as utilsCheckStrIdExists,
 	objFilled as utilsCheckObjFilled,
+	bool as utilsCheckBool,
 } from '@nest-datum-utils/check';
 import { MainService } from '@nest-datum/main';
 import { CacheService } from '@nest-datum/cache';
@@ -70,32 +71,35 @@ export class SystemService extends MainService {
 	public async manager(payload): Promise<Array<any>> {
 		let limit = Number(payload['limit'] || 10),
 			page = Number(payload['page'] || 0),
-			filter = `WHERE systemId = '${payload['systemId']}' `;
+			filter = `WHERE systemId = '${payload['systemId']}' AND parentId != "" `;
 
+		if (payload['query']) {
+			filter += `AND name LIKE '%${payload['query']}%' `;
+		}
+		if (utilsCheckObjFilled(payload['filter'])) {
+			if (utilsCheckStrIdExists(payload['filter']['parentId'])) {
+				filter += `AND parentId = '${payload['filter']['parentId']}' `;
+			}
+			if (String(payload['filter']['isDeleted']) === '0' 
+				|| String(payload['filter']['isDeleted']) === '1') {
+				filter += `AND isDeleted = ${payload['filter']['isDeleted']} `;
+			}
+			if (String(payload['filter']['isNotDelete']) === '0' 
+				|| String(payload['filter']['isNotDelete']) === '1') {
+				filter += `AND isNotDelete = ${payload['filter']['isNotDelete']} `;
+			}
+		}
 		delete payload['systemId'];
+		delete payload['query'];
 
 		if (page >= 1) {
-			page = 0;
+			page = page - 1;
 		}
 		page = page * limit;
 
-		if (utilsCheckObjFilled(payload['filter'])) {
-			filter += `AND (`;
-
-			if (utilsCheckStrIdExists(payload['filter']['parentId'])) {
-				filter += `parentId = '${payload['filter']['parentId']}'`;
-			}
-			if (utilsCheckStrIdExists(payload['filter']['isDeleted'])) {
-				filter += `isDeleted = ${!!Number(payload['filter']['isDeleted'])}`;
-			}
-			if (utilsCheckStrIdExists(payload['filter']['isNotDelete'])) {
-				filter += `isNotDelete = ${!!Number(payload['filter']['isNotDelete'])}`;
-			}
-			filter += `)`;
-		}
 		return [
-			await this.connection.query(`SELECT * FROM (SELECT * FROM (SELECT id, userId, systemId, parentId, path, name, description, type, size, isNotDelete, isDeleted, createdAt FROM folder AS b ${filter} ORDER BY id DESC) AS t1 UNION SELECT * FROM (SELECT id, userId, systemId, parentId, path, name, description, type, size, isNotDelete, isDeleted, createdAt FROM file AS b ${filter} ORDER BY id DESC) AS t2) AS qry LIMIT ${page},${page + limit};`),
-			Number((((await this.connection.query(`SELECT COUNT(*) as total FROM (SELECT * FROM (SELECT id, userId, systemId, parentId, path, name, description, type, size, isNotDelete, isDeleted, createdAt FROM folder AS b ${filter} ORDER BY id DESC) AS t1 UNION SELECT * FROM (SELECT id, userId, systemId, parentId, path, name, description, type, size, isNotDelete, isDeleted, createdAt FROM file AS b ${filter} ORDER BY id DESC) AS t2) AS qry LIMIT ${page},${page + limit};`)) ?? [])[0] || {})['total']),
+			await this.connection.query(`SELECT * FROM (SELECT * FROM (SELECT id, userId, systemId, parentId, path, name, description, type, size, isNotDelete, isDeleted, createdAt FROM folder AS b ${filter} ORDER BY id DESC) AS t1 UNION SELECT * FROM (SELECT id, userId, systemId, parentId, path, name, description, type, size, isNotDelete, isDeleted, createdAt FROM file AS b ${filter} ORDER BY id DESC) AS t2) AS qry ORDER BY type ASC, createdAt DESC LIMIT ${page},${page + limit};`),
+			Number((((await this.connection.query(`SELECT COUNT(*) as total FROM (SELECT * FROM (SELECT id, userId, systemId, parentId, path, name, description, type, size, isNotDelete, isDeleted, createdAt FROM folder AS b ${filter} ORDER BY id DESC) AS t1 UNION SELECT * FROM (SELECT id, userId, systemId, parentId, path, name, description, type, size, isNotDelete, isDeleted, createdAt FROM file AS b ${filter} ORDER BY id DESC) AS t2) AS qry;`)) ?? [])[0] || {})['total']),
 		];
 	}
 }
