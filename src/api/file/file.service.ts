@@ -250,4 +250,19 @@ export class FileService extends FuseService {
 		}
 		return entity;
 	}
+
+	protected async dropManyProperties(payload): Promise<object> {
+		return { ...payload, ids: payload['ids'] };
+	}
+
+	protected async dropManyProcess(processedPayload: Array<string>, payload: object): Promise<any> {
+		let i = 0;
+
+		while (i < processedPayload['ids'].length) {
+			await this.dropProcess(processedPayload['ids'][i], payload);
+			i++;
+		}
+
+		return true;
+	}
 }
