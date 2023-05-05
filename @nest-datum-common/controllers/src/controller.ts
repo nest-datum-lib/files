@@ -206,8 +206,6 @@ export class Controller {
 			if (!(err instanceof Exception)) {
 				throw new FailureException(err.message);
 			}
-			console.log('err', err);
-
 			throw err;
 		}
 	}
