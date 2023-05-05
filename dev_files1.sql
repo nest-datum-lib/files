@@ -116,7 +116,7 @@ CREATE TABLE `access_status` (
 --
 
 INSERT INTO `access_status` (`id`, `userId`, `envKey`, `name`, `description`, `isNotDelete`, `isDeleted`, `createdAt`, `updatedAt`) VALUES
-('e5b4b081-57c4-4428-b633-e1a7af191ec1', '', 'SSO_USER_ADMIN_HAPP_ACCESSSTATUSSERVICE_ACTIVE', 'Active', 'Access is active.', 1, 0, '2023-04-11 01:34:44', '2023-04-11 01:34:44');
+('e5b4b081-57c4-4428-b633-e1a7af191ec1', '', 'HAPP_FILES_ACCESS_STATUS_ACTIVE', 'Active', 'Access is active.', 1, 0, '2023-04-11 01:34:44', '2023-04-11 01:34:44');
 
 -- --------------------------------------------------------
 
@@ -175,7 +175,7 @@ CREATE TABLE `folder` (
 --
 
 INSERT INTO `folder` (`id`, `userId`, `systemId`, `parentId`, `path`, `name`, `description`, `isNotDelete`, `isDeleted`, `createdAt`, `updatedAt`, `type`, `size`) VALUES
-('files-folder-avatara', 'happ-sso-user-admin', 'files-system-avatars', '', '/avatars', 'avatars', 'User avatars folder.', 1, 0, '2023-04-11 19:05:12', '2023-04-13 03:19:41', 'folder', 0),
+('files-folder-avatar', 'happ-sso-user-admin', 'files-system-avatars', '', '/avatars', 'avatars', 'User avatars folder.', 1, 0, '2023-04-11 19:05:12', '2023-04-13 03:19:41', 'folder', 0),
 ('files-folder-cv', 'happ-sso-user-admin', 'files-system-cv', '', '/cv', 'cv', 'CV folder.', 1, 0, '2023-04-11 19:05:12', '2023-04-13 03:19:41', 'folder', 0),
 ('files-folder-cv-lensa', 'happ-sso-user-admin', 'files-system-cv-lensa', '', '/cv-lensa', 'cv-lensa', 'CV lensa folder.', 1, 0, '2023-04-11 19:05:12', '2023-04-13 03:19:41', 'folder', 0),
 ('files-folder-email-views', 'happ-sso-user-admin', 'files-system-email-views', '', '/email-views', 'email-views', 'Email views folder.', 1, 0, '2023-04-11 19:05:12', '2023-04-20 04:02:33', 'folder', 0),
@@ -205,7 +205,7 @@ CREATE TABLE `provider` (
 --
 
 INSERT INTO `provider` (`id`, `userId`, `providerStatusId`, `name`, `description`, `isDeleted`, `isNotDelete`, `createdAt`, `updatedAt`, `envKey`) VALUES
-('012c48bf-4857-4ea8-90fe-291fc9af47c2', 'sso-user-admin', '9d0337b6-dfe7-4668-80ff-7744c9393760', 'Local', 'Local storage.', 0, 1, '2023-04-11 07:50:06', '2023-04-13 07:14:15', 'SSO_USER_ADMIN_HAPP_PROVIDERSERVICE_LOCAL');
+('012c48bf-4857-4ea8-90fe-291fc9af47c2', 'sso-user-admin', '9d0337b6-dfe7-4668-80ff-7744c9393760', 'Local', 'Local storage.', 0, 1, '2023-04-11 07:50:06', '2023-04-13 07:14:15', 'HAPP_FILES_PROVIDER_LOCAL');
 
 -- --------------------------------------------------------
 
@@ -283,7 +283,7 @@ CREATE TABLE `provider_status` (
 --
 
 INSERT INTO `provider_status` (`id`, `userId`, `envKey`, `name`, `description`, `isNotDelete`, `isDeleted`, `createdAt`, `updatedAt`) VALUES
-('9d0337b6-dfe7-4668-80ff-7744c9393760', 'sso-user-admin', 'SSO_USER_ADMIN_HAPP_PROVIDERSTATUSSERVICE_ACTIVE', 'Active', 'Provider is active.', 1, 0, '2023-04-11 07:02:55', '2023-04-11 07:02:55');
+('9d0337b6-dfe7-4668-80ff-7744c9393760', 'sso-user-admin', 'HAPP_FILES_PROVIDER_STATUS_ACTIVE', 'Active', 'Provider is active.', 1, 0, '2023-04-11 07:02:55', '2023-04-11 07:02:55');
 
 -- --------------------------------------------------------
 
@@ -346,11 +346,11 @@ CREATE TABLE `system` (
 --
 
 INSERT INTO `system` (`id`, `providerId`, `userId`, `systemStatusId`, `name`, `description`, `isDeleted`, `isNotDelete`, `createdAt`, `updatedAt`, `envKey`) VALUES
-('files-system-avatars', '012c48bf-4857-4ea8-90fe-291fc9af47c2', 'happ-sso-user-admin', '6a7871eb-869b-43b9-b4cc-542a6033da18', 'Avatars', 'User avatars.', 0, 1, '2023-04-11 07:52:23', '2023-04-19 08:08:24', 'SSO_USER_ADMIN_HAPP_SYSTEMSERVICE_AVATARS'),
-('files-system-cv', '012c48bf-4857-4ea8-90fe-291fc9af47c2', 'happ-sso-user-admin', '6a7871eb-869b-43b9-b4cc-542a6033da18', 'CV', 'CV files.', 0, 1, '2023-04-11 07:53:21', '2023-04-19 08:09:02', 'SSO_USER_ADMIN_HAPP_SYSTEMSERVICE_CV'),
-('files-system-cv-lensa', '012c48bf-4857-4ea8-90fe-291fc9af47c2', 'happ-sso-user-admin', '6a7871eb-869b-43b9-b4cc-542a6033da18', 'CV lensa', 'CV files from lensa API.', 0, 1, '2023-04-11 07:53:53', '2023-04-19 08:09:12', 'SSO_USER_ADMIN_HAPP_SYSTEMSERVICE_CV_LENSA'),
-('files-system-default', '012c48bf-4857-4ea8-90fe-291fc9af47c2', 'sso-user-admin', '6a7871eb-869b-43b9-b4cc-542a6033da18', 'Default', 'Default filesystem.', 0, 1, '2023-04-11 07:51:46', '2023-04-11 19:01:29', 'SSO_USER_ADMIN_HAPP_SYSTEMSERVICE_DEFAULT'),
-('files-system-email-views', '012c48bf-4857-4ea8-90fe-291fc9af47c2', 'happ-sso-user-admin', '6a7871eb-869b-43b9-b4cc-542a6033da18', 'Email views', 'Email views.', 0, 1, '2023-04-11 07:52:50', '2023-04-19 08:08:52', 'SSO_USER_ADMIN_HAPP_SYSTEMSERVICE_EMAIL_VIEWS');
+('files-system-avatars', '012c48bf-4857-4ea8-90fe-291fc9af47c2', 'happ-sso-user-admin', '6a7871eb-869b-43b9-b4cc-542a6033da18', 'Avatars', 'User avatars.', 0, 1, '2023-04-11 07:52:23', '2023-04-19 08:08:24', 'HAPP_FILES_SYSTEM_STATUS_ACTIVE'),
+('files-system-cv', '012c48bf-4857-4ea8-90fe-291fc9af47c2', 'happ-sso-user-admin', '6a7871eb-869b-43b9-b4cc-542a6033da18', 'CV', 'CV files.', 0, 1, '2023-04-11 07:53:21', '2023-04-19 08:09:02', 'HAPP_FILES_SYSTEM_CV'),
+('files-system-cv-lensa', '012c48bf-4857-4ea8-90fe-291fc9af47c2', 'happ-sso-user-admin', '6a7871eb-869b-43b9-b4cc-542a6033da18', 'CV lensa', 'CV files from lensa API.', 0, 1, '2023-04-11 07:53:53', '2023-04-19 08:09:12', 'HAPP_FILES_SYSTEM_CV_LENSA'),
+('files-system-default', '012c48bf-4857-4ea8-90fe-291fc9af47c2', 'sso-user-admin', '6a7871eb-869b-43b9-b4cc-542a6033da18', 'Default', 'Default filesystem.', 0, 1, '2023-04-11 07:51:46', '2023-04-11 19:01:29', 'HAPP_FILES_SYSTEM_DEFAULT'),
+('files-system-email-views', '012c48bf-4857-4ea8-90fe-291fc9af47c2', 'happ-sso-user-admin', '6a7871eb-869b-43b9-b4cc-542a6033da18', 'Email views', 'Email views.', 0, 1, '2023-04-11 07:52:50', '2023-04-19 08:08:52', 'HAPP_FILES_SYSTEM_EMAIL_VIEWS');
 
 -- --------------------------------------------------------
 
@@ -380,7 +380,7 @@ CREATE TABLE `system_option` (
 --
 
 INSERT INTO `system_option` (`id`, `userId`, `dataTypeId`, `envKey`, `name`, `description`, `defaultValue`, `regex`, `isRequired`, `isMultiline`, `isNotDelete`, `isDeleted`, `createdAt`, `updatedAt`) VALUES
-('files-system-option-root', 'happ-sso-user-admin', 'happ-data-type-text', 'SSO_USER_ADMIN_HAPP_SYSTEMOPTIONSERVICE_ROOT_PATH', 'Root path', 'Path to system folder.', '/', '', 1, 0, 1, 0, '2023-04-11 07:51:14', '2023-04-19 08:07:35');
+('files-system-option-root', 'happ-sso-user-admin', 'happ-data-type-text', 'HAPP_FILES_SYSTEM_OPTION_ROLE_PATH', 'Root path', 'Path to system folder.', '/', '', 1, 0, 1, 0, '2023-04-11 07:51:14', '2023-04-19 08:07:35');
 
 -- --------------------------------------------------------
 
@@ -405,7 +405,7 @@ CREATE TABLE `system_status` (
 --
 
 INSERT INTO `system_status` (`id`, `userId`, `envKey`, `name`, `description`, `isNotDelete`, `isDeleted`, `createdAt`, `updatedAt`) VALUES
-('6a7871eb-869b-43b9-b4cc-542a6033da18', 'sso-user-admin', 'SSO_USER_ADMIN_HAPP_SYSTEMSTATUSSERVICE_ACTIVE', 'Active', 'System is active', 1, 0, '2023-04-11 06:32:38', '2023-04-11 06:32:38');
+('6a7871eb-869b-43b9-b4cc-542a6033da18', 'sso-user-admin', 'HAPP_FILES_SYSTEM_STATUS_ACTIVE', 'Active', 'System is active', 1, 0, '2023-04-11 06:32:38', '2023-04-11 06:32:38');
 
 -- --------------------------------------------------------
 
