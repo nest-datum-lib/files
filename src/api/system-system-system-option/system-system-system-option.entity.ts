@@ -13,13 +13,17 @@ export class SystemSystemSystemOption extends Many {
 	public systemSystemOptionId: string;
 
 	@ManyToOne(() => SystemSystemOption, (systemSystemOption) => systemSystemOption.systemSystemSystemOptions, {
-		onDelete: 'CASCADE'
+		onDelete: 'CASCADE',
+		onUpdate: 'CASCADE',
 	})
 	public systemSystemOption: SystemSystemOption;
 
 	@Column()
 	public systemId: string;
 
-	@ManyToOne(() => System, (system) => system.systemSystemSystemOptions)
+	@ManyToOne(() => System, (system) => system.systemSystemSystemOptions, {
+		onDelete: 'CASCADE',
+		onUpdate: 'CASCADE',
+	})
 	public system: System;
 }

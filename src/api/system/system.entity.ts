@@ -25,7 +25,10 @@ export class System {
 	@Column({ default: '' })
 	public providerId: string;
 
-	@ManyToOne(() => Provider, (provider) => provider.systems, { onDelete: 'CASCADE' })
+	@ManyToOne(() => Provider, (provider) => provider.systems, {
+		onDelete: 'CASCADE',
+		onUpdate: 'CASCADE',
+	})
 	public provider: Provider;
 
 	@Column({ default: '' })
@@ -67,15 +70,23 @@ export class System {
 	})
 	public updatedAt: Date;
 
-	@OneToMany(() => SystemSystemOption, (systemSystemOption) => systemSystemOption.system)
+	@OneToMany(() => SystemSystemOption, (systemSystemOption) => systemSystemOption.system, {
+		cascade: true,
+	})
 	public systemSystemOptions: SystemSystemOption[];
 
-	@OneToMany(() => SystemSystemSystemOption, (systemSystemSystemOption) => systemSystemSystemOption.system)
+	@OneToMany(() => SystemSystemSystemOption, (systemSystemSystemOption) => systemSystemSystemOption.system, {
+		cascade: true,
+	})
 	public systemSystemSystemOptions: SystemSystemSystemOption[];
 
-	@OneToMany(() => Folder, (folder) => folder.system)
+	@OneToMany(() => Folder, (folder) => folder.system, {
+		cascade: true,
+	})
 	public folders: Folder[];
 
-	@OneToMany(() => File, (file) => file.system)
+	@OneToMany(() => File, (file) => file.system, {
+		cascade: true,
+	})
 	public files: File[];
 }

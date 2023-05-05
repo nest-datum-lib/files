@@ -194,14 +194,14 @@ export class FileService extends FuseService {
 			this.repositoryCache.drop({ key: [ this.prefix(), 'one', { id } ] });
 		}
 		if (processedPayload['name']) {
-			const currentFile =await this.repository.findOne({
+			const currentFile = await this.repository.findOne({
 				select: {
 					id: true,
 					path: true,
 					name: true,
 				},
 				where: {
-					id: processedPayload['id'],
+					id,
 				},
 			});
 

@@ -22,13 +22,19 @@ export class File {
 	@Column({ default: '' })
 	public systemId: string;
 
-	@ManyToOne(() => System, (system) => system.files, { onDelete: 'CASCADE' })
+	@ManyToOne(() => System, (system) => system.files, {
+		onDelete: 'CASCADE',
+		onUpdate: 'CASCADE',
+	})
 	public system: System;
 
 	@Column({ default: '' })
 	public parentId: string;
 
-	@ManyToOne(() => Folder, (parent) => parent.files, { onDelete: 'CASCADE' })
+	@ManyToOne(() => Folder, (parent) => parent.files, {
+		onDelete: 'CASCADE',
+		onUpdate: 'CASCADE',
+	})
 	public parent: Folder;
 
 	@Column({ unique: true })

@@ -7,6 +7,8 @@ import { SystemSystemOption } from '../system-system-option/system-system-option
 
 @Entity()
 export class SystemOption extends Option {
-	@OneToMany(() => SystemSystemOption, (systemSystemOption) => systemSystemOption.systemOption)
+	@OneToMany(() => SystemSystemOption, (systemSystemOption) => systemSystemOption.systemOption, {
+		cascade: true,
+	})
 	public systemSystemOptions: SystemSystemOption[];
 }

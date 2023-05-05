@@ -14,15 +14,23 @@ export class ProviderProviderOption extends Bind {
 	@Column()
 	public providerOptionId: string;
 
-	@ManyToOne(() => ProviderOption, (providerOption) => providerOption.providerProviderOptions)
+	@ManyToOne(() => ProviderOption, (providerOption) => providerOption.providerProviderOptions, {
+		onDelete: 'CASCADE',
+		onUpdate: 'CASCADE',
+	})
 	public providerOption: ProviderOption;
 
 	@Column()
 	public providerId: string;
 
-	@ManyToOne(() => Provider, (provider) => provider.providerProviderOptions)
+	@ManyToOne(() => Provider, (provider) => provider.providerProviderOptions, {
+		onDelete: 'CASCADE',
+		onUpdate: 'CASCADE',
+	})
 	public provider: Provider;
 
-	@OneToMany(() => ProviderProviderProviderOption, (providerProviderProviderOption) => providerProviderProviderOption.providerProviderOption)
+	@OneToMany(() => ProviderProviderProviderOption, (providerProviderProviderOption) => providerProviderProviderOption.providerProviderOption, {
+		cascade: true,
+	})
 	public providerProviderProviderOptions: ProviderProviderProviderOption[];
 }

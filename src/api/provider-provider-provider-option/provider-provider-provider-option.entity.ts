@@ -13,13 +13,17 @@ export class ProviderProviderProviderOption extends Many {
 	public providerProviderOptionId: string;
 
 	@ManyToOne(() => ProviderProviderOption, (providerProviderOption) => providerProviderOption.providerProviderProviderOptions, {
-		onDelete: 'CASCADE'
+		onDelete: 'CASCADE',
+		onUpdate: 'CASCADE',
 	})
 	public providerProviderOption: ProviderProviderOption;
 
 	@Column()
 	public providerId: string;
 
-	@ManyToOne(() => Provider, (provider) => provider.providerProviderProviderOptions)
+	@ManyToOne(() => Provider, (provider) => provider.providerProviderProviderOptions, {
+		onDelete: 'CASCADE',
+		onUpdate: 'CASCADE',
+	})
 	public provider: Provider;
 }

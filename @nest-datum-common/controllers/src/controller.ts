@@ -203,6 +203,11 @@ export class Controller {
 			if (this.serviceLog) {
 				this.serviceLog.create(err);
 			}
+			if (!(err instanceof Exception)) {
+				throw new FailureException(err.message);
+			}
+			console.log('err', err);
+
 			throw err;
 		}
 	}

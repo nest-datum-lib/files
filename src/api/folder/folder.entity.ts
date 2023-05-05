@@ -23,7 +23,10 @@ export class Folder {
 	@Column({ default: '' })
 	public systemId: string;
 
-	@ManyToOne(() => System, (system) => system.files, { onDelete: 'CASCADE' })
+	@ManyToOne(() => System, (system) => system.files, {
+		onDelete: 'CASCADE',
+		onUpdate: 'CASCADE',
+	})
 	public system: System;
 
 	@Column({ default: '' })
@@ -68,6 +71,8 @@ export class Folder {
 	})
 	public updatedAt: Date;
 
-	@OneToMany(() => File, (file) => file.parent)
+	@OneToMany(() => File, (file) => file.parent, {
+		cascade: true,
+	})
 	public files: File[];
 }

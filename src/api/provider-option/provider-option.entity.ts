@@ -7,6 +7,8 @@ import { ProviderProviderOption } from '../provider-provider-option/provider-pro
 
 @Entity()
 export class ProviderOption extends Option {
-	@OneToMany(() => ProviderProviderOption, (providerProviderOption) => providerProviderOption.providerOption)
+	@OneToMany(() => ProviderProviderOption, (providerProviderOption) => providerProviderOption.providerOption, {
+		cascade: true,
+	})
 	public providerProviderOptions: ProviderProviderOption[];
 }

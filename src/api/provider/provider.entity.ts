@@ -58,12 +58,18 @@ export class Provider {
 	})
 	public updatedAt: Date;
 
-	@OneToMany(() => ProviderProviderOption, (providerProviderOption) => providerProviderOption.provider)
+	@OneToMany(() => ProviderProviderOption, (providerProviderOption) => providerProviderOption.provider, {
+		cascade: true,
+	})
 	public providerProviderOptions: ProviderProviderOption[];
 
-	@OneToMany(() => ProviderProviderProviderOption, (providerProviderProviderOption) => providerProviderProviderOption.provider)
+	@OneToMany(() => ProviderProviderProviderOption, (providerProviderProviderOption) => providerProviderProviderOption.provider, {
+		cascade: true,
+	})
 	public providerProviderProviderOptions: ProviderProviderProviderOption[];
 
-	@OneToMany(() => System, (system) => system.provider)
+	@OneToMany(() => System, (system) => system.provider, {
+		cascade: true,
+	})
 	public systems: System[];
 }

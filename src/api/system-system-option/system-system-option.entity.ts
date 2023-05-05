@@ -14,15 +14,23 @@ export class SystemSystemOption extends Bind {
 	@Column()
 	public systemOptionId: string;
 
-	@ManyToOne(() => SystemOption, (systemOption) => systemOption.systemSystemOptions)
+	@ManyToOne(() => SystemOption, (systemOption) => systemOption.systemSystemOptions, {
+		onDelete: 'CASCADE',
+		onUpdate: 'CASCADE',
+	})
 	public systemOption: SystemOption;
 
 	@Column()
 	public systemId: string;
 
-	@ManyToOne(() => System, (system) => system.systemSystemOptions)
+	@ManyToOne(() => System, (system) => system.systemSystemOptions, {
+		onDelete: 'CASCADE',
+		onUpdate: 'CASCADE',
+	})
 	public system: System;
 
-	@OneToMany(() => SystemSystemSystemOption, (systemSystemSystemOption) => systemSystemSystemOption.systemSystemOption)
+	@OneToMany(() => SystemSystemSystemOption, (systemSystemSystemOption) => systemSystemSystemOption.systemSystemOption, {
+		cascade: true,
+	})
 	public systemSystemSystemOptions: SystemSystemSystemOption[];
 }
