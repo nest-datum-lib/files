@@ -216,7 +216,7 @@ export class FileService extends FuseService {
 			: await this.repository.update({ id }, processedPayload);
 	}
 
-	protected async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
+	public async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
 		const id = utilsCheckObjFilled(processedPayload)
 			? String((processedPayload || {})['id'])
 			: String(processedPayload);

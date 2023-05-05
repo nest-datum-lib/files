@@ -39,7 +39,7 @@ export class FolderService extends FuseService {
 		@InjectRepository(Folder) protected readonly repository: Repository<Folder>,
 		@InjectRepository(File) protected readonly repositoryFile: Repository<File>,
 		@InjectRepository(SystemSystemSystemOption) protected readonly repositorySystemOptionContent: Repository<SystemSystemSystemOption>,
-		@InjectRepository(ProviderProviderProviderOption) protected readonly repositoryProviderOptionContent: Repository<ProviderProviderProviderOption>,
+		// @InjectRepository(ProviderProviderProviderOption) protected readonly repositoryProviderOptionContent: Repository<ProviderProviderProviderOption>,
 		protected readonly connection: Connection,
 		protected readonly repositoryCache: CacheService,
 		protected readonly repositoryDiskFolder: DiskFolderService,
@@ -161,7 +161,7 @@ export class FolderService extends FuseService {
 		return await this.after(initialPayload, processedPayload, data);
 	}
 
-	protected async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
+	public async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
 		const id = utilsCheckObjFilled(processedPayload)
 			? String((processedPayload || {})['id'])
 			: String(processedPayload);

@@ -17,6 +17,9 @@ import { Provider } from '../provider/provider.entity';
 import { Folder } from '../folder/folder.entity';
 import { File } from '../file/file.entity';
 import { System } from './system.entity';
+import { FileService } from '../../api/file/file.service'; 
+import { FileService as DiskFileService, FolderService as DiskFolderService } from '@nest-datum/disk';
+import { FolderService } from '../../api/folder/folder.service'; 
 
 @Module({
 	controllers: [ SystemTcpController ],
@@ -35,6 +38,10 @@ import { System } from './system.entity';
 	providers: [ 
 		CacheService,
 		SystemService,
+		DiskFileService,
+		FileService,
+		FolderService,
+		DiskFolderService
 	],
 })
 export class SystemTcpModule implements NestModule {
