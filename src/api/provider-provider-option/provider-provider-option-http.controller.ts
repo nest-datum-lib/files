@@ -4,6 +4,9 @@ import { ProviderProviderOptionService } from './provider-provider-option.servic
 
 @Controller(`/provider/option`)
 export class ProviderProviderOptionHttpController extends BindHttpController {
+	protected readonly mainRelationColumnName: string = 'providerId';
+	protected readonly optionRelationColumnName: string = 'providerOptionId';
+
 	constructor(
 		protected service: ProviderProviderOptionService,
 	) {

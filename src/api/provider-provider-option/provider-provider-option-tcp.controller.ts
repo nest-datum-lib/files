@@ -8,6 +8,9 @@ import { ProviderProviderOptionService } from './provider-provider-option.servic
 
 @Controller()
 export class ProviderProviderOptionTcpController extends BindTcpController {
+	protected readonly mainRelationColumnName: string = 'providerId';
+	protected readonly optionRelationColumnName: string = 'providerOptionId';
+
 	constructor(
 		protected service: ProviderProviderOptionService,
 	) {

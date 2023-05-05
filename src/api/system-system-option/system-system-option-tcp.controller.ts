@@ -8,6 +8,9 @@ import { SystemSystemOptionService } from './system-system-option.service';
 
 @Controller()
 export class SystemSystemOptionTcpController extends BindTcpController {
+	protected readonly mainRelationColumnName: string = 'systemId';
+	protected readonly optionRelationColumnName: string = 'systemOptionId';
+	
 	constructor(
 		protected service: SystemSystemOptionService,
 	) {
