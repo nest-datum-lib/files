@@ -25,6 +25,8 @@ export class ProviderHttpTcpController extends MainHttpTcpController {
 	protected readonly serviceName: string = process.env.SERVICE_FILES;
 	protected readonly entityName: string = 'provider';
 	protected readonly entityManyName: string = 'providerOptionRelation';
+	protected readonly mainRelationColumnName: string = 'providerId';
+	protected readonly optionRelationColumnName: string = 'providerOptionId';
 
 	constructor(
 		protected transport: TransportService,
