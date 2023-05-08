@@ -167,8 +167,8 @@ export class FolderService extends FuseService {
 			: String(processedPayload);
 
 		if (this.withCache === true) {
-			this.repositoryCache.drop({ key: [ this.prefix(), 'many', '*' ] });
-			this.repositoryCache.drop({ key: [ this.prefix(), 'one', { id } ] });
+			this.repositoryCache.drop({ key: [ this.prefix(process.env.APP_NAME), 'many', '*' ] });
+			this.repositoryCache.drop({ key: [ this.prefix(process.env.APP_NAME), 'one', { id } ] });
 		}
 		if (!this.withTwoStepRemoval) {
 			return await this.dropProcessForever(id);
