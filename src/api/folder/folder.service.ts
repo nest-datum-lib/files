@@ -39,7 +39,7 @@ export class FolderService extends FuseService {
 		@InjectRepository(Folder) protected readonly repository: Repository<Folder>,
 		@InjectRepository(File) protected readonly repositoryFile: Repository<File>,
 		@InjectRepository(SystemSystemSystemOption) protected readonly repositorySystemOptionContent: Repository<SystemSystemSystemOption>,
-		@InjectRepository(ProviderProviderProviderOption) protected readonly repositoryProviderOptionContent: Repository<ProviderProviderProviderOption>,
+		// @InjectRepository(ProviderProviderProviderOption) protected readonly repositoryProviderOptionContent: Repository<ProviderProviderProviderOption>,
 		protected readonly connection: Connection,
 		protected readonly repositoryCache: CacheService,
 		protected readonly repositoryDiskFolder: DiskFolderService,
@@ -161,7 +161,7 @@ export class FolderService extends FuseService {
 		return await this.after(initialPayload, processedPayload, data);
 	}
 
-	protected async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
+	public async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
 		const id = utilsCheckObjFilled(processedPayload)
 			? String((processedPayload || {})['id'])
 			: String(processedPayload);
@@ -188,8 +188,8 @@ export class FolderService extends FuseService {
 
 		if (entity['isDeleted']) {
 			await this.dropProcessForever(id);
-			await this.dropByParent(id);
 			await this.repositoryDiskFolder.dropProcess({ path: entity['path'] }, payload);
+			await this.dropByParent(id);
 		}
 		else {
 			await this.dropProcessPrepare(id);
@@ -206,6 +206,7 @@ export class FolderService extends FuseService {
 				parentId: id,
 			},
 		});
+
 		const files = await this.repositoryFile.find({
 			select: {
 				id: true,
@@ -215,12 +216,17 @@ export class FolderService extends FuseService {
 			},
 		});
 
-		(utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
-			? await this.queryRunner.manager.delete(this.repositoryConstructor, folders.map((item) => item['id']))
-			: await this.repository.delete(folders.map((item) => item['id']));
-		(utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
-			? await this.queryRunner.manager.delete(this.repositoryFileConstructor, files.map((item) => item['id']))
-			: await this.repositoryFile.delete(files.map((item) => item['id']));
+		if(folders.length > 0) {
+			(utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
+				? await this.queryRunner.manager.delete(this.repositoryConstructor, folders.map((item) => item['id']))
+				: await this.repository.delete(folders.map((item) => item['id']));
+		}
+
+		if(files.length > 0) {
+			(utilsCheckObjQueryRunner(this.queryRunner) && this.enableTransactions === true)
+				? await this.queryRunner.manager.delete(this.repositoryFileConstructor, files.map((item) => item['id']))
+				: await this.repositoryFile.delete(files.map((item) => item['id']));
+		}
 
 		return true;
 	}
@@ -272,5 +278,20 @@ export class FolderService extends FuseService {
 			i++;
 		}
 		return await this.updateProcess(folder['id'], { path: newPath }, payload);
+	}
+
+	protected async dropManyProperties(payload): Promise<object> {
+		return { ...payload, ids: payload['ids'] };
+	}
+
+	protected async dropManyProcess(processedPayload: Array<string>, payload: object): Promise<any> {
+		let i = 0;
+
+		while (i < processedPayload['ids'].length) {
+			await this.dropProcess(processedPayload['ids'][i], payload);
+			i++;
+		}
+
+		return true;
 	}
 }
