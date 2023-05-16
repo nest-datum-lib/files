@@ -216,7 +216,7 @@ export class FileService extends FuseService {
 			: await this.repository.update({ id }, processedPayload);
 	}
 
-	protected async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
+	public async dropProcess(processedPayload: object | string, payload: object): Promise<any> {
 		const id = utilsCheckObjFilled(processedPayload)
 			? String((processedPayload || {})['id'])
 			: String(processedPayload);
@@ -249,5 +249,20 @@ export class FileService extends FuseService {
 			await this.dropProcessPrepare(id);
 		}
 		return entity;
+	}
+
+	protected async dropManyProperties(payload): Promise<object> {
+		return { ...payload, ids: payload['ids'] };
+	}
+
+	protected async dropManyProcess(processedPayload: Array<string>, payload: object): Promise<any> {
+		let i = 0;
+
+		while (i < processedPayload['ids'].length) {
+			await this.dropProcess(processedPayload['ids'][i], payload);
+			i++;
+		}
+
+		return true;
 	}
 }
