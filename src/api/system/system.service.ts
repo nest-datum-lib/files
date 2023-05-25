@@ -188,8 +188,7 @@ export class SystemService extends MainService {
 	}
 
 	private async checkTypeOfEntity(payload: object): Promise<object> {
-		let whatIsType;
-		whatIsType = await this.repositoryFile.findOne({
+		let whatIsType = await this.repositoryFile.findOne({
 			select: {
 				id: true,
 				systemId: true,
@@ -199,7 +198,7 @@ export class SystemService extends MainService {
 			},
 		});
 
-		if(!whatIsType) {
+		if (!whatIsType) {
 			whatIsType = await this.repositoryFolder.findOne({
 				select: {
 					id: true,
@@ -209,10 +208,10 @@ export class SystemService extends MainService {
 					id: payload['id'],
 				},
 			});
-
-			payload['type'] = "folder";
-		} else {
-			payload['type'] = "file";
+			payload['type'] = 'folder';
+		} 
+		else {
+			payload['type'] = 'file';
 		}
 
 		if (whatIsType 
@@ -221,6 +220,7 @@ export class SystemService extends MainService {
 			payload['name'] = `${payload['userId']}.jpg`;
 		}
 
+		console.log('??????', whatIsType, payload);
 
 		return payload;
 	}
