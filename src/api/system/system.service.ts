@@ -188,7 +188,7 @@ export class SystemService extends MainService {
 	}
 
 	private async checkTypeOfEntity(payload: object): Promise<object> {
-		let whatIsType = await this.repositoryFile.findOne({
+		let whatIsType: any = await this.repositoryFile.findOne({
 			select: {
 				id: true,
 				systemId: true,
