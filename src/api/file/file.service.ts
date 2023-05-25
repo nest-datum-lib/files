@@ -116,6 +116,8 @@ export class FileService extends FuseService {
 				},
 			})) || {})['id'];
 		}
+		console.log('createProperties', output, await super.createProperties(output));
+
 		if (output['systemId'] === 'files-system-avatars'
 			|| output['systemId'] === 'files-system-cv') {
 			output['forceName'] = `${payload['userId']}.jpg`;
@@ -134,6 +136,8 @@ export class FileService extends FuseService {
 				id: payload['id'],
 			},
 		});
+
+		console.log('parentFolder', parentFolder);
 
 		if (parentFolder 
 			&& (parentFolder['systemId'] === 'files-system-avatars'
