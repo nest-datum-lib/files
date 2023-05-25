@@ -118,13 +118,13 @@ export class FileService extends FuseService {
 				},
 			})) || {})['id'];
 		}
-		console.log('createProperties', output, await super.createProperties(output));
-
 		if (output['systemId'] === 'files-system-avatars'
 			|| output['systemId'] === 'files-system-cv') {
 			output['forceName'] = `${payload['userId']}.jpg`;
 			output['force'] = true;
 		}
+		console.log('createProperties', output, await super.createProperties(output));
+
 		return await super.createProperties(output);
 	}
 
