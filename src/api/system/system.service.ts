@@ -218,6 +218,7 @@ export class SystemService extends MainService {
 			&& (whatIsType['systemId'] === 'files-system-avatars'
 				|| whatIsType['systemId'] === 'files-system-cv')) {
 			payload['name'] = `${payload['userId']}.jpg`;
+			payload['force'] = true;
 		}
 
 		console.log('??????', whatIsType, payload);

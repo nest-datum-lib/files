@@ -23,7 +23,7 @@ export class FileService extends LocalService {
 
 			if (await this.exists(destinationPath)) {
 				if (!processedPayload['force']) {
-					throw new MethodNotAllowedException(`Folder "${destinationPath}" already exists.`);
+					throw new MethodNotAllowedException(`File "${destinationPath}" already exists.`);
 				}
 				fileNameSplit = fileName.split('.');
 				dbPath = `${processedPayload['path']}/${fileName}`;
