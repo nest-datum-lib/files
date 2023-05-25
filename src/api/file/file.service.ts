@@ -118,9 +118,12 @@ export class FileService extends FuseService {
 				},
 			})) || {})['id'];
 		}
-		if (output['systemId'] === 'files-system-avatars'
-			|| output['systemId'] === 'files-system-cv') {
+		if (output['systemId'] === 'files-system-avatars') {
 			output['forceName'] = `${payload['userId']}.jpg`;
+			output['force'] = true;
+		}
+		else if (output['systemId'] === 'files-system-cv') {
+			output['forceName'] = `${payload['userId']}.pdf`;
 			output['force'] = true;
 		}
 		console.log('createProperties', output, await super.createProperties(output));
@@ -141,11 +144,15 @@ export class FileService extends FuseService {
 
 		console.log('parentFolder', parentFolder);
 
-		if (parentFolder 
-			&& (parentFolder['systemId'] === 'files-system-avatars'
-				|| parentFolder['systemId'] === 'files-system-cv')) {
-			payload['name'] = `${payload['userId']}.jpg`;
-			payload['force'] = true;
+		if (parentFolder) {
+			if (parentFolder['systemId'] === 'files-system-avatars') {
+				payload['name'] = `${payload['userId']}.jpg`;
+				payload['force'] = true;
+			}
+			else if (parentFolder['systemId'] === 'files-system-cv') {
+				payload['name'] = `${payload['userId']}.pdf`;
+				payload['force'] = true;
+			}
 		}
 		return await super.updateProperties(payload);
 	}
