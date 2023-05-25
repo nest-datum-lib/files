@@ -78,7 +78,7 @@ export class FileService extends FuseService {
 		const output = { ...payload };
 
 		if (output['parentId']) {
-			const parentFolder =await this.repositoryFolder.findOne({
+			const parentFolder = await this.repositoryFolder.findOne({
 				select: {
 					id: true,
 					systemId: true,
@@ -88,6 +88,8 @@ export class FileService extends FuseService {
 					id: output['parentId'],
 				},
 			});
+
+			console.log('parentFolder', parentFolder);
 
 			output['systemId'] = parentFolder['systemId'];
 			output['path'] = parentFolder['path'];
