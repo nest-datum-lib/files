@@ -134,7 +134,9 @@ export class FileService extends FuseService {
 			},
 		});
 
-		if (parentFolder && parentFolder['systemId'] === 'files-system-avatars') {
+		if (parentFolder 
+			&& (parentFolder['systemId'] === 'files-system-avatars'
+				|| parentFolder['systemId'] === 'files-system-cv')) {
 			payload['name'] = `${payload['userId']}.jpg`;
 			payload['force'] = true;
 		}

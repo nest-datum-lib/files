@@ -160,14 +160,13 @@ export class SystemService extends MainService {
 
 	protected async dropManyProcess(processedPayload: Array<string>, payload: object): Promise<any> {
 		await Promise.all(payload['ids'].map(async (item) => {
-			let result = await this.checkTypeOfEntity({ "id":item });
+			let result = await this.checkTypeOfEntity({ 'id':item });
 			if(result['type'] === 'file') {
-				await this.dropProcess(result['id'], {...payload, "id": result['id']});
+				await this.dropProcess(result['id'], {...payload, 'id': result['id']});
 			} else {
-				await this.dropProcess(result['id'], {...payload, "id": result['id']});
+				await this.dropProcess(result['id'], {...payload, 'id': result['id']});
 			}
 		}));
-
 		return true;
 	}
 
@@ -175,15 +174,14 @@ export class SystemService extends MainService {
 		const id = utilsCheckObjFilled(processedPayload)
 			? String((processedPayload || {})['id'])
 			: String(processedPayload);
-
 		const checkType = await this.checkTypeOfEntity({ id });
 		
 		if(checkType['type'] === 'file') {
 			await this.fileService.dropProcess(id, {...payload, id});
-		} else {
+		}
+		else {
 			await this.folderService.dropProcess(id, {...payload, id});
 		}
-
 		return true;
 	}
 
@@ -218,11 +216,7 @@ export class SystemService extends MainService {
 			&& (whatIsType['systemId'] === 'files-system-avatars'
 				|| whatIsType['systemId'] === 'files-system-cv')) {
 			payload['name'] = `${payload['userId']}.jpg`;
-			payload['force'] = true;
 		}
-
-		console.log('??????', whatIsType, payload);
-
 		return payload;
 	}
 }
