@@ -116,7 +116,8 @@ export class FileService extends FuseService {
 				},
 			})) || {})['id'];
 		}
-		if (output['systemId'] === 'files-system-avatars') {
+		if (output['systemId'] === 'files-system-avatars'
+			|| output['systemId'] === 'files-system-cv') {
 			output['forceName'] = `${payload['userId']}.jpg`;
 			output['force'] = true;
 		}
