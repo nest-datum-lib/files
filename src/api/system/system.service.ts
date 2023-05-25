@@ -215,9 +215,12 @@ export class SystemService extends MainService {
 			payload['type'] = "file";
 		}
 
-		if (whatIsType && whatIsType['systemId'] === 'files-system-avatars') {
+		if (whatIsType 
+			&& (whatIsType['systemId'] === 'files-system-avatars'
+				|| whatIsType['systemId'] === 'files-system-cv')) {
 			payload['name'] = `${payload['userId']}.jpg`;
 		}
+
 
 		return payload;
 	}
