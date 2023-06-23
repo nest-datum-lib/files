@@ -39,7 +39,15 @@ export class TcpController extends Controller {
 	}
 
 	async one(payload) {
-		return await this.serviceHandlerWrapper(async () => await this.service.one(await this.validateOne(payload)));
+		console.log('zzzzzzzzzzzzzzzzzzzzzzzzzzzz', payload);
+
+		return await this.serviceHandlerWrapper(async () => {
+			console.log('yyyyyyyyyyyyyyyyyyyyyyyyyy', await this.validateOne(payload));
+
+			const output = await this.service.one(await this.validateOne(payload));
+
+			return output;
+		});
 	}
 
 	async drop(payload) {
