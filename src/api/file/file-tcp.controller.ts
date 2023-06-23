@@ -79,7 +79,11 @@ export class FileTcpController extends TcpController {
 	async one(payload) {
 		console.log('payload', payload);
 
-		return await super.one(payload);
+		const output = await super.one(payload);
+
+		console.log('======================================', output);
+
+		return output;
 	}
 
 	@EventPattern('file.drop')

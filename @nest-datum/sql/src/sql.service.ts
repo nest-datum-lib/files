@@ -291,6 +291,8 @@ export class SqlService extends ModelService {
 		if (!output) {
 			return new NotFoundException(`Entity is undefined.`);
 		}
+		console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~222222222', output);
+
 		return output;
 	}
 
