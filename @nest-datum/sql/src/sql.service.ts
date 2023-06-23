@@ -282,7 +282,7 @@ export class SqlService extends ModelService {
 		console.log('>>>>>>>>>>>>>', this.repository, processedPayload);
 		console.log('await this.findOne(processedPayload)', await this.findOne(processedPayload));
 
-		const output = await this.repository.findOne({ id: (await this.findOne(processedPayload))['id'] });
+		const output = await this.repository.findOne(await this.findOne(processedPayload));
 
 		if (output && this.withCache === true) {
 			await this.repositoryCache.create({ key: [ this.prefix(process.env.APP_NAME), 'one', { id: processedPayload['id'] } ], output });
