@@ -279,11 +279,7 @@ export class SqlService extends ModelService {
 				return cachedData;
 			}
 		}
-		console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', await this.findOne(processedPayload));
-
 		const output = await this.repository.findOne(await this.findOne(processedPayload));
-
-		console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~', output);
 
 		if (output && this.withCache === true) {
 			await this.repositoryCache.create({ key: [ this.prefix(process.env.APP_NAME), 'one', { id: processedPayload['id'] } ], output });
@@ -291,8 +287,6 @@ export class SqlService extends ModelService {
 		if (!output) {
 			return new NotFoundException(`Entity is undefined.`);
 		}
-		console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~222222222', output);
-
 		return output;
 	}
 

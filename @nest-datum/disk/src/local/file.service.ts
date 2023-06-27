@@ -22,8 +22,6 @@ export class FileService extends LocalService {
 					: mimetypeSplit[mimetypeSplit.length - 1]) || 'octet-stream';
 
 			if (await this.exists(destinationPath)) {
-				console.log('processedPayload', processedPayload, payload);
-
 				if (!processedPayload['force']) {
 					throw new MethodNotAllowedException(`File "${destinationPath}" already exists.`);
 				}

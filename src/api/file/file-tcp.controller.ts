@@ -77,11 +77,7 @@ export class FileTcpController extends TcpController {
 
 	@MessagePattern({ cmd: 'file.one' })
 	async one(payload) {
-		console.log('payload', payload);
-
 		const output = await super.one(payload);
-
-		console.log('======================================', { ...output });
 
 		return { ...output };
 	}

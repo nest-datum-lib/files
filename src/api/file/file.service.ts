@@ -89,8 +89,6 @@ export class FileService extends FuseService {
 				},
 			});
 
-			console.log('parentFolder', parentFolder);
-
 			output['systemId'] = parentFolder['systemId'];
 			output['path'] = parentFolder['path'];
 		}
@@ -126,8 +124,6 @@ export class FileService extends FuseService {
 			output['forceName'] = `${payload['userId']}.pdf`;
 			output['force'] = true;
 		}
-		console.log('createProperties', output, await super.createProperties(output));
-
 		return await super.createProperties(output);
 	}
 
@@ -141,8 +137,6 @@ export class FileService extends FuseService {
 				id: payload['id'],
 			},
 		});
-
-		console.log('parentFolder', parentFolder);
 
 		if (parentFolder) {
 			if (parentFolder['systemId'] === 'files-system-avatars') {
