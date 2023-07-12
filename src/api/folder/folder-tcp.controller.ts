@@ -13,6 +13,7 @@ import {
 	strDescription as utilsCheckStrDescription,
 } from '@nest-datum-utils/check';
 import { FolderService } from './folder.service';
+import { FolderCreateDto, FolderUpdateDto } from "./folder.dto";
 
 @Controller()
 export class FolderTcpController extends TcpController {
@@ -22,7 +23,7 @@ export class FolderTcpController extends TcpController {
 		super();
 	}
 
-	async validateCreate(options) {
+	async validateCreate(options: FolderCreateDto) {
 		if (!utilsCheckStrId(options['systemId'])) {
 			throw new MethodNotAllowedException(`Property "systemId" is not valid.`);
 		}
@@ -49,7 +50,7 @@ export class FolderTcpController extends TcpController {
 		return await super.validateCreate(options);
 	}
 
-	async validateUpdate(options) {
+	async validateUpdate(options: FolderUpdateDto) {
 		const output = {};
 
 		if (utilsCheckExists(options['name'])) {

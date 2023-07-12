@@ -4,6 +4,7 @@ import {
 	Repository,
 	Connection, 
 	Like,
+	Equal
 } from 'typeorm';
 import { 
 	objQueryRunner as utilsCheckObjQueryRunner,
@@ -26,6 +27,7 @@ import { ProviderProviderProviderOption } from '../provider-provider-provider-op
 import { SystemSystemSystemOption } from '../system-system-system-option/system-system-system-option.entity';
 import { File } from '../file/file.entity';
 import { Folder } from './folder.entity';
+import { FolderCreateDto } from "./folder.dto";
 
 @Injectable()
 export class FolderService extends FuseService {
@@ -293,5 +295,24 @@ export class FolderService extends FuseService {
 		}
 
 		return true;
+	}
+
+	public async create(payload: FolderCreateDto) {
+		const existingFolder: Folder | null = await this.repository.findOne({
+			select: {
+				name: true
+			},
+			where: {
+				name: Equal(payload.name),
+				parentId: Equal(payload.parentId),
+				systemId: Equal(payload.systemId)
+			}
+		});
+
+		if (existingFolder) {
+			throw new MethodNotAllowedException(`Folder with name "${payload.name}" is already exist!`);
+		}
+
+		return super.create(payload);
 	}
 }

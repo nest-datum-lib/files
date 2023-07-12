@@ -18,6 +18,7 @@ import {
 	strName as utilsCheckStrName, 
 	strDescription as utilsCheckStrDescription,
 } from '@nest-datum-utils/check';
+import { FolderCreateDto, FolderUpdateDto } from "./folder.dto";
 
 @Controller(`${process.env.SERVICE_FILES}/folder`)
 export class FolderHttpTcpController extends HttpTcpController {
@@ -29,7 +30,7 @@ export class FolderHttpTcpController extends HttpTcpController {
 		super();
 	}
 
-	async validateCreate(options) {
+	async validateCreate(options: FolderCreateDto) {
 		if (!utilsCheckStrId(options['systemId'])) {
 			throw new MethodNotAllowedException(`Property "systemId" is not valid.`);
 		}
@@ -56,7 +57,7 @@ export class FolderHttpTcpController extends HttpTcpController {
 		return await super.validateCreate(options);
 	}
 
-	async validateUpdate(options) {
+	async validateUpdate(options: FolderUpdateDto) {
 		const output = {};
 
 		if (utilsCheckExists(options['name'])) {

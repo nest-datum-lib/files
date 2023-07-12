@@ -18,6 +18,7 @@ import {
 	arrFilled as utilsCheckArrFilled,
 } from '@nest-datum-utils/check';
 import { FolderService } from './folder.service';
+import { FolderCreateDto, FolderUpdateDto } from "./folder.dto";
 
 @Controller(`/folder`)
 export class FolderHttpController extends HttpController {
@@ -27,7 +28,7 @@ export class FolderHttpController extends HttpController {
 		super();
 	}
 
-	async validateCreate(options) {
+	async validateCreate(options: FolderCreateDto) {
 		const output = {};
 
 		if (utilsCheckExists(options['systemId'])) {
@@ -66,7 +67,7 @@ export class FolderHttpController extends HttpController {
 		};
 	}
 
-	async validateUpdate(options) {
+	async validateUpdate(options: FolderUpdateDto) {
 		const output = {};
 
 		if (utilsCheckExists(options['name'])) {
@@ -97,7 +98,7 @@ export class FolderHttpController extends HttpController {
 		@Body('path') path: string,
 		@Body('name') name: string,
 	) {
-		return await this.serviceHandlerWrapper(async () => await this.service.create(await this.validateCreate({
+		return await this.serviceHandlerWrapper(async () => await this.service.create(<FolderCreateDto>await this.validateCreate({
 			accessToken,
 			id,
 			userId,
