@@ -1,6 +1,6 @@
 // Set these variables if needed.
 def SERVICE_NAME="files" // name of service or project.
-def AGENT_NODE="happ2" // node/slave name where to run this job.
+def AGENT_NODE="happ3" // node/slave name where to run this job.
 
 // DO NOT CHANGE!
 def WORKSPACE_PATH="$JENKINS_HOME/jobs/$JOB_NAME/workspace"
