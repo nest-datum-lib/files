@@ -1,5 +1,5 @@
 # @nest-datum-lib/files
-## File manager.
+## File manager
 
 controller
 jwt
