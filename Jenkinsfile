@@ -26,9 +26,13 @@ pipeline {
             steps {
                 sh "sudo chmod -R o+rw $TARGET_DIST_DEPLOY_PATH"
                 sh "rm -r $TARGET_DIST_DEPLOY_PATH/* || true"
+                sh "rm -r $SERVICE_ROOT/storage/* || true"
 
                 sh "cp -r ./dist/* $TARGET_DIST_DEPLOY_PATH"
-                sh "sudo chown -R $JOB_NAME:$JOB_NAME $TARGET_DIST_DEPLOY_PATH/*"
+                sh "cp -r ./storage/* $SERVICE_ROOT/storage"
+
+                sh "sudo chown -R $JOB_NAME:$JOB_NAME $TARGET_DIST_DEPLOY_PATH"
+                sh "sudo chown -R $JOB_NAME:$JOB_NAME $SERVICE_ROOT/storage"
 
                 script {
                     try {
